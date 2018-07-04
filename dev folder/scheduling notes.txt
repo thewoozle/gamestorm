@@ -1,0 +1,42 @@
+
+
+	LOCATIONS:
+	
+	locations are defined as: function_spaces, event_areas, and event_locations.
+	
+	Venue has function_spaces. convention has event_areas. Events have event_locations. 
+	
+	convention has event_areas, which are related to one or more function_spaces, or may share a function_space
+	
+	an event_location is in one event_area. 
+	
+	each event has one or more event_locations (tables)
+	
+	for example, LARP is an event_area that takes place in several different rooms, each room is a single event_location. 
+	
+	schedulers have access to one or more event_areas. 
+	
+	
+	
+	
+	EVENTS:
+	an event describes one event or game, which may be in multiple event_locations (tables) but in a single event_area
+	
+	
+	
+	DATABASE:
+	locations table has function_spaces tied to venue. 
+	
+	[con]_locations table has convention-specific event_areas and event_locations, with references to venue_function_spaces.
+	
+	[con]_locations table may be copied to the next con. 
+	
+	[con]_events table has event_id, event_location, event info
+	individual events may be copied from one [con]_events table to current table (but not after con has started). 
+	
+	
+	[con]_member_roles table has who is signed-up for, or running each event. 
+	
+	
+	Creating a new con creates new [con] tables. 
+	

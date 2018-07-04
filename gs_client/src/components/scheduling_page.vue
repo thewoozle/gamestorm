@@ -1,0 +1,1344 @@
+
+	<template>
+		<div id="scheduling_page">
+		
+		
+		<span class="section_title">Scheduling Hub</span>
+		
+		
+		<div class="sections">
+			<section class="section scheduling_header">
+
+				<div class="con_controls">
+					<convention_select/>
+				</div>
+				
+				<div class="scheduling_report ">
+					<scheduling_control_panel/>
+				</div>
+			
+			</section>
+			
+			
+			<section class="section scheduling_panel">
+				<div class="tab_box" >
+					<div class="tabs">
+						<button type="button" class="tab_button" :class="schedulingTab == 'alerts'? 'active' : '' " @click="schedulingTab='alerts'">Alerts</button>
+						<button type="button"  class="tab_button" :class="schedulingTab == 'locations'? 'active' : '' "  @click="schedulingTab='locations'">Locations</button>
+						<button type="button"  class="tab_button" :class="schedulingTab == 'events'? 'active' : '' "  @click="schedulingTab='events'">Events</button>
+						<button type="button"  class="tab_button" :class="schedulingTab == 'schedule'? 'active' : '' "  @click="schedulingTab='schedule'">Schedule</button>
+						<button type="button"  class="tab_button" :class="schedulingTab == 'schedulers'? 'active' : '' "  @click="schedulingTab='schedulers'">Schedulers</button>
+					</div>
+					<div class="boxes">
+						<div class="box alerts"  :class="schedulingTab == 'alerts'? 'active' : '' " >
+							ALERTS</br>
+							<p> event submissions, conflicts, scheduler area status </p>
+						</div>
+						
+						
+						<div class="box locations" :class="schedulingTab == 'locations'? 'active' : '' " >
+							LOCATIONS</br>
+							<p>copy-from con dropdown</p>
+							<p>list of locations from venue and con with inline edit/add</p>
+							
+							{{conLocations}}
+							
+							
+							
+						</div>
+						
+						
+						<div class="box events" :class="schedulingTab == 'events'? 'active' : '' " >
+							EVENTS</br>
+							<p>show events by status with edit/create form and one-click status hange</p>
+                     
+                     {{allEvents}}
+						</div>
+						
+						
+						<div class="box schedule" :class="schedulingTab == 'schedule'? 'active' : '' " >
+							SCHEDULE</br>
+							<p>big schedule grid of locations and timeblocks with list of unscheduled events. </p>
+							<p>color-coded event-type, status-flag, presenter, and info-dropdown. </p>
+							<p>click on event to highlight start-time in area. click on location to place event. event may be copied or moved. </p>
+						</div>
+						
+						
+						<div class="box schedule" :class="schedulingTab == 'schedulers'? 'active' : '' " >
+							SCHEDULERS</br>
+							<p>list of areas with schedulers and area status. dropdown to add scheduler for area</p>
+						</div>
+					</div>				
+				</div>
+			
+			
+			
+			</section>
+		
+		
+		
+		
+		</div>
+		
+		
+			<p>big tab-box of locations-manager, event-manager, event-grid</p>
+			
+			
+			
+			<p>Scheduling Panel (create con, like admin panel)</p>
+			<p>select con, show basic events info. and status. </p>
+			<p>edit events, add events, schedule events in big grid</p>
+			
+			<p>{{conEvents}}</p>
+			<p>{{filteredEvents}}</p>
+			
+		
+		</div>
+		
+		
+		
+		
+		
+
+	</template>
+	
+	
+	
+	<script>
+		import Vue from 'vue'
+		import { mapGetters } from 'vuex'
+		import Router from 'vue-router'
+		import convention_select from '@/components/includes/convention_select'
+		import scheduling_control_panel from '@/components/includes/scheduling_control_panel'
+		
+		Vue.use(Router);
+		
+		export default{
+			name: 'scheduling_page',
+			
+			
+			data() {
+				return {
+					selectedCon		: null,
+					schedulingTab	: 'alerts',
+					
+				}
+			},
+			
+			components: {
+				'convention_select'	: convention_select,
+				'scheduling_control_panel' : scheduling_control_panel,
+			},
+			
+			
+			watch: {
+				
+				
+			},
+			
+			created() {
+				var vm = this;
+				vm.check_user();
+				vm.get_scheduling_data();            
+			},
+			
+			computed: {
+				...mapGetters({
+					user        : 'user',
+					conEvents	: 'conEvents',
+					currentCon	: 'currentCon',
+               allEvents   : 'allEvents',
+               conLocations: 'conLocations',
+				}),
+            
+				filteredEvents:  () => {
+					var vm = this;
+					
+					return vm.events;
+				}
+				
+				
+			},
+			
+			
+			
+			methods: {
+				get_scheduling_data() {
+				//GET STORE DATA
+					var vm = this;
+               
+               
+               if (localStorage) {
+						if (localStorage.selectedCon) {
+							var vm = this;
+							vm.selectedCon = localStorage.selectedCon;
+						}
+					}
+					
+					vm.$store.dispatch('get_scheduling_data', vm.selectedCon).then(()=>{});
+					
+				},
+				
+				
+				
+				check_user() {
+					var vm = this;
+					vm.user.permissions.scheduling >= 10? '' : vm.$router.go('/');  
+				},
+			},
+			
+		}
+	</script>
+	
+	
+	<style >
+	
+	
+	
+	
+	
+	
+	/*  -----------------------------------------------------------------------------------------------------
+                                SCHEDULING PAGE
+		-----------------------------------------------------------------------------------------------------    */ 
+	#scheduling_page .page_content {
+		background: #e0f0f3;
+	}
+	
+	
+	.section.scheduling_header {
+		justify-content: space-around;
+		
+		
+	}
+	.scheduling_header  .con_controls {
+		display: flex;
+		
+	}
+	
+	.scheduling_report {
+		width: 100%;
+		max-width: 45rem;
+	}
+	
+	 .section_title {
+		display: block;
+		text-align: center;
+	}
+	
+	
+	.section.scheduling_panel {
+		
+	}
+	
+	.scheduling_panel .tab_box {
+		display: flex;
+		flex-direction: column;
+		padding: 2rem;
+		width: 100%;
+	}
+	.scheduling_panel .tab_box .tabs {
+		display: flex;
+		width: 100%;
+		padding: 0 2rem;
+	}
+	.scheduling_panel .tab_box .tab_button {
+		display: flex;
+		justify-content: center;
+		cursor: pointer;
+		margin: 0 .5rem;
+		border-radius: .15rem;
+		width: 20%;
+		font-size: 1.25rem;
+		height: 2rem;
+		background: rgba(0,118,163,.4);		
+		padding: .25rem .5rem;
+		color: var(--titleColor);
+		letter-spacing: .1em;
+		opacity: .85;
+		text-shadow: -1px -1px rgba(0,0,0,0.25);
+		justify-content: center;
+		align-items: center;
+	}
+	.scheduling_panel .tab_box .tab_button:hover {
+		background: rgba(0,118,163,.1);
+	}
+	.scheduling_panel .tab_box .tab_button.active {
+		background: var(--altBackground);
+		color: var(--button);
+	}
+	.scheduling_panel .tab_box .boxes {
+		position: relative;
+		display: flex;
+		width: 100%;
+		margin: 1rem 0;
+	}
+	.scheduling_panel .tab_box .box {
+		position: absolute;
+			top: 0;
+			left: 0;
+			z-index: -1;
+		opacity: 0;
+		width: 100%;		
+		max-height: 30rem;
+		pointer-events: none;
+		min-height: 30rem;	
+		background: var(--altBackground);
+		color: black;
+		transition: opacity .3s, max-height .3s;
+	}
+	.scheduling_panel .tab_box .box.active {
+		position: relative;
+		z-index: 10;
+		opacity: 1;
+		max-height: 1000rem;
+		border: solid 1px var(--button2);
+	}
+	.scheduling_panel .tab_box p {
+		color: inherit;
+	}
+	
+	
+	
+	
+	
+	
+	/*
+	 .schedule_controls {
+		position: absolute;
+		top: 0;
+		right: 0;		
+	}
+	 .main_content_inner {
+		padding-top: 0;
+	}
+	
+	
+	
+	
+	.section.event_manager .search_bar {
+		width: 100%;
+		height: 6rem;
+		border: solid 1px var(--borderColor);
+		border-radius: var(--borderRadius);
+		background: #7c8390;
+	}
+	.section.event_manager .search_bar .sort_button {
+		color: var(--borderColor2);
+	}
+	.section.event_manager .event_list_wrapper {
+		display: flex;
+		width: 100%;
+		flex-wrap: wrap;
+		margin-top: 1rem;
+	}
+	
+	/*	------	EVENT WRAPPER	------	* /
+	.section.event_manager .event_list,
+	.section.event_manager .event_wrapper {
+		display: flex;
+		width: 100%;
+		flex-wrap: wrap;
+	}
+	.section.event_manager .event_list {
+		max-height: calc(100vh - 6rem);
+		padding: 0 1rem;
+		overflow: hidden;
+		overflow-y: auto;		
+		border: solid 1px #aaa;
+		padding: .5rem 0 .5rem 0;
+		background: #7c8390;
+		border-radius: var(--borderRadius);
+	}
+	.section.event_manager .event_list .event {
+		border-top: solid 1px #ccc;
+		padding-top: .5rem;
+	}
+	.section.event_manager .event_wrapper + .event_wrapper {
+		margin-top: 1rem;
+	}
+	.section.event_manager .event_wrapper  .event {
+		position: relative;
+		display: flex;
+		width: 100%;
+	}
+	.section.event_manager .event_wrapper .status_title {
+		position: relative;
+		display: flex;
+		align-items: flex-end;
+		width: 5%;
+	}
+	.section.event_manager .event_wrapper .status_title .title {
+		display: flex;
+		font-weight: bold;
+		text-transform: uppercase;
+		transform: rotate(-90deg);		
+		transform-origin: 5% 25%;
+	}
+	.section.event_manager .event_wrapper.Unapproved .status_title {
+		background: #4e2f06;
+	}
+	
+	.section.event_manager .event_wrapper .event_content {
+		display: flex;
+		width: 95%;
+		padding-left: .5rem;
+		flex-wrap: wrap;
+	}
+	.section.event_manager .event_wrapper  .event {
+		max-height: 10rem;
+		transition: max-height .4s;
+		overflow: hidden;
+		padding: 0 .5rem 0 0;
+		flex-wrap: wrap;
+	}
+	.section.event_manager .event_wrapper.active .event {
+		max-height: 10rem;
+	}
+	.section.event_manager .event_wrapper.active .status_title ~ .event {
+		max-height: 50rem;
+		overflow-Y: auto;
+	}
+	
+	
+	
+	
+	.section.event_manager .event_wrapper .fields {
+		display: flex;
+		width: 70%;
+		flex-wrap: wrap;
+	}
+	.section.event_manager .event_wrapper .element {
+		display: flex;
+	}
+	.section.event_manager .event_wrapper .event_top {
+		position: relative;
+		display: flex;
+		width: 100%;
+		border-bottom: solid 1px var(--textColor);
+		padding: .25rem 0;
+		margin: 0 0 .5rem 0;
+		justify-content: space-between;
+	}
+	.section.event_manager .event_wrapper .presenter {
+		width: 35%;
+		align-items: center;
+		font-size: .9rem;
+		line-height: 1.1em;
+	}
+	.section.event_manager .event_wrapper .event_name {
+		width: 65%;
+		align-items: center;
+		font-weight: bold;
+		font-size: .9rem;
+		line-height: 1.1em;
+	}
+	.section.event_manager .event_wrapper .event_track,
+	.section.event_manager .event_wrapper .event_type,
+	.section.event_manager .event_wrapper .event_time,
+	.section.event_manager .event_wrapper .event_seats {
+		width: 50%;
+		font-size: .85rem;
+		padding: 0 .25rem;
+	}
+	.section.event_manager .event_list_wrapper .controls {
+		display: flex;
+		width: 30%;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+	}
+	.section.event_manager .event_list_wrapper .controls .text {
+		display: flex;
+	}
+	.section.event_manager .event_list_wrapper .header {
+		padding: 0 1rem;
+	}
+	.section.event_manager .event_list_wrapper .header span {
+		text-transform: uppercase;
+	}
+	.section.event_manager .event_list_wrapper .header .event_top {
+		border: none;
+	}
+	.section.event_manager .event_list_wrapper .header .event_type,
+	.section.event_manager .event_list_wrapper .header .event_time,
+	.section.event_manager .event_list_wrapper .header .event_seats,
+	.section.event_manager .event_list_wrapper .header .event_track,
+	.section.event_manager .event_list_wrapper .header .controls {
+		justify-content: center;
+		font-weight: bold;
+		
+	}
+	.section.event_manager .event_wrapper .controls .control {
+		display: flex;
+		width: 48%;
+		cursor: pointer;
+		background: #fff;
+		border: solid 1px var(--textColor3);
+		color:  var(--textColor3);
+		border-radius: .25rem;
+		padding: .25rem .5rem;
+		margin: .15rem 0;
+		align-items: center;
+		justify-content: center;
+		font-size: .9rem;
+	}
+	.section.event_manager .event_wrapper .controls .control:hover {
+		background: var(--glowColor);
+		color: #fff;
+		text-shadow: -1px -1px 1px rgba(0,0,0,0.1);
+	}
+	
+	.section.event_manager .event_wrapper .controls .control .control {
+		border: none;
+		padding: 0;
+		margin: 0;
+		background: none;
+	}
+	.section.event_manager .event_edit_wrapper {
+		position: relative;
+		display: flex;
+		flex-wrap: wrap;
+		width: 100%;
+		padding: .5rem;
+		border: solid 1px var(--borderColor);
+		background: var(--textColor);
+	}
+	.section.event_manager .event_submission_form {
+		display: flex;
+		flex-wrap: wrap;
+		width: 100%;
+		padding: .5rem;
+		margin-top: 1.5rem;
+	}
+	.section.event_manager .section_title {
+		display: flex;
+		width: 100%;
+		height: 2rem;
+		font-size: 1.5rem;
+	}
+	.section.event_manager .event_submission_form .section_title,
+	.section.event_manager .event_submission_form .subission_intro {
+		display: none;
+	}
+	
+	.section.event_manager  .new_event_button {
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+	.section.event_manager .event_submission_form .close_button {
+			
+	}
+	.section.event_manager .event_submission_form .controls,
+	.section.event_manager .event_submission_form .rows {
+		display: flex;
+		width: 100%;
+		flex-wrap: wrap;
+	}
+	
+	.section.event_manager .event_submission_form .select, 
+	.section.event_manager .event_submission_form .text_box, 
+	.section.event_manager .event_submission_form .textarea {
+		max-width: 25rem;
+	} 
+	.section.event_manager .event_submission_form .checkbox_wrapper {
+		width: 60%;
+	}
+	.section.event_manager .event_submission_form .checkbox_wrapper .checkbox {
+		width: 1.5rem;
+		height: 1.5rem;
+		transform-origin: 0 0;
+		margin: 0 4rem 0 1rem;
+	}
+	.section.event_manager .event_submission_form .label {
+		width: 30%;
+	}
+	.section.event_manager .event_submission_form .form_row {
+		flex-wrap: wrap;
+	}
+	.section.event_manager .event_submission_form .button {
+		color: #fff;
+	}
+	
+	.schedule_settings_section .tab_box  .form .schedulers,
+	.section.event_manager .event_submission_form .presenters {
+		display: flex;
+		width: 100%;
+		align-items: center;
+	}
+	.schedule_settings_section .tab_box  .form .schedulers .select,
+	.section.event_manager .event_submission_form .presenters .select {
+		width: calc(100% - 3rem);
+	}
+	.schedule_settings_section .tab_box  .form .schedulers .remove_button,
+	.section.event_manager .event_submission_form .presenters .remove_button {
+		display: flex;
+		height: 2rem;		
+		width: 2rem;
+		background: var(--warningColor);
+		color: #fff;
+		border-radius: .2rem;
+		margin-left: 2rem;
+		justify-content: center;
+		font-size: 1.75rem;
+		text-shadow: -1px -1px 1px rgba(-1px -1px 1px );
+		text-shadow: 1px 1px 2px rgba(0,0,0,0.25);
+	}
+	.schedule_settings_section .tab_box  .form .schedulers_row .buttons, 
+	.section.event_manager .event_submission_form .presenter_row .buttons {
+		display: flex;
+		width: 100%;
+		justify-content: center;
+	}
+	
+	.section.event_manager .event_submission_form .form_element {
+		width: 100%;
+		flex-wrap: nowrap
+	}
+	.section.event_manager .event_submission_form .split_row .form_element,
+	.section.event_manager .event_submission_form .event_time_element,
+	.section.event_manager .event_submission_form .time_picker_element {
+		width: 50%;
+	}
+	.section.event_manager .event_submission_form  .event_time_row .input_message {
+		display: flex;
+		width: 100%;
+		position: relative;
+		top: 0;
+	}
+	.section.event_manager .event_submission_form .event_time_row {		
+		background: #fff;
+		padding: .25rem;
+		border: solid 1px #ccc;
+		border-radius: .1rem;
+	}
+	.section.event_manager .event_submission_form .event_time_row .title {
+		display: flex;
+		width: 100%;
+		justify-content: center;
+	}
+	.section.event_manager .event_submission_form .event_time_element {
+		flex-wrap: wrap;
+	}
+	.section.event_manager .event_submission_form .event_time_element p {
+		display: flex;
+		width: 100%;
+		font-size: 1.15rem;
+		text-shadow: none;
+		color: var(--button);
+	}
+	.section.event_manager .event_submission_form .form_element + .form_element {
+		margin-top: .75rem;
+	}
+	
+	
+	
+	
+	
+	
+	
+	  .event_list .status_form { 
+		width: 1rem;
+	}
+	  .event_list .element .icon_button { 
+		cursor: pointer;
+		width: 100%;
+		height: 1rem;
+	}
+	  .event_list .element .icon_button .icon_label  { 
+		position: relative;		
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		border: 0;
+	}
+	  .event_list .element .icon_button .checkbox  { 
+		position: absolute;
+			z-index: -1;
+			top: 0;
+			left: 0;
+		opacity: 0;	
+	}
+	
+	/*edit button* /
+	  .event_list .element .icon{ 
+		display: inline-block;
+	}	
+	  .event_list_wrapper.edit .element.edit .fa-pencil-square-o,
+	  .event_list .element.edit .fa-chevron-up { 
+		display: none;
+	}
+	  .event_list_wrapper.edit .element.edit .fa-chevron-up { 
+		display: inline-block;
+	}
+	
+	
+	  .event_list .event_form  { 
+		max-height: 0;
+		overflow: hidden;
+		transition: max-height .4s;
+	}
+	  .event_list_wrapper.edit .event_form  { 
+		max-height: 50rem;
+	}
+	  .event_list{ 
+		
+	}
+   
+    
+   
+   
+	
+	/*  -----------------------------------------------------------------------------------------------------
+                                SCHEDULING GRID
+		-----------------------------------------------------------------------------------------------------    * / 
+		
+	_grid_page _grid {
+		visibility: hidden;
+	}
+	_grid_page.loaded _grid  {
+		visibility: visible;
+	}
+	
+	_grid_page .main_content {
+		padding: 0;
+		height: calc(100% - 6rem);
+		min-height: auto;
+		margin-top: 6rem;
+	}
+	_grid_page .page_header {
+		margin-top: 0;
+	}
+	_grid_page .page_content {
+		overflow-y: hidden;
+		padding: 0;
+	}
+	_grid_page .main_content_inner,
+	_grid_page .sections,
+	_grid_page .section_content,
+	.section_grid {
+		max-width: 100%;
+		width: 100%;
+		height: 100%;
+		padding: 0;
+	} 
+	_grid_page .section_wrapper {
+		height: 100%;
+	}
+	
+	_grid_page .section_content{
+		display: flex;
+		padding-bottom: 5rem;
+	}
+	
+	.section_grid .location_wrapper {
+		position: relative;
+		display: flex;
+		width: 100%;
+		flex-wrap: wrap;
+	}
+	.section_grid .location_wrapper + .location_wrapper {		
+		margin-top: .5rem;
+		border-top: solid px var(--borderColor);
+		padding-top: 1rem;
+	}
+	.section_grid .location_wrapper .location {
+		padding: .73rem 0;
+		width: 100%;
+	}
+	.section_grid .grid_wrapper {
+		display: flex;
+		position: relative;
+		justify-content: space-between;
+		overflow: hidden;
+		overflow: auto;
+		width: 100%;
+		height: 100%;
+	}
+	
+	.section_grid .grid_wrapper .loading {
+		position: fixed;
+			top: 6rem;
+			left: 0;
+			z-index: 100;
+		width: 100vw;
+		height: calc(100vh - 6rem);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 4rem;
+		color: #f0f0f0;
+		text-shadow: -1px -1px 1px rgba(0,0,0,0.1);
+		background: rgba(0,0,0,0.25);
+	}
+	.section_grid .grid_wrapper.show .loading {
+		display: none;
+	}
+	.section_grid .event_grid {
+		position: relative;
+		display: none;		
+		flex-wrap: wrap;
+		width: 100%;
+		overflow: hidden;
+	}
+	.section_grid .grid_wrapper.show .event_grid {
+		display: flex;
+		align-items: flex-start;
+	}
+	.section_grid .event_grid .grid_content {
+		flex-wrap: wrap;
+		position: relative;
+		overflow: hidden;
+		overflow-Y: auto;
+	}
+	.section_grid  {
+		position: relative;
+		height: 100%;
+		width: 100%;
+		overflow: auto;
+		flex-wrap: wrap;
+		padding: 0 0 1rem 0;
+		background: #fff;
+		border-radius: .2rem;
+		border: solid 1px var(--borderColor);
+	}
+	.section_grid .grid {
+		position: absolute;
+			top: 0;
+			left: 0;
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		border-left: solid 2px #555;
+		background: #ffffe7;
+	}	
+	.section_grid .grid .location_names {
+		display: flex;
+		flex-direction: column;
+		width: 8rem;	
+		padding-bottom: 1rem;
+		margin-bottom: .25rem;
+	}
+	.section_grid .grid .location_names .location_wrapper {
+		width: 100%;
+	}
+	.section_grid .grid .location_names .sub_location_wrapper {
+		display: flex;
+		width: 100%;
+	}
+	
+	.section_grid .location_wrappers {
+		display: flex;
+		overflow: hidden;
+		overflow-x: auto;
+		padding-bottom: 1rem;
+		margin-bottom: .25rem;
+		width: calc(100% - 8rem);
+	}
+	.section_grid .scroller {
+		position: relative;
+			top: 0;
+			left: 8rem;
+			z-index: 10;
+		overflow: hidden;
+		overflow-x: auto;
+		height: 1rem;
+		background: #666;
+		border: solid 1px var(--borderColor);
+		border-radius: .25rem;
+		width: calc(100% - 9rem);
+	}
+	.section_grid .scroller .scroll_body {
+		width: 100rem;
+		display: inline-block;
+	}
+	.section_grid .location_wrappers .wrappers {
+		display: flex;
+		flex-direction: column;
+	}
+	.section_grid .location_wrapper {
+		display: flex;
+		width: 80%;
+		color: #333;
+		flex-wrap: wrap;
+	}
+	
+	.section_grid .location_title {
+		display: flex;
+		width: 100%;
+		font-size: 1rem;
+		height: 1.5rem;
+		font-weight: bold;
+		align-items: center;
+		white-space: nowrap;
+		color: var(--button);
+		text-transform: uppercase;
+		border-top: solid 1px var(--highlightColor);
+		border-bottom: solid 1px var(--highlightColor);
+		line-height: 1.5rem;
+		padding: .25rem .5rem;
+	}
+	.section_grid .sublocation_title {
+		color: #333;
+		display: flex;
+		width: 100%;
+		padding: 0 0 0 1rem;
+	}
+	
+	.section_grid .grid_header {
+		display: flex;
+		width: 100%;
+		position: relative;
+		height: 4.5rem;
+		flex-wrap: nowrap;
+		border-bottom: solid 2px #ccc;
+	}
+	.section_grid .grid_header .title {
+		align-items: flex-end;
+	}
+	.section_grid .grid_header .grid_row {
+		display: flex;
+		flex-wrap: nowrap;
+	}
+	.section_grid .grid_header .days {
+		display: flex;
+		background: #777;
+	}
+	.section_grid .grid_header .day {
+		display: flex;
+		flex-wrap: wrap;
+	}
+	.section_grid .grid_header .day_name {
+		display: flex;
+		width: 100%;
+		background: var(--highlightColor);
+		padding: .15rem 0;
+		justify-content: space-around;
+	}
+	.section_grid .grid_header .days {
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+	.section_grid .grid_header .day_name .day_wrapper {
+		display: flex;
+		color: #5a5a5a;
+	}
+	.section_grid .grid_header .day_name .text{
+		display:flex;
+		text-transform: uppercase;
+		letter-spacing: .1rem;
+		font-weight: bold;
+	}
+	.section_grid .grid_header .day_name .date{
+		display: flex;
+		padding: 0 .35rem;
+		font-style: italic;
+		white-space: nowrap;
+	}
+	.section_grid .grid_header .times {
+		display: flex;
+		width: 100%;
+	}
+	.section_grid .grid_header .day .time_wrapper {
+		display: flex;	
+		background: var(--button);
+	}
+	.section_grid .grid_header .time_wrapper .time {		
+	display: flex;
+		width: 4rem;
+		font-size: .75rem;
+		align-items: center;
+		justify-content: flex-end;
+		color: #fff;
+	}
+	.section_grid .grid_content {
+		display: flex;
+		width: 100%;
+		height: calc(100% - 4.5rem);
+		margin-top: auto;
+	}
+	.section_grid .location_row {
+		display: flex;
+		height: 1.5rem;
+		flex-wrap: nowrap;
+		justify-content: flex-start;
+		border-top: solid 1px #ccc;
+		border-bottom: solid 1px #ccc;
+	}
+	.section_grid .location_row + .location_row {
+		margin-top: .25rem;
+	}
+	.section_grid .grid_header .title,	
+	.section_grid .location_row .sublocation_title {
+		display: flex; 
+		width: 100%;
+		justify-content: flex-end;
+		padding: 0 1rem 0 0;
+		color: var(--borderColor2);
+	}
+	.section_grid .times {
+		display: flex;
+		
+	}
+	.section_grid .sub_location_wrapper,
+	.section_grid .days {
+		display: flex;
+		height: 1.5rem;
+	}
+	.section_grid .day {
+		display: flex; 
+		border-right: solid 1px #eee;
+		border-left: solid 1px #eee;
+	}
+	.section_grid .day + .day{
+		margin-left: 4px;
+		
+	}
+	.section_grid  .day .time_wrapper {
+		position: relative;
+		display: flex; 
+		width: 5rem;
+		height: 1.5rem;		
+		padding-right: .5rem;
+		justify-content: center;
+		background: #fff;
+		color: black;
+	}
+	.section_grid  .day .time_wrapper + .time_wrapper {
+		border-left: solid 1px #ccc;
+	}
+	
+	.section_grid   .event_card {
+		position: absolute;
+			top: 0;
+			left: 0;
+			z-index: 10;
+		display: flex;
+		height: 100%;
+		z-index: 10;
+		border: solid 1px red;
+		color: black;
+		background: #f9f9e5;		
+		transition:z-index .4s;
+	}
+	.section_grid .event_card:focus,
+	.section_grid .event_card:hover {
+		z-index: 100;
+	}
+	.section_grid   .event_card .buttons {
+		position: absolute;
+		top: -1rem;
+		left: 100%;
+		display: none;
+		padding: .5rem .5rem 5.rem 0 ;
+		width: 2rem;
+		flex-wrap: wrap;
+	}
+	
+	.section_grid .event_card:focus .buttons,
+	.section_grid .event_card:hover .buttons {
+		display: flex;
+		cursor: pointer;
+	}
+	.section_grid   .event_card .buttons .event_button {
+		width: 1.5rem;
+		height: 1.5rem;
+		display: flex;
+		margin: .1rem;
+		box-shadow: 1px 1px 2px rgba(0,0,0,0.25);
+		border-radius: .2rem;
+	}	
+	.section_grid   .event_card .buttons .edit_button {
+		color: #fff;
+		text-shadow: -1px -1px 1px rgba(0,0,0,0.1);
+		background: var(--textColor3);
+	}
+	.section_grid  .card_content {
+		max-height: 100%;
+		overflow: hidden;	
+height: 10rem;		
+		transition: max-height .4s		
+	}
+	.section_grid   .event_card:focus .card_content,
+	.section_grid   .event_card:hover .card_content {
+		z-index: 100;
+		max-height: 25rem;
+	}
+	.section_grid   .event_card .event_name {
+		display: flex;
+		width: 100%;
+		color: var(--button);
+		flex-wrap: wrap;
+	}
+	.section_grid   .event_card {
+		
+	}
+	.section_grid .events_wrapper {
+		display: flex;
+		flex-direction: column;
+		width: 20%;
+		height: (100vh - 6rem);
+		overflow: hidden;
+		overflow-Y: auto;
+		flex-wrap: wrap;
+	}
+	.section_grid .event_wrapper {
+		display: flex;
+		width: 100%;
+		align-items: flex-start;
+	}
+	.section_grid .event_wrapper + .event_wrapper {
+		margin-top: .5rem;
+	}
+	.section_grid .event_wrapper .event {
+		border-top: solid 1px var(--borderColor);
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		width: 100%;
+		padding: .5rem;
+		margin: .5rem 0;
+		color: black;
+	}
+	.section_grid .event_wrapper .event .row {
+		display: flex;
+		width: 100%;
+		align-items: center;
+		justify-content: space-between;
+		color: var(--mainColor);
+	}
+	.section_grid .event_wrapper .event .row + .row {
+		margin-top: .25rem;
+	}
+	.section_grid .event_wrapper .name_row {
+		justify-content: space-between;
+	}
+	.section_grid .event_wrapper .event_title {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		font-size: .85rem;
+		line-height: 1em;		
+		font-weight: bold;
+		width: 74%;
+		padding-bottom: .15rem;
+	}
+	.section_grid .event_wrapper .event_tag {
+		display: flex;
+		align-items: center;
+		width: 25%;
+		justify-content: center;
+	}
+	.section_grid .event_wrapper .event_location {
+		display: flex;
+		width: 100%;
+		color: #000;		
+	}
+	.section_grid .event_wrapper .event_location .select {
+		border: solid 1px var(--borderColor);
+		width: 100%;
+		border-radius: .15rem;
+		color: #333;
+	}
+	.section_grid .event_wrapper .event_location .select optgroup,
+	.section_grid .event_wrapper .event_location .select option {
+		color: inherit;
+	}
+	.section_grid .event_wrapper .event .event_time {
+		display: flex;
+		width: 100%;
+		font-size: .85rem;
+		justify-content: center;
+	}
+	
+	
+	
+	/*  -----------------------------------------------------------------------------------------------------
+                                SCHEDULING SETTINGS PAGE
+		-----------------------------------------------------------------------------------------------------    * / 
+	.schedule_settings_section .tab_box {
+		display: flex;
+		flex-wrap: wrap;		
+	}
+	.schedule_settings_section .tab_box .tabs {
+		position: relative;
+		z-index: 10;
+		display: flex;		
+		transform:translateY(1px);
+	}
+	.schedule_settings_section .tab_box .tabs .tab {
+		display: flex;
+		border: solid 1px #a1a8b6;
+		border-radius: .15rem .15rem 0 0;
+		cursor: pointer;
+		color: #fff;
+		text-shadow: -1px -1px 1px rgba(0,0,0,0.15);
+		padding: .25rem .5rem;		
+		background: #c1c9da;
+		transition: border-bottom .3s, background .3s, color .3s, text-shadow .3s;
+	}
+	.schedule_settings_section .tab_box .tabs .tab + .tab{
+		margin-left: .2rem;
+	}
+	.schedule_settings_section .tab_box .boxes {
+		display: flex;
+		position: relative;
+		min-height: 25rem;
+		width: 100%;
+		border: solid 1px #a1a8b6;
+		border-radius: 0 .25rem .25rem .25rem;
+		background: #fff;
+	}	
+	.schedule_settings_section .tab_box .boxes .box {
+		position: absolute;
+			top: 0;
+			left: 0;
+			z-index: -1;
+		width: 100%;
+		min-height: 25rem;
+		display: flex;
+		flex-wrap: wrap;
+		opacity: 0;
+		padding: 1rem 2rem;
+		transition: opacity .3s, z-index .3s, position.3s;
+	}
+	.schedule_settings_section .tab_box .box_title {
+		display: flex;
+		width: 100%;
+		justify-content: center;
+		font-size: 3rem;
+		line-height: 1em;
+		color: var(--textColor2);
+	}
+	
+	.schedule_settings_section .tab_box .form_wrapper {
+		display: flex;
+		flex-direction: column;
+		width: 60%;
+		padding: .5rem;
+		border: solid 2px #ccc;
+		border-radius: .25rem;
+	}
+	.schedule_settings_section .tab_box .form_wrapper .message {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		z-index: 20;
+		color: #c00;
+		padding: .25rem 0;
+		background: rgba(255,255,0,.5);
+		text-align: center;
+	}
+	.schedule_settings_section .tab_box .form {
+		display: flex;
+		flex-wrap: wrap;
+		height: 100%;
+		width: 100%;
+		padding: .5rem 1rem;
+	}
+	.schedule_settings_section .tab_box .form_content {
+		display: flex;
+		flex-wrap: wrap; 
+		flex-direction: column;
+		width: 70%;
+	}
+	.schedule_settings_section .tab_box  .form .controls {
+		position: relative;
+		display: flex;
+		justify-content: flex-start;
+		width: 25%;
+		margin: 0 0 0 5%;
+		padding: 0;
+		flex-direction: column;
+	}
+	.schedule_settings_section .tab_box  .form .controls .button {
+		width: 100%;
+		color: var(--button);
+	}
+	.schedule_settings_section .tab_box  .form .controls .button:hover {
+		color: #fff;
+		text-shadow: -1px -1px 1px rgba(0,0,0,0.25);
+	}
+	.schedule_settings_section .tab_box  .form .controls .button + .button {
+		margin-top: 1rem;
+	}
+	.schedule_settings_section .tab_box  .form .controls .save_button {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+	}
+	.schedule_settings_section .tab_box  .form .label {
+		width: 7rem;
+	}	
+	.schedule_settings_section .tab_box  .form .select,
+	.schedule_settings_section .tab_box  .form .textarea,
+	.schedule_settings_section .tab_box  .form .text_box {
+		
+	}
+	.schedule_settings_section .tab_box .button_wrapper {
+		display: flex;
+		width: 40%;
+		justify-content: center;
+		max-height: 35rem;
+		overflow: hidden;
+		overflow-Y: auto;
+	}
+	.schedule_settings_section .tab_box .button_wrapper .buttons {
+		display: flex;
+		flex-direction: column;
+	}
+	.schedule_settings_section .tab_box .option_button {
+		display: flex;
+		width: 100%;
+		color: var(--button);
+		cursor: pointer;
+		flex-shrink: 0;
+		padding: .25rem .5rem;
+		justify-content: space-between;
+		border: solid 1px #a1a8b6;
+		border-radius: .25rem;
+	}
+	.schedule_settings_section .tab_box .option_button:hover {
+		background: #ccc;
+		color: #fff;
+		text-shadow: -1px -1px 1px rgba(0,0,0,0.25);
+	}
+	.schedule_settings_section .tab_box .option_button + .option_button {
+		margin-top: .25rem;
+	}
+	.schedule_settings_section .tab_box .option_button .text{
+		display: flex;
+	}
+	
+	
+	
+	.schedule_settings_section .tab_box.tracks .tab.tracks,
+	.schedule_settings_section .tab_box.schedulers .tab.schedulers
+	.schedule_settings_section .tab_box.types .tab.types,
+	.schedule_settings_section .tab_box.tables .tab.tables,
+	.schedule_settings_section .tab_box.locations .tab.locations,
+	.schedule_settings_section .tab_box.areas .tab.areas {		
+		border-bottom: solid 1px #fff;
+		background: #fff;
+		color: #818cc3;
+		text-shadow: none;
+	}
+	.schedule_settings_section .tab_box.schedulers .box.schedulers,
+	.schedule_settings_section .tab_box.types .box.types,
+	.schedule_settings_section .tab_box.tracks .box.tracks,
+	.schedule_settings_section .tab_box.tables .box.tables,
+	.schedule_settings_section .tab_box.locations .box.locations,
+	.schedule_settings_section .tab_box.areas .box.areas {		
+		opacity: 1;
+		z-index: 10;
+		position: relative;
+	}
+	
+	*/
+	
+	
+	</style>

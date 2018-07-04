@@ -1,0 +1,14 @@
+
+
+
+	import conventions table
+	
+	rename GS_21 to GS_21_membership
+
+	rename event_members to gs20_event_member_roles
+	
+	
+	
+	rename roles -> permissions and replace, change 'uuid' to 'perm_uuid'
+	
+	

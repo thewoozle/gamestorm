@@ -1,0 +1,136 @@
+
+	/*------	BANGERS	------*/
+	@font-face {
+		font-family: Bangers;
+		src: url(../fonts/Bangers/Bangers-Regular.ttf);		
+	}
+	
+	/*------	QUATTROCENTO	------*/
+	@font-face {
+		font-family: Quattrocento;  
+		src: url(../fonts/Quattrocento/Quattrocento-Regular.ttf);		
+		font-weight: normal;
+		font-style: normal;
+	}
+	@font-face {
+		font-family: Quattrocento;  
+		src: url(../fonts/Quattrocento/Quattrocento-Bold.ttf);		
+		font-weight: bold;
+	}
+	/*------ AV Quest	------	*/
+	@font-face {
+		font-family: Avquest;
+		src: url(../fonts/Avquest.ttf);	
+		font-weight: normal;
+		font-style: normal;
+	}
+	
+	
+	
+	/*------	DOSIS	------*/	
+	@font-face {
+		font-family: Dosis;  
+		src: url(../fonts/Dosis/Dosis-Regular.ttf);		
+		font-weight: normal;
+		font-style: normal;
+	}
+	@font-face {
+		font-family: Dosis;  
+		src: url(../fonts/Dosis/Dosis-Medium.ttf);		
+		font-weight: 500;
+		font-style: normal;
+	}
+	@font-face {
+		font-family: Dosis;  
+		src: url(../fonts/Dosis/Dosis-Light.ttf);		
+		font-weight: 300;
+		font-style: normal;
+	}
+	@font-face {
+		font-family: Dosis;  
+		src: url(../fonts/Dosis/Dosis-ExtraLight.ttf);		
+		font-weight: 200;
+		font-style: normal;
+	}
+	@font-face {
+		font-family: Dosis;  
+		src: url(../fonts/Dosis/Dosis-Bold.ttf);		
+		font-weight: normal;
+		font-style: normal;
+	}
+	@font-face {
+		font-family: Dosis;  
+		src: url(../fonts/Dosis/Dosis-SemiBold.ttf);		
+		font-weight: normal;
+		font-style: normal;
+	}
+	
+	/*------	LoversQuarrel	------*/
+	@font-face {
+		font-family: LoversQuarrel;
+		src: url(../fonts/LoversQuarrel/LoversQuarrel-Regular.ttf);
+	}
+	
+	/* ------	SOURCE SANS PRO	------ */
+	@font-face {
+		font-family: 'Source Sans Pro';  
+		src: url(../fonts/SourceSansPro/SourceSansPro-Regular.ttf);		
+		font-weight: normal;
+		font-style: normal;
+	}
+	@font-face {
+		font-family: 'Source Sans Pro';  
+		src: url(../fonts/SourceSansPro/SourceSansPro-Italic.ttf);		
+		font-weight: normal;
+		font-style: italic;
+	}
+	
+	@font-face {
+		font-family: 'Source Sans Pro';  
+		src: url(../fonts/SourceSansPro/SourceSansPro-ExtraLight.ttf);		
+		font-weight: 200;
+		font-style: normal;
+	}
+	@font-face {
+		font-family: 'Source Sans Pro';  
+		src: url(../fonts/SourceSansPro/SourceSansPro-ExtraLightItalic.ttf);		
+		font-weight: 200;
+		font-style: italic;
+	}
+	@font-face {
+		font-family: 'Source Sans Pro';  
+		src: url(../fonts/SourceSansPro/SourceSansPro-Light.ttf);		
+		font-weight: 300;
+		font-style: normal;
+	}
+	@font-face {
+		font-family: 'Source Sans Pro';  
+		src: url(../fonts/SourceSansPro/SourceSansPro-LightItalic.ttf);		
+		font-weight: 300;
+		font-style: italic;
+	}
+	
+	@font-face {
+		font-family: 'Source Sans Pro';  
+		src: url(../fonts/SourceSansPro/SourceSansPro-SemiBold.ttf);		
+		font-weight: 600;
+		font-style: normal;
+	}
+	@font-face {
+		font-family: 'Source Sans Pro';  
+		src: url(../fonts/SourceSansPro/SourceSansPro-SemiBoldItalic.ttf);		
+		font-weight: 600;
+		font-style: italic;
+	}
+	@font-face {
+		font-family: 'Source Sans Pro';  
+		src: url(../fonts/SourceSansPro/SourceSansPro-Bold.ttf);		
+		font-weight: bold;
+		font-style: normal;
+	}
+	@font-face {
+		font-family: 'Source Sans Pro';  
+		src: url(../fonts/SourceSansPro/SourceSansPro-BoldItalic.ttf);		
+		font-weight: bold;
+		font-style: italic;
+	}
