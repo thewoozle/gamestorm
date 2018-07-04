@@ -86,7 +86,6 @@
 			// GET STORE DATA FOR VUEX  
 			get_store_data() {
 				var vm = this;
-            console.log(vm.$store);
 				vm.$store.dispatch('get_site_data').then(() => {
 					vm.handle_page_load(); 
 					vm.set_page_type(this.$route.name);

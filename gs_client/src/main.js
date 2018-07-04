@@ -13,7 +13,7 @@
 	
 	Vue.use(VueAxios, Axios)
 	Vue.use(Vuex)	
-	new Vue(Vue.util.extend({ router }, App)).$mount('#app');
+	//new Vue(Vue.util.extend({ router }, App)).$mount('#app');
 	Vue.config.productionTip = false;
 	
 	Vue.mixin({
