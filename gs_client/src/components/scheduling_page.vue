@@ -37,12 +37,14 @@
 						
 						
 						<div class="box locations" :class="schedulingTab == 'locations'? 'active' : '' " >
-							LOCATIONS for [convention] at [venue] </br>
-							<p>option to copy from a con [con dropdown]</p>
-							<p>list of locations from venue and con with inline edit/add</p>
+							LOCATIONS for {{currentCon.name+' '+currentCon.con_num}} at {{currentVenue.venue_name}} </br>
+							<pre style="color: black;">option to copy from a con [con dropdown]
+							list of locations from venue and con with inline edit/add
+                        CRUD locations except venue locations
+                     </pre>
 							
 							<div class="" v-for="location in conLocations">
-                     {{location.location_type}} - {{location.location_name}} - {{location.location_tag}}<br />
+                     <p style="color: #222;">{{location.location_type}} - {{location.location_name}} - {{location.location_tag}}</p>
                      </div>
 							
 							
@@ -123,6 +125,7 @@
 				return {
 					selectedCon		: null,
 					schedulingTab	: 'alerts',
+               selectedVenue  : {},
 					
 				}
 			},
@@ -141,8 +144,13 @@
 			created() {
 				var vm = this;
 				vm.check_user();
-				vm.get_scheduling_data();            
+				vm.get_scheduling_data();    
 			},
+         
+         mounted() {
+            var vm = this;
+            
+         },
 			
 			computed: {
 				...mapGetters({
@@ -151,13 +159,23 @@
 					currentCon	: 'currentCon',
                allEvents   : 'allEvents',
                conLocations: 'conLocations',
+               venues      : 'venues',
 				}),
             
 				filteredEvents:  () => {
 					var vm = this;
 					
 					return vm.events;
-				}
+				},
+            
+            currentVenue() {
+               var   vm = this,
+                     currentVenue;                     
+               Object.entries(vm.venues).forEach(([key, venue]) => {
+                  venue.id == vm.currentCon.venue? currentVenue = venue : '';
+               });               
+               return currentVenue;
+            }
 				
 				
 			},

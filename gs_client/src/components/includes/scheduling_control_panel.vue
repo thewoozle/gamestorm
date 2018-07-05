@@ -5,8 +5,8 @@
 			<div class="mini_report ">
 			
 				<div class="report_widget event_breakdown">
-					<span class="widget_title">Events Breakdown {{currentCon.short_name? currentCon.short_name : ''  }}</span>
-					<div class="elements"  v-if="conEvents">
+					<div class="elements"  v-if="conEvents && conEvents.length >0">
+                  <span class="widget_title">Events Breakdown {{currentCon.short_name? currentCon.short_name : ''  }}</span>
 						<div class="info_wrapper">
 							<div class="info_element">
 								<div class="info_item">
@@ -44,7 +44,7 @@
 							</div>	
 					</div>
 					<div  v-else class="info">
-						<span class="name">No Events for {{currentCon.short_name}}</span>
+						<span class="widget_title">No Events listed for {{currentCon.short_name}}</span>
 					</div>	
 				</div>					
 				
@@ -157,7 +157,7 @@
 						vm.eventReport.hasTable 		=0;
 						vm.eventReport.assigned 		=0;
 						
-						if(vm.conEvents.length > 0) {
+						if(vm.conEvents && vm.conEvents.length > 0) {
 							vm.conEvents.forEach(function(thisEvent){
 								/*	event status: 	0 = unapproved, 20 = approved, 
 													30 = pendingAssignment , 31 = scheduled, 32 = has Location,   
