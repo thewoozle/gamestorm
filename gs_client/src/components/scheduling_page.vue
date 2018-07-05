@@ -37,11 +37,13 @@
 						
 						
 						<div class="box locations" :class="schedulingTab == 'locations'? 'active' : '' " >
-							LOCATIONS</br>
-							<p>copy-from con dropdown</p>
+							LOCATIONS for [convention] at [venue] </br>
+							<p>option to copy from a con [con dropdown]</p>
 							<p>list of locations from venue and con with inline edit/add</p>
 							
-							{{conLocations}}
+							<div class="" v-for="location in conLocations">
+                     {{location.location_type}} - {{location.location_name}} - {{location.location_tag}}<br />
+                     </div>
 							
 							
 							

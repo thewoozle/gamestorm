@@ -204,9 +204,8 @@
 		// SET SITE DATA
 		set_site_data: (state, {info, pageContent, conventions, articles}) => {
 			state.conventionInfo= info;
-			state.currentCon 	= info;
 			state.conventions	= conventions;
-			
+			state.currentCon = info;
 			// set current con as selected con for scheduling if no prev. selection
 			if(localStorage) {
 				if(!localStorage.selectedCon) {

@@ -4,7 +4,7 @@
    if(location.hostname == 'localhost') {
       domainLocation = 'http://localhost:8000/api/';
    } else {
-      domainLocation = '/api/';
+      domainLocation = '/public/api/';
    }
    
    console.log('host: '+location.hostname);
