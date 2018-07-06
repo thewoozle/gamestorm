@@ -46,7 +46,6 @@
 		
 		// GET SITE DATA
 		get_site_data ({commit}) {
-			return new Promise((resolve, reject) => {
 				Axios.get(apiDomain+ '_get_site_data').then((response) => {
 					commit('set_site_data', {
 						info		: response.data.convention, 
@@ -55,11 +54,9 @@
 						articles 	: response.data.articles,
 					});
                console.log(response.data);
-					resolve();
 			  }, (err) => {
-				  console.log(err.statusText);
+				  console.log('error: '+err.statusText);
 			  });
-			});
 		},
 		
 		// GET EVENTS
