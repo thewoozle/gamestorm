@@ -52,6 +52,7 @@
 							
 							<div class="dropdown_section login_section" :class="{'show': dropdownSection == 'login'}">
 								<form method="post" @submit.prevent="submit_login">
+                        
 									<div class="form_row">
 										<label for="email">Email</label>
 										<div class="input_wrapper">
@@ -215,63 +216,67 @@
 								SUBMIT LOGIN	
 					-----------------------------------------------------------	*/
 				submit_login(e) {
-					var vm = this;
+					var vm = this,
+                  loginInfo = {
+                     email	: this.email,
+                     password: this.password
+                  };                  
+                  
 					vm.submitErrors = {};
 					vm.showLoginLoading = true;
 					
-					// clear user in store
-					vm.$store.dispatch('update_user', {});
+					vm.$store.dispatch('submit_login', loginInfo);
 					
-					vm.formData = {
-						email	: this.email,
-						password: this.password
-					}							
+					// vm.formData = {
+						// email	: this.email,
+						// password: this.password
+					// }							
 							
-					Axios.post(apiDomain+ '_login', vm.formData)
-					.then((response) => {
-						vm.showLoginLoading = false;
+					// Axios.post(apiDomain+ '_login', vm.formData)
+					// .then((response) => {
+						// vm.showLoginLoading = false;
 						
-						if (response.data.response.message) {
+						// if (response.data.response.message) {
 							
-							// show response message for two seconds
-							vm.formMessage = response.data.response.message;							
-							vm.$refs.loginMessage.classList.add('show');
-							setTimeout(function() {
-								vm.$refs.loginMessage.classList.remove('show');
-							},2000);
-						}	
+							// // show response message for two seconds
+							// vm.formMessage = response.data.response.message;							
+							// vm.$refs.loginMessage.classList.add('show');
+							// setTimeout(function() {
+								// vm.$refs.loginMessage.classList.remove('show');
+							// },2000);
+						// }	
 							
-						// returns multiple users sharing email
-						if (response.data.response.users) {
-							vm.loginUsers = response.data.response.users;
+						// // returns multiple users sharing email
+						// if (response.data.response.users) {
+							// vm.loginUsers = response.data.response.users;
 							
-						// returned single user, log that person in 	
-						} else if (response.data.user) {	
-							vm.$store.dispatch('update_user', response.data.user );
+						// // returned single user, log that person in 	
+						// } else if (response.data.user) {	
+							// vm.$store.dispatch('update_user', response.data.user );
 							
-							Vue.ls.set('user', response.data.user, (60*60*1000) *2); // one hour
+							// Vue.ls.set('user', response.data.user, (60*60*1000) *2); // one hour
 							
-							// start one-hour-and-two-minutes timer then log-out 
-							setTimeout(function() {
-								console.log('LOG OUT timer expired');
-								vm.logout();					
-							},(61*60*1000) * 2);
+							// // start one-hour-and-two-minutes timer then log-out 
+							// setTimeout(function() {
+								// console.log('LOG OUT timer expired');
+								// vm.logout();					
+							// },(61*60*1000) * 2);
 							
-							vm.loginUsers = {};
+							// vm.loginUsers = {};
 						
-						// no users, clear variables just to be safe
-						} else {
-							vm.loginUsers = {};								
-						}
+						// // no users, clear variables just to be safe
+						// } else {
+							// vm.loginUsers = {};								
+						// }
 						
-					}, (err) => {
+					// }, (err) => {
 						
-						// set validation errors to submitErrors object, which will display under input box until clicked-on
-						if (err.response.data.errors) {
-						vm.submitErrors = err.response.data.errors;
-						vm.showLoginDropdown = false; 
-						}
-					});
+						// // set validation errors to submitErrors object, which will display under input box until clicked-on
+						// if (err.response.data.errors) {
+						// vm.submitErrors = err.response.data.errors;
+						// vm.showLoginDropdown = false; 
+						// }
+					// });
 				},
 				
 				

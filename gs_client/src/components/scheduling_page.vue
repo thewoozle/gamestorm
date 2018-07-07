@@ -170,10 +170,12 @@
             
             currentVenue() {
                var   vm = this,
-                     currentVenue;                     
-               Object.entries(vm.venues).forEach(([key, venue]) => {
-                  venue.id == vm.currentCon.venue? currentVenue = venue : '';
-               });               
+                     currentVenue = {};  
+               if(vm.venues) {      
+                  Object.entries(vm.venues).forEach(([key, venue]) => {
+                     venue.id == vm.currentCon.venue? currentVenue = venue : '';
+                  });
+               }
                return currentVenue;
             }
 				

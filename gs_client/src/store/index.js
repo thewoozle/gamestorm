@@ -88,9 +88,66 @@
 		update_user({commit}, user) {
 			commit('set_user', {user});
 		},
+      
+      // SUBMIT LOGIN
+      submit_login({commit}, loginInfo) {
+         var vm = this,
+            _formData = new FormData();
+            
+         for(var key in loginInfo) {
+            _formData.append(key, loginInfo[key]);
+         }
+         
+         Axios.post(apiDomain+ '_login', _formData, {headers : 
+            {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+         }).then((response) => {
+				
+						vm.showLoginLoading = false;
+						
+						if (response.data.response.message) {
+							
+							// show response message for two seconds
+							vm.formMessage = response.data.response.message;							
+							vm.$refs.loginMessage.classList.add('show');
+							setTimeout(function() {
+								vm.$refs.loginMessage.classList.remove('show');
+							},2000);
+						}	
+							
+						// returns multiple users sharing email
+						if (response.data.response.users) {
+							vm.loginUsers = response.data.response.users;
+							
+						// returned single user, log that person in 	
+						} else if (response.data.user) {
+                     var user = response.data.user;
+                     
+							commit('set_user', {user});
+							Vue.ls.set('user', response.data.user, (60*60*1000) *2); // one hour
+							
+							// start one-hour-and-two-minutes timer then log-out 
+							setTimeout(function() {
+								console.log('LOG OUT timer expired');
+								vm.logout();					
+							},(61*60*1000) * 2);
+							
+							vm.loginUsers = {};
+						
+						// no users, clear variables just to be safe
+						} else {
+							vm.loginUsers = {};								
+						}
+                  
+                  
+			},(err) => {
+				console.log(err.statusText);
+            console.log(err.response.data.errors);
+			});
+         
+         
+      },
 		
-		
-		
+      
 		
 		/*-----------------------------------------------------------
                   REGISTRATION DATA 
@@ -174,14 +231,12 @@
       ----------------------------------------------------------- */
 		// get scheduling data (con locations, con events, con signups, events)
    
-		get_scheduling_data({commit}, selectedCon) {
-			console.log(selectedCon);
-			var vm = this;
-			vm.conData = {
-				con: selectedCon
-			};
+		get_scheduling_data({commit}, selectedCon) {         
+			var vm = this,
+            _formData = new FormData();
+			_formData.append('con', selectedCon);			
       
-			Axios.post(apiDomain+'_get_scheduling_data', vm.conData).then((response) => {
+			Axios.post(apiDomain+'_get_scheduling_data', _formData).then((response) => {
 				commit('set_scheduling_data', {
                conEvents : response.data.conEvents, 
                venues: response.data.venues, 
