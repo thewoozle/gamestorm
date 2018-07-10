@@ -37,14 +37,83 @@
 						
 						
 						<div class="box locations" :class="schedulingTab == 'locations'? 'active' : '' " >
-							LOCATIONS for {{currentCon.name+' '+currentCon.con_num}} at {{currentVenue.venue_name}} </br>
-							<pre style="color: black;">option to copy from a con [con dropdown]
-							list of locations from venue and con with inline edit/add
-                        CRUD locations except venue locations
-                     </pre>
-							
-							<div class="" v-for="location in conLocations">
-                     <p style="color: #222;">{{location.location_type}} - {{location.location_name}} - {{location.location_tag}}</p>
+                     <header class="box_header">
+                        
+                        LOCATIONS for {{currentCon.name+' '+currentCon.con_num}} at {{currentVenue.venue_name}} </br>
+                        <pre style="color: black; display: flex; width: 100%;">if no [con]-events, option to copy from a con [con dropdown]
+                        list of locations from venue and con with inline edit/add
+                           CRUD locations except venue locations
+                        </pre>
+                        
+                        
+                     </header>
+                     
+							<div class="list_element">
+                        <div class="list_item" v-for="location in conLocations">
+                           <button type="button" style="color: #222;" @click.prevent="editLocation = location">{{location.location_type}} - {{location.location_name}} - {{location.location_tag}}</button>
+                           <button type="button" class="activate_button fas" :class="location.location_active? 'fa-ban' : 'fa-circle'" ></button>
+                        </div>
+                     </div>
+                     
+                     <div class="edit_element">
+                        <span class="title">Location Details</span>
+                        <form class="form edit_location_form">
+                           <input type="" name="location_id" v-model="editLocation.id" />
+                           <div class="form_row">
+                              <label>Location Name</label>
+                              <div class="input_wrapper">
+                                 <input class="text_box" name="location_name" v-model="editLocation.location_name" />
+                              </div>
+                           </div>
+                           <div class="form_row">
+                              <label>location Type</label>
+                              <div class="input_wrapper">
+                                 <input class="text_box" name="location_type" v-model="editLocation.location_type" />
+                              </div>
+                           </div>
+                           <div class="form_row">
+                              <label>Location Capacity</label>
+                              <div class="input_wrapper">
+                                 <input class="text_box" name="location_capacity" v-model="editLocation.location_capacity" />
+                              </div>
+                           </div>
+                           <div class="form_row">
+                              <label>Location Tag</label>
+                              <div class="input_wrapper">
+                                 <input class="text_box" name="location_tag" v-model="editLocation.location_tag" />
+                              </div>
+                           </div>
+                           <div class="form_row">
+                              <label>Venue</label>
+                              <div class="input_wrapper">
+                                 <select class="select" name="location_venue" v-model="editLocation.location_venue">
+                                 
+                                 </select>
+                              </div>
+                           </div>
+                           <div class="form_row">
+                              <label>Location Parent</label>
+                              <div class="input_wrapper">
+                                 <input class="text_box" name="location_parent" v-model="editLocation.location_parent" />
+                              </div>
+                           </div>
+                           <div class="form_row">
+                              <label>Location Active</label>
+                              <div class="input_wrapper">
+                                 <input type="checkbox" class="checkbox_box" name="location_active" v-model="editLocation.location_active" />
+                              </div>
+                           </div>
+                           <div class="form_row">
+                              <label>Description</label>
+                              <div class="input_wrapper">
+                                 <textarea class="textarea" name="location_description" v-model="editLocation.location_description" ></textarea>
+                              </div>
+                           </div>
+                           
+                           <div class="controls">
+                              <button type="submit" class="button" v-text="editLocation.id? 'Update Location' : 'Add Location'"></button> 
+                           </div>
+                        </form>
                      </div>
 							
 							
@@ -126,6 +195,7 @@
 					selectedCon		: null,
 					schedulingTab	: 'alerts',
                selectedVenue  : {},
+               editLocation   : {},
 					
 				}
 			},
@@ -296,6 +366,9 @@
 		margin: 1rem 0;
 	}
 	.scheduling_panel .tab_box .box {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
 		position: absolute;
 			top: 0;
 			left: 0;
@@ -304,6 +377,7 @@
 		width: 100%;		
 		max-height: 30rem;
 		pointer-events: none;
+      padding: 2rem 3rem; 
 		min-height: 30rem;	
 		background: var(--altBackground);
 		color: black;
@@ -313,13 +387,32 @@
 		position: relative;
 		z-index: 10;
 		opacity: 1;
+      pointer-events: auto;
 		max-height: 1000rem;
 		border: solid 1px var(--button2);
 	}
+   
+	.scheduling_panel .tab_box .box_header {
+      display: flex;
+      width: 100%;
+   }
 	.scheduling_panel .tab_box p {
 		color: inherit;
 	}
-	
+   
+   .scheduling_panel .box .list_element {
+      display: flex;
+      flex-direction: column;
+      width: 30%;
+   }
+   .scheduling_panel .box .edit_element {
+      display: flex;
+      width: 50%;
+   }
+   .scheduling_panel .box .list_item {
+      display: flex;
+      width: 100%;
+	}
 	
 	
 	

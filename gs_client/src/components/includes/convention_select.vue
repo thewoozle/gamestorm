@@ -132,9 +132,14 @@
 									<option v-for="venue in venues" :value="venue.id">{{venue.venue_name}}</option>
 								</select>
 								
-								
 							</div>
 						</div>
+                  
+                  <div class="form_row">
+                     <div class="input_wrapper">
+                     [ copy convention locations form previous con ]
+                     </div>
+                  </div>
 						
 						
 						<div class="controls">
@@ -202,7 +207,6 @@
 						returnCon;
 					
 					if(localStorage) {
-						console.log('WORKING HERE');
 						selectedCon = localStorage.selectedCon;
 						console.log(selectedCon+' / ' + vm.currentCon.tag_name);	
 						if (!selectedCon == vm.currentCon.tag_name) {	
