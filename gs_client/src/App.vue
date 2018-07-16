@@ -1920,8 +1920,7 @@
 			display: flex;
 			width: 100%;
 		}
-		
-		
+      
 			
 		/*------------	PAGE HEADER		------------	*/
 		

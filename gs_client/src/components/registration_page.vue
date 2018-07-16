@@ -330,15 +330,14 @@
 							</div>
 							
 							<div class="controls">
-								
+                     {{member.send_email_conf}}
 								<div class="button_wrapper email_status" v-bind:class="regSettings.reg_mode >0? '':'show'">
 									<span class="info_text" v-if="member.email_conf">
 										<span class="label">Confirmed: </span>
 										<span class="info" v-text="get_date(member.email_conf)"></span>
 									</span>
 									
-									<button v-else class="toggle_button " v-bind:class="sendEmailConf == 1? 'active' : '' "  type="button" title="send email confirmation on save" @click="sendEmailConf==1? sendEmailConf=0 : sendEmailConf=1">
-										<input type="checkbox" class="checkbox" name="send_email_conf" v-model="sendEmailConf" />
+									<button type="button" v-else class="toggle_button " v-bind:class="member.send_email_conf == '1'? 'active' : '' "  title="send email confirmation on save" @click="member.send_email_conf=='1'? member.send_email_conf='0' : member.send_email_conf='1'">
 										<span class="text_wrapper">
 											<span class="text">Send Email Confirmation on save</span> 
 										</span>
@@ -449,7 +448,6 @@
 				//conNum : 0,
 					searchQuery 	: '',
 					formErrors		: [],
-					sendEmailConf	: 0,
 					memberSort		: 'last_name',
 				}
 			},

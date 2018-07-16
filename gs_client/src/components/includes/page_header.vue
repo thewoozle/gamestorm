@@ -40,8 +40,8 @@
 						<button class="button" :class="{'active':showLoginDropdown}" type="button" @click.prevent="showLoginDropdown? showLoginDropdown = false : showLoginDropdown = true">Sign In</button>
 						
 						<div class="login_dropdown" :class="{'show': showLoginDropdown}">
+                     <div class="form_message"  ref="login_message">{{formMessage}}</div>	
 						
-							<div class="form_message"  ref="loginMessage">{{formMessage}}</div>	
 							<div class="buttons">
 								<button type="button" class="button"  :class="{'active':dropdownSection == 'login'}" @click.prevent="dropdownSection = 'login'">Sign in</button>
 								<button type="button" class="button"  :class="{'active':dropdownSection == 'help'}" @click.prevent="dropdownSection == 'help'? dropdownSection = 'login' : dropdownSection ='help'">Sign-in Help</button>
@@ -216,6 +216,7 @@
 								SUBMIT LOGIN	
 					-----------------------------------------------------------	*/
 				submit_login(e) {
+               console.log('resolve multiple user emails');
 					var vm = this,
                   loginInfo = {
                      email	: this.email,
@@ -225,58 +226,27 @@
 					vm.submitErrors = {};
 					vm.showLoginLoading = true;
 					
-					vm.$store.dispatch('submit_login', loginInfo);
+					vm.$store.dispatch('submit_login', loginInfo).then((response)=>{
+                  console.log(response.response.message);
+                  
+                     vm.showLoginLoading = false;
+                     if (response.response.message) {
+                        
+                        // show response message for two seconds
+                        vm.formMessage = response.response.message;							
+                        vm.$refs.login_message.classList.add('show');
+                        console.log('fix login message');
+                           setTimeout(function() {
+                           vm.$refs.login_message.classList.remove('show');
+                           },2000);
+                     }
+                     
+                     if (response.users) {
+                        vm.loginUsers = response.users;
+                     }	
+                     
+               });
 					
-					// vm.formData = {
-						// email	: this.email,
-						// password: this.password
-					// }							
-							
-					// Axios.post(apiDomain+ '_login', vm.formData)
-					// .then((response) => {
-						// vm.showLoginLoading = false;
-						
-						// if (response.data.response.message) {
-							
-							// // show response message for two seconds
-							// vm.formMessage = response.data.response.message;							
-							// vm.$refs.loginMessage.classList.add('show');
-							// setTimeout(function() {
-								// vm.$refs.loginMessage.classList.remove('show');
-							// },2000);
-						// }	
-							
-						// // returns multiple users sharing email
-						// if (response.data.response.users) {
-							// vm.loginUsers = response.data.response.users;
-							
-						// // returned single user, log that person in 	
-						// } else if (response.data.user) {	
-							// vm.$store.dispatch('update_user', response.data.user );
-							
-							// Vue.ls.set('user', response.data.user, (60*60*1000) *2); // one hour
-							
-							// // start one-hour-and-two-minutes timer then log-out 
-							// setTimeout(function() {
-								// console.log('LOG OUT timer expired');
-								// vm.logout();					
-							// },(61*60*1000) * 2);
-							
-							// vm.loginUsers = {};
-						
-						// // no users, clear variables just to be safe
-						// } else {
-							// vm.loginUsers = {};								
-						// }
-						
-					// }, (err) => {
-						
-						// // set validation errors to submitErrors object, which will display under input box until clicked-on
-						// if (err.response.data.errors) {
-						// vm.submitErrors = err.response.data.errors;
-						// vm.showLoginDropdown = false; 
-						// }
-					// });
 				},
 				
 				

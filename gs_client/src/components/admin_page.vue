@@ -115,7 +115,8 @@
 		.section {
 			
 		}
-		.section * {
+      
+		#admin_page .section * {
 			color: var(--mainColor);
 		}
 		

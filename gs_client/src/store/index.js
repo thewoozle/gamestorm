@@ -91,59 +91,41 @@
       
       // SUBMIT LOGIN
       submit_login({commit}, loginInfo) {
-         var vm = this,
-            _formData = new FormData();
+         
+         return new Promise((resolve, reject) =>{
+            var vm = this,
+               _formData = new FormData();
+               
+            for(var key in loginInfo) {
+               _formData.append(key, loginInfo[key]);
+            }
             
-         for(var key in loginInfo) {
-            _formData.append(key, loginInfo[key]);
-         }
-         
-         Axios.post(apiDomain+ '_login', _formData, {headers : 
-            {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
-         }).then((response) => {
-				
-						vm.showLoginLoading = false;
-						
-						if (response.data.response.message) {
-							
-							// show response message for two seconds
-							vm.formMessage = response.data.response.message;							
-							vm.$refs.loginMessage.classList.add('show');
-							setTimeout(function() {
-								vm.$refs.loginMessage.classList.remove('show');
-							},2000);
-						}	
-							
-						// returns multiple users sharing email
-						if (response.data.response.users) {
-							vm.loginUsers = response.data.response.users;
-							
-						// returned single user, log that person in 	
-						} else if (response.data.user) {
-                     var user = response.data.user;
-                     
-							commit('set_user', {user});
-							Vue.ls.set('user', response.data.user, (60*60*1000) *2); // one hour
-							
-							// start one-hour-and-two-minutes timer then log-out 
-							setTimeout(function() {
-								console.log('LOG OUT timer expired');
-								vm.logout();					
-							},(61*60*1000) * 2);
-							
-							vm.loginUsers = {};
-						
-						// no users, clear variables just to be safe
-						} else {
-							vm.loginUsers = {};								
-						}
-                  
-                  
-			},(err) => {
-				console.log(err.statusText);
-            console.log(err.response.data.errors);
-			});
-         
+            Axios.post(apiDomain+ '_login', _formData, {headers : 
+               {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+            }).then((response) => {
+                   
+               if (response.data.user) {
+
+                        var user = response.data.user;
+                        
+                        commit('set_user', {user});
+                        Vue.ls.set('user', response.data.user, (60*60*1000) *2); // one hour
+                        
+                        // start one-hour-and-two-minutes timer then log-out 
+                        setTimeout(function() {
+                           console.log('LOG OUT timer expired');
+                           vm.logout();					
+                        },(61*60*1000) * 2);
+               }
+               
+               resolve(response.data);         
+
+            },(err) => {
+               reject(err.response.data.errors );
+               console.log(err.statusText);
+               console.log(err.response.data.errors);
+            });
+         });
          
       },
 		
@@ -169,18 +151,26 @@
 		 
 		// SUBMIT MEMBER for registration
 		submit_member({commit}, member) {
-			console.log(member);
 			var errors = {errors: []};
 			return new Promise((resolve, reject) => {
-				Axios.post(apiDomain+'_submit_member', member).then((response) => {					
+            
+            var formData = new FormData();
+            for (var key in member) {
+               formData.append(key, member[key]);               
+            }
+            
+            
+				Axios.post(apiDomain+'_submit_member', formData, {headers : 
+            {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}}).then((response) => {		
+            
 					commit ('set_member', {updatedMember: response.data.response.member.member});
 					resolve(response.data.response);
 				}, (err) => {
 					if (err.response.data.errors) {
-						errors.errors = err.response.data.errors
+						errors.errors = err.response.data.errors;
 						resolve(errors);
 					}						
-					console.log(err.statusText);
+					console.log(err.statusText+' - ' + JSON.stringify(err.response.data.errors));
 				});
 			});	
 		},
