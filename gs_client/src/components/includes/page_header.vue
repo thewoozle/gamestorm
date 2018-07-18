@@ -27,7 +27,7 @@
 							</div> 
 							
 							<div class="column">							
-								<router-link v-if="user.permissions.admin > 0" :to="'/admin'" class="button" >Admin</router-link>								
+								<router-link v-if="user.permissions && user.permissions.admin > 0" :to="'/admin'" class="button" >Admin</router-link>								
 								<button type="button" class="button" @click="logout">Sign Out</button>
 							</div>
 						</div>						
@@ -53,7 +53,17 @@
 							<div class="dropdown_section login_section" :class="{'show': dropdownSection == 'login'}">
 								<form method="post" @submit.prevent="submit_login">
                         
-									<div class="form_row">
+                           <div class="form_row" v-if="loginUsers.length > 0">
+										<label for="email">Select shared user account</label>
+										<div class="input_wrapper">
+                                 <select class="select" name="uuid" v-model="uuid">
+                                    <option value="" style="display: none">select user....</option>
+                                    <option v-for="user in loginUsers" :value="user.uuid" v-text="user.first_name+' '+user.last_name"></option>
+                                 </select>
+										</div>
+                           </div>                       
+                        
+									<div class="form_row" v-else >
 										<label for="email">Email</label>
 										<div class="input_wrapper">
 											<input type="text" class="input text_box" v-model="email" @keydown="submitErrors.email = null" name="email" />
@@ -144,11 +154,12 @@
 			data() {
 				return {
 					showLoginDropdown	: false,
-					dropdownSection		: 'login',
+					dropdownSection	: 'login',
 					showPassword		: 'password',
 					email 				: '',
-					password			: '',
-					formData			: {},
+					password		   	: '',
+               uuid              : '',
+					formData		   	: {},
 					submitErrors		: {},
 					formMessage			: '',
 					loginUsers			: {},
@@ -216,18 +227,17 @@
 								SUBMIT LOGIN	
 					-----------------------------------------------------------	*/
 				submit_login(e) {
-               console.log('resolve multiple user emails');
 					var vm = this,
                   loginInfo = {
-                     email	: this.email,
-                     password: this.password
+                     email	   : vm.email,
+                     password : vm.password,
+                     uuid     : vm.uuid,
                   };                  
                   
 					vm.submitErrors = {};
 					vm.showLoginLoading = true;
 					
-					vm.$store.dispatch('submit_login', loginInfo).then((response)=>{
-                  console.log(response.response.message);
+					vm.$store.dispatch('submit_login', loginInfo).then((response) => {
                   
                      vm.showLoginLoading = false;
                      if (response.response.message) {
@@ -239,8 +249,7 @@
                            setTimeout(function() {
                            vm.$refs.login_message.classList.remove('show');
                            },2000);
-                     }
-                     
+                     } 
                      if (response.users) {
                         vm.loginUsers = response.users;
                      }	
