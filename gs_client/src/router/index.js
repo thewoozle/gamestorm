@@ -9,6 +9,7 @@
 	import connect_page from '@/components/connect_page'
 	import admin_page from '@/components/admin_page'
 	import registration_page from '@/components/registration_page'
+	import reg_reports_page from '@/components/reg_reports_page'
 	import scheduling_page from '@/components/scheduling_page'
 
 	Vue.use(Router)
@@ -19,30 +20,30 @@
 		{
 			path		: '/',
 			name		: 'mainpage',
-			component	: main_page
+			component: main_page
 		}, {
 			path		: '/gamestorm',
 			name		: 'gamestormpage', 
-			component	: gamestorm_page
+			component: gamestorm_page
 		}, {
 			path		: '/events',
 			name		: 'eventspage',
-			component	: events_page
+			component: events_page
 		}, {
 			path		: '/community',
 			name		: 'communitypage', 
-			component	: community_page
+			component: community_page
 		}, {
 			path		: '/connect',
 			name		: 'connectpage', 
-			component	: connect_page
+			component: connect_page
 		},
 
 		//	ADMIN LINKS
 		{
 			path		: '/admin',
 			name		: 'adminpage',
-			component	: admin_page
+			component: admin_page
 		}, {
 			path		: '/registration_hub',
 			name		: 'registrationpage', 
@@ -50,16 +51,20 @@
 		}, {
 			path		: '/scheduling_hub',
 			name		: 'schedulingpage',
-			component	: scheduling_page
+			component: scheduling_page
 		}, {
 			path		: '/departments_hub',
 			name		: 'departmentspage',
-			component	: scheduling_page
+			component: scheduling_page
 		}, {
 			path		: '/news_hub',
 			name		: 'newspage',
-			component	: scheduling_page
-		}
+			component: scheduling_page
+		}, {
+         path     : '/registration_reports',
+         name     : 'reg_reports_page',
+         component: reg_reports_page 
+      }
       
 		
 	  ]

@@ -462,7 +462,7 @@
 			computed: {
 				...mapGetters({
 					conventionInfo	: 'conventionInfo',
-					user			: 'user',
+					user		   	: 'user',
 					statesList		: 'states',
 					conventions		: 'conventions',
 					members			: 'members',
