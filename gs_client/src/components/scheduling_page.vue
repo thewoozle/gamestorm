@@ -37,15 +37,16 @@
 						
 						
 						<div class="box locations" :class="schedulingTab == 'locations'? 'active' : '' " >
-                     <header class="box_header">
-                        
+                     <header class="box_header">                        
+                        <span class="title">Locations</span>
+                        <div class="header_content">
                         LOCATIONS for {{currentCon.name+' '+currentCon.con_num}} at {{currentVenue.venue_name}} </br>
                         <pre style="color: black; display: flex; width: 100%;">if no [con]-events, option to copy from a con [con dropdown]
                         list of locations from venue and con with inline edit/add
                            CRUD locations except venue locations
                         </pre>
                         
-                        
+                        </div>
                      </header>
                      
 							<div class="list_element">
@@ -57,7 +58,9 @@
                      
                      <div class="edit_element">
                         <span class="title">Location Details</span>
-                        <form class="form edit_location_form">
+                        <form class="form edit_location_form">   
+                           <button class="control_button fal fa-times"   type="button" @click="editLocation = {}" title="Clear Location form" ></button>
+                  
                            <input type="" name="location_id" v-model="editLocation.id" />
                            <div class="form_row">
                               <label>Location Name</label>
@@ -122,10 +125,64 @@
 						
 						
 						<div class="box events" :class="schedulingTab == 'events'? 'active' : '' " >
-							EVENTS</br>
-							<p>show events by status with edit/create form and one-click status hange</p>
+                     <header class="box_header">                        
+                        <span class="title">Events</span>
+                     </header>
                      
-                     {{allEvents}}
+							<div class="list_element">
+                        <pre style="color: red"> paginate</pre>
+                        <div class="list_item" v-for="event in allEvents">
+                           <button type="button" style="color: #222;" @click.prevent="editEvent = event">{{event.event_name}} - {{event.track}} </button>
+                           <button type="button" class="activate_button fas" :class="event.event_active? 'fa-ban' : 'fa-circle'" ></button>
+                        </div>
+                     </div>
+                     
+                     <div class="edit_element">
+                        <span class="title">Event Details</span>
+                        
+                        <form class="form edit_event_form">
+                           <button class="control_button fal fa-times"   type="button" @click="editEvent = {}" title="Clear Event form" ></button>
+                           <p style="color: red;">add or update event for master Events table. Does not schudule unless event is deactivated.</p>
+                           <input type="hidden" name="event_id" v-model="editEvent.event_id" />
+                           
+									event tag: <span class="text"  v-text="editEvent.event_tag || '-'"></span>
+                           
+                           
+                           <div class="form_row">
+										<div class="form_element">
+                                 <label>Event Name</label>
+                                 <div class="input_wrapper">
+                                    <input class="text_box" name="event_name" v-model="editEvent.event_name" />
+                                 </div>
+                                 <span class="form_error" v-if="formErrors.event_name" v-text="formErrors.event_name? 'Event Name!' : ''"></span>
+                              </div>
+                              
+										<div class="form_element">
+											<label class="label">Event Track</label>
+											<div class="input_wrapper">
+                                    <select class="input select" name="event_track" v-model="editEvent.event_track"   >
+                                       <option value="" style="display: none">select event track</option>
+                                       
+                                       <option v-for="type in eventTypes" value="" >{{type}}</option>
+                                                      
+                                    </select>
+                                 </div>	
+                              <span class="input_message" v-if="formErrors.event_track" v-text="formErrors.event_track"></span> 		
+                              </div>
+                           </div>	
+                                          
+                                          
+                                          
+                                          
+                                          
+                           
+                           <div class="controls">
+                              <button type="submit" class="button" v-text="editEvent.event_id? 'Update Event' : 'Add Event'"></button> 
+                           </div>
+                        </form>   
+                        
+                     </div>
+                     
 						</div>
 						
 						
@@ -196,6 +253,8 @@
 					schedulingTab	: 'alerts',
                selectedVenue  : {},
                editLocation   : {},
+               editEvent      : {},
+               formErrors    : [],
 					
 				}
 			},
@@ -230,6 +289,7 @@
                allEvents   : 'allEvents',
                conLocations: 'conLocations',
                venues      : 'venues',
+               eventTypes  : 'eventTypes'
 				}),
             
 				filteredEvents:  () => {
@@ -394,8 +454,23 @@
    
 	.scheduling_panel .tab_box .box_header {
       display: flex;
+      flex-wrap: wrap;
       width: 100%;
    }
+	.scheduling_panel .tab_box .box_header .title {
+      display: flex;
+      justify-content: center;
+      text-align: center;
+      width: 100%;
+      color: var(--titleColor);
+      font-size:2rem;
+   }
+	.scheduling_panel .tab_box .box_header .header_content {
+      display: flex;
+      width: 100%;
+      color: black;
+   }
+   
 	.scheduling_panel .tab_box p {
 		color: inherit;
 	}

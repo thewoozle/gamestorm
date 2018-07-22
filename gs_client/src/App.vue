@@ -140,6 +140,7 @@
 						
 						
 					case 'registrationpage':
+               case 'regreportspage':
 						vm.pageType = 'registration';
 						console.log(vm.pageType);
 						break;
@@ -1641,7 +1642,6 @@
 			border-radius: .2em;
 			color: var(--titleColor);
 			font-size: 1.15rem;
-			text-align: center;
 			font-weight: 300;
 			letter-spacing: .05em;
 			width: 100%;

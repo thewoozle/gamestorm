@@ -40,6 +40,9 @@
 		staffPositions : {},
 		venues         : {},
       conLocations   : {},
+      eventTraks     : {},
+      eventTypes     : {},
+      ageGroups      : {},  
 	}
 	
 	const actions = {
@@ -228,10 +231,14 @@
       
 			Axios.post(apiDomain+'_get_scheduling_data', _formData).then((response) => {
 				commit('set_scheduling_data', {
-               conEvents : response.data.conEvents, 
-               venues: response.data.venues, 
-               conLocations : response.data.conLocations, 
-               allEvents : response.data.allEvents});
+               conEvents      : response.data.conEvents, 
+               venues         : response.data.venues, 
+               conLocations   : response.data.conLocations, 
+               allEvents      : response.data.allEvents,
+               eventTypes     : response.data.eventTypes,
+               eventTracks    : response.data.eventTracks,
+               ageGroups      : response.data.ageGroups   
+            });
 			},(err) => {
 				console.log(err.statusText);
 			});
@@ -289,11 +296,12 @@
 		},
 		
 		//	 SCHEDULING DATA (for scheduling)
-		set_scheduling_data: (state, {conEvents, venues, conLocations, allEvents}) => {
+		set_scheduling_data: (state, {conEvents, venues, conLocations, allEvents, eventTypes}) => {
 			state.conEvents= conEvents;
 			state.venues   = venues;
          state.conLocations= conLocations;
          state.allEvents   = allEvents;
+         state.eventTypes = eventTypes;
 		},		
 		
 		// SET USER 
@@ -373,6 +381,7 @@
 		allEvents		: state => state.allEvents,
 		conEvents 		: state => state.conEvents,
 		venues			: state => state.venues,
+      eventTypes     : state => state.eventTypes,
       conLocations   : state=>state.conLocations
 		
 	}

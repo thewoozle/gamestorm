@@ -62,7 +62,7 @@
 			component: scheduling_page
 		}, {
          path     : '/registration_reports',
-         name     : 'reg_reports_page',
+         name     : 'regreportspage',
          component: reg_reports_page 
       }
       

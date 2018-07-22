@@ -330,11 +330,11 @@
 							</div>
 							
 							<div class="controls">
-                     {{member.send_email_conf}}
-								<div class="button_wrapper email_status" v-bind:class="regSettings.reg_mode >0? '':'show'">
+								<div class="button_wrapper email_status" v-if="member.email" v-bind:class="regSettings.reg_mode >0? '':'show'">
+                           <input type="checkbox" style="vizibility: hidden; position: absolute; z-index: -1;" name="send_email_conf" :checked="member.send_email_conf == '1'" value="1" />
 									<span class="info_text" v-if="member.email_conf">
 										<span class="label">Confirmed: </span>
-										<span class="info" v-text="get_date(member.email_conf)"></span>
+										<span class="info" v-text="month_day_year(member.email_conf)"></span>
 									</span>
 									
 									<button type="button" v-else class="toggle_button " v-bind:class="member.send_email_conf == '1'? 'active' : '' "  title="send email confirmation on save" @click="member.send_email_conf=='1'? member.send_email_conf='0' : member.send_email_conf='1'">
@@ -346,7 +346,7 @@
 									<button class="button print_button" type="button" @click.prevent="print_badge(member)">Print Badge</button>
 								</div>
 
-								<button class="button " type="submit">Save</button>
+								<button class="button" :class="member.email? '' : 'disabled'" type="submit">Save</button>
 							</div>
 							
 						
