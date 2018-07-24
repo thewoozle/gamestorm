@@ -141,6 +141,7 @@
 						
 					case 'registrationpage':
                case 'regreportspage':
+               case 'scheduling_page':
 						vm.pageType = 'registration';
 						console.log(vm.pageType);
 						break;
@@ -1639,7 +1640,6 @@
 			border-bottom: solid 1px #777;
 			margin-left: .5rem;
 			line-height: 1em;
-			border-radius: .2em;
 			color: var(--titleColor);
 			font-size: 1.15rem;
 			font-weight: 300;
@@ -1649,9 +1649,13 @@
 			min-height: 2rem;
 			padding: 0 1rem 0 .5rem;
 		}
-		
+		.select {         
+			border: solid 1px #777;
+			border-radius: .2em;
+      }
 		.textarea {
 			min-height: 3rem;
+			border-radius: .2em;
 		}
 		.checkbox_wrapper {
 			flex-wrap: nowrap;

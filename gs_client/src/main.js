@@ -31,7 +31,15 @@
 			
 			day_date(date) {
 				return moment(date).format('MMM Do');
-			}
+			},
+         
+         date_time(date) {
+            return moment(date).format('MMM Do hh:mm a');
+         },
+         
+         sql_date_time(date) {
+           return moment(date).format('YYYY-MM-DD HH:MM:SS'); 
+         },
 		}
 	});
 

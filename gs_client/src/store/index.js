@@ -34,13 +34,13 @@
 		memberTypes    : {},
 		departments    : {},
 		paymentMethods : {},
-		members	      : {},
+		members	      : [],
 		regReport      : {},
 		articles       : {},
 		staffPositions : {},
 		venues         : {},
       conLocations   : {},
-      eventTraks     : {},
+      eventTracks    : {},
       eventTypes     : {},
       ageGroups      : {},  
 	}
@@ -149,7 +149,7 @@
 				});
 			}, (err) => {
 				  console.log(err.statusText);
-			  });			
+			})
 		},
 		 
 		// SUBMIT MEMBER for registration
@@ -188,12 +188,15 @@
 		},
 		
 		// GET MEMBERS
-		get_members({commit}) {
-			Axios.get(apiDomain + '_get_members').then((response) => {
-				commit('set_members', { members: response.data.members });
-			  }, (err) => {
-				  console.log(err.statusText);
-			  });
+		get_members({commit}) {         
+         // ten-step request for 10% of records at a time 
+         for(var x = 0; x<=9; x++) {
+            Axios.get(apiDomain + '_get_members', {params: {step : x }}).then((response) => {
+               commit('set_members', { members: response.data.members });
+            }, (err) => {
+               console.log(err.statusText);
+            }); 
+         }   
 		},
 		
 		// REMOVE MEMBER
@@ -296,12 +299,14 @@
 		},
 		
 		//	 SCHEDULING DATA (for scheduling)
-		set_scheduling_data: (state, {conEvents, venues, conLocations, allEvents, eventTypes}) => {
-			state.conEvents= conEvents;
-			state.venues   = venues;
+		set_scheduling_data: (state, {conEvents, venues, conLocations, allEvents, eventTypes, eventTracks, ageGroups}) => {
+			state.conEvents   = conEvents;
+			state.venues      = venues;
          state.conLocations= conLocations;
          state.allEvents   = allEvents;
-         state.eventTypes = eventTypes;
+         state.eventTracks = eventTracks;
+         state.eventTypes  = eventTypes;
+         state.ageGroups   = ageGroups;
 		},		
 		
 		// SET USER 
@@ -311,7 +316,15 @@
 		
 		// SET MEMBERS 
 		set_members: (state, { members }) => {
-			state.members = members;
+         members.forEach((member)=> {
+            if (!(member in state.members)) {
+               state.members.push(member);
+            } else {
+               state.members.forEach((_member)=>{
+                  _member.uuid == member.uuid? _member = member: '';
+               });
+            }
+         });
 		},
 		
 		
@@ -334,13 +347,20 @@
 		
 		// SET MEMBER 
 		set_member: (state, {updatedMember}) => {
-			var member = state.members.find(member => member.uuid === updatedMember.uuid);
-			
-			if (member) {
-				member = updatedMember;
-			} else {
-				state.members.push(updatedMember);
-			}
+         console.log(updatedMember);
+         var inMembers = false;
+        
+         state.members.forEach((member, i)=>{
+            if (member.uuid == updatedMember.uuid) {
+               console.log('update');
+               inMembers = true;
+               member = updatedMember;
+               Vue.set(state.members[i], 'badge_number', updatedMember.badge_number);               
+            }
+         });
+         
+         inMembers? '' : state.members.push(updatedMember);    
+            
 		},
 		
 		// 	set reg settings	
@@ -382,8 +402,9 @@
 		conEvents 		: state => state.conEvents,
 		venues			: state => state.venues,
       eventTypes     : state => state.eventTypes,
-      conLocations   : state=>state.conLocations
-		
+      eventTracks    : state => state.eventTracks,
+      ageGroups      : state => state.ageGroups,
+      conLocations   : state=>state.conLocations,		
 	}
 	
 	export default new Vuex.Store ({

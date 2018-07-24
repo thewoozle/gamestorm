@@ -149,32 +149,92 @@
                            
                            
                            <div class="form_row">
-										<div class="form_element">
-                                 <label>Event Name</label>
-                                 <div class="input_wrapper">
-                                    <input class="text_box" name="event_name" v-model="editEvent.event_name" />
-                                 </div>
-                                 <span class="form_error" v-if="formErrors.event_name" v-text="formErrors.event_name? 'Event Name!' : ''"></span>
+                              <label>Event Name</label>
+                              <div class="input_wrapper">
+                                 <input class="text_box" name="event_name" v-model="editEvent.event_name" />
                               </div>
+                              <span class="form_error" v-if="formErrors.event_name" v-text="formErrors.event_name? 'Event Name!' : ''"></span>
+                           </div>
                               
-										<div class="form_element">
-											<label class="label">Event Track</label>
-											<div class="input_wrapper">
-                                    <select class="input select" name="event_track" v-model="editEvent.event_track"   >
-                                       <option value="" style="display: none">select event track</option>
-                                       
-                                       <option v-for="type in eventTypes" value="" >{{type}}</option>
-                                                      
-                                    </select>
-                                 </div>	
+                           <div class="form_row">
+                              <label class="label">Event Track</label>
+                              <div class="input_wrapper">
+                                 <select class="input select" name="event_track" v-model="editEvent.event_track"   >
+                                    <option value="" style="display: none">select event track...</option>
+                                    <option v-for="track in eventTracks" :value="track.id" v-text="track.track_name" :selected="editEvent.event_track == 1" ></option>
+                                 </select>
+                              </div>	
                               <span class="input_message" v-if="formErrors.event_track" v-text="formErrors.event_track"></span> 		
+                           </div>
+                           
+                           <div class="form_row" >
+                              <div class="form_element">	
+                                 <label class="label">GM is Designer</label>
+                                 <div class="checkbox_wrapper input_wrapper">
+                                    <input class="checkbox" type="checkbox" name="gm_designer" v-model="editEvent.gm_designer"  value="1" /> 
+                                 </div>
+                                 <span class="input_message" v-if="formErrors.gm_designer" v-text="formErrors.gm_designer"></span> 
+                              </div>
+                              <div class="form_element expanding_row" v-bind:class="submissionSystem">
+                                 <label class="label">Game System</label>
+                                 <div class="input_wrapper">
+                                    <input class="input text_box" type="text"  v-model="editEvent.event_system"  name="event_system" /> 	
+                                 </div>	
+                              </div>
+                           </div>
+                           
+                           
+                           <div class="form_row event_time_row">
+                              <div class="form_element">	
+                                 <div class="input_wrapper">
+                                    <select class="select"  v-model="editEvent.event_start_time" name="event_start_time">
+                                    <option value="" style="display: none">select start time...</option>
+                                       <option v-for="timeblock in timeblocks" :value="sql_date_time(timeblock)" v-text="date_time(timeblock)"></option>
+                                    </select>
+                                    <div class="buttons">
+                                    </div>
+                                 </div>
+                              </div>   
+                              <div class="form_element">	
+                                 <select class="select" v-model="editEvent.duration" name="event_duration">
+                                    <option value="" style="display: none">select duration...</option>
+                                    <option value="30" >30 minutes</option>
+                                    <option value="60" >one hour</option>
+                                    <option value="90" >90 minutes</option>
+                                    <option value="120" >Two hours</option>
+                                    <option value="180" >Three hours</option>
+                                    <option value="240" >Four hours</option>
+                                    <option value="300" >Five hours</option>
+                                    <option value="360" >Six hours</option>
+                                    <option value="480" >Eight hours</option>
+                                    <option value="600" >Ten hours</option>
+                                    <option value="720" >Twelve hours</option>
+                                 </select>
+                              </div>
+                           </div>
+                           
+                           
+                           <div class="form_row players ">
+                              <div class="form_element">
+                                 <label class="label">Total number of players<br/>(including presenter)</label>
+                                 <div class="input_wrapper">
+                                    <input class="text_box num_players_box" type="number" min="1" max="100" v-model="editEvent.seats"  name="event_players" placeholder="1"   />
+                                 </div>	
+                              </div>
+                              <div class="form_element " >
+                                 <label class="label">Presenter is player</label>
+                                 <div class="checkbox_wrapper" >
+                                    <div class="input_wrapper">
+                                       <input class="checkbox" type="checkbox" name="gm_player" v-model="editEvent.gm_player" value="1" placeholder="will you be playing the game" /> 
+                                    </div>
+                                    <span class="input_message" v-if="formErrors.event_duration">Event duration may not be greater than 24 hours</span>
+                                 </div>
                               </div>
                            </div>	
-                                          
-                                          
-                                          
-                                          
-                                          
+                           
+                           
+                           
+                           
                            
                            <div class="controls">
                               <button type="submit" class="button" v-text="editEvent.event_id? 'Update Event' : 'Add Event'"></button> 
@@ -236,6 +296,7 @@
 	
 	<script>
 		import Vue from 'vue'
+      import moment from 'moment'
 		import { mapGetters } from 'vuex'
 		import Router from 'vue-router'
 		import convention_select from '@/components/includes/convention_select'
@@ -249,12 +310,13 @@
 			
 			data() {
 				return {
-					selectedCon		: null,
-					schedulingTab	: 'alerts',
-               selectedVenue  : {},
-               editLocation   : {},
-               editEvent      : {},
-               formErrors    : [],
+					selectedCon		   : null,
+					schedulingTab	   : 'alerts',
+               selectedVenue     : {},
+               editLocation      : {},
+               editEvent         : {},
+               formErrors        : [],
+               submissionSystem  : {},
 					
 				}
 			},
@@ -289,7 +351,9 @@
                allEvents   : 'allEvents',
                conLocations: 'conLocations',
                venues      : 'venues',
-               eventTypes  : 'eventTypes'
+               eventTypes  : 'eventTypes',
+               eventTracks : 'eventTracks',
+               ageGroups   : 'ageGroups'
 				}),
             
 				filteredEvents:  () => {
@@ -307,6 +371,18 @@
                   });
                }
                return currentVenue;
+            },
+            
+            timeblocks() {
+               var   vm = this,
+                     times = [];
+               for(var timeBlock = moment(vm.currentCon.start_date_time); moment(timeBlock).diff(vm.currentCon.end_date_time, 'hours') <=0; timeBlock.add(30, 'minutes') ) {
+                  if(parseInt(timeBlock.format('HH')) >= 9 || timeBlock.format('HH') == '00') { 
+                     times.push(moment(timeBlock));
+                  }
+               }
+                     
+               return times;
             }
 				
 				
@@ -325,10 +401,8 @@
 							var vm = this;
 							vm.selectedCon = localStorage.selectedCon;
 						}
-					}
-					
-					vm.$store.dispatch('get_scheduling_data', vm.selectedCon).then(()=>{});
-					
+					}					
+					vm.$store.dispatch('get_scheduling_data', vm.selectedCon).then(()=>{});					
 				},
 				
 				
@@ -488,6 +562,31 @@
       display: flex;
       width: 100%;
 	}
+   .scheduling_panel .box.events .event_time_row {
+      position: relative;
+   }
+   .scheduling_panel .box.events .event_time_row .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      position: absolute;
+         top: 0;
+         left: 0;
+      width: 12rem;
+      max-height: 1.5rem;
+      overflow: hidden;
+      transition: max-height .3s;
+   }
+   .scheduling_panel .box.events .event_time_row .buttons:hover {
+      max-height: 25rem;
+      overflow-y: auto;
+   }
+   .scheduling_panel .box.events .event_time_row .time_button {
+      display: flex;
+      width: 100%;
+      color: var(--button);
+      font-size: .95rem;
+      height: 1.5rem;
+   }
 	
 	
 	
