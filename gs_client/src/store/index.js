@@ -153,7 +153,7 @@
 		},
 		 
 		// SUBMIT MEMBER for registration
-		submit_member({commit}, member) {
+		submit_member({dispatch,commit}, member) {
 			var errors = {errors: []};
 			return new Promise((resolve, reject) => {
             
@@ -167,6 +167,7 @@
             {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}}).then((response) => {		
             
 					commit ('set_member', {updatedMember: response.data.response.member.member});
+               dispatch('get_reg_report');
 					resolve(response.data.response);
 				}, (err) => {
 					if (err.response.data.errors) {
@@ -175,7 +176,8 @@
 					}						
 					console.log(err.statusText+' - ' + JSON.stringify(err.response.data.errors));
 				});
-			});	
+            
+			});	         
 		},
 		
 		// GET REG SETTINGS	
@@ -200,7 +202,7 @@
 		},
 		
 		// REMOVE MEMBER
-		remove_member({commit}, uuid) {	
+		remove_member({dispatch,commit}, uuid) {	
 			var vm = this;
 			vm.formData = {
 				uuid	: uuid,
@@ -211,6 +213,8 @@
 			}, (err) => {
 				  console.log(err.statusText);
 			});
+         
+			resolve(response.data.response);
 		},
 		
 		// GET REGISTRATION REPORT
@@ -347,7 +351,6 @@
 		
 		// SET MEMBER 
 		set_member: (state, {updatedMember}) => {
-         console.log(updatedMember);
          var inMembers = false;
         
          state.members.forEach((member, i)=>{
