@@ -175,7 +175,7 @@
 			--borderColor2			: #0c485f;
 			--borderColor3			: #0076A3;			
 			--lightColor			: #fff;
-			--contrastColor			: #735896;
+			--contrastColor		: #735896;
 			--passColor				: #7adc8a;					
 			--button2				: #42634e;
 			--textColor				: #fbffea;
@@ -183,17 +183,17 @@
 			--textColor2			: #6e6673;
 			--textColor4			: #182c35;
 			--titleColor			: #a8d4f5;
-			--button				: #182c35;
+			--button				   : #182c35;
 			--buttonHighlight		: rgba(28,63,79,.75);
-			--backHighlight			: rgba(168, 212, 245, .5);			
-			--sectionBackground		: #374146;
+			--backHighlight		: rgba(168, 212, 245, .5);			
+			--sectionBackground	: #374146;
 			--linkColor				: #ae9868;		
 			--glowColor				: #98c6ff;
-			--warningColor          : #c50d0d;
+			--warningColor         : #c50d0d;
 			--highlightColor		: #F7D17D;
 
 			
-			--altBackground			: #f9f7ec;
+			--altBackground		: #f9f7ec;
 			--altColor				: #ebeeff;
 							
 			

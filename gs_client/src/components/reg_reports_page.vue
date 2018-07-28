@@ -66,7 +66,6 @@
 			...mapGetters({
                conventionInfo	: 'conventionInfo',
                user		   	: 'user',
-               statesList		: 'states',
                conventions		: 'conventions',
                members			: 'members',
                memberTypes		: 'memberTypes',

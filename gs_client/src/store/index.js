@@ -190,11 +190,16 @@
 		},
 		
 		// GET MEMBERS
-		get_members({commit}) {         
-         // ten-step request for 10% of records at a time 
-         for(var x = 0; x<=9; x++) {
+		get_members({commit}) {
+         if (window.sessionStorage) {
+            if(sessionStorage.memberList) {
+               commit('set_members', { members: JSON.parse(sessionStorage.memberList), action: 'localstorage' });
+            }          
+         }
+         // ten-step request for 20% of records at a time 
+         for(var x = 0; x<=4; x++) {
             Axios.get(apiDomain + '_get_members', {params: {step : x }}).then((response) => {
-               commit('set_members', { members: response.data.members });
+               commit('set_members', { members: response.data.members, action: 'update' });
             }, (err) => {
                console.log(err.statusText);
             }); 
@@ -208,13 +213,13 @@
 				uuid	: uuid,
 			}	
 			Axios.post(apiDomain + '_remove_member', vm.formData).then((response) => {
+            dispatch('get_reg_report');
 				commit('unset_member', {uuid});
 				commit ('set_response', response.data.response);
 			}, (err) => {
 				  console.log(err.statusText);
 			});
          
-			resolve(response.data.response);
 		},
 		
 		// GET REGISTRATION REPORT
@@ -318,17 +323,36 @@
 			state.user = user;
 		},
 		
-		// SET MEMBERS 
-		set_members: (state, { members }) => {
-         members.forEach((member)=> {
-            if (!(member in state.members)) {
-               state.members.push(member);
-            } else {
+		// SET MEMBERS (chunks of 20%)
+		set_members: (state, { members, action }) => {
+         if(action == 'localstorage') {
+            if(window.sessionStorage) {
+               state.members = JSON.parse(sessionStorage.memberList);
+            } 
+         } else { 
+         
+            members.forEach((member)=> {
+               var inMembers = false;
+               
                state.members.forEach((_member)=>{
-                  _member.uuid == member.uuid? _member = member: '';
+                  if(_member.uuid == member.uuid) {
+                     console.log('update match');
+                     _member = member;
+                     inMembers = true;
+                  } 
                });
-            }
-         });
+               
+               if(!inMembers) {
+               state.members.push(member);
+                  inMembers = false;
+                  console.log('new');
+               }
+            });
+            
+            if(window.sessionStorage) {  
+               sessionStorage.memberList = JSON.stringify(state.members); 
+            }            
+         }
 		},
 		
 		
@@ -353,7 +377,7 @@
 		set_member: (state, {updatedMember}) => {
          var inMembers = false;
         
-         state.members.forEach((member, i)=>{
+         state.members.forEach((member, i)=> {
             if (member.uuid == updatedMember.uuid) {
                console.log('update');
                inMembers = true;
@@ -362,8 +386,10 @@
             }
          });
          
-         inMembers? '' : state.members.push(updatedMember);    
-            
+         inMembers? '' : state.members.push(updatedMember);  
+         if(window.sessionStorage) {  
+               sessionStorage.memberList = JSON.stringify(state.members); 
+         }
 		},
 		
 		// 	set reg settings	

@@ -360,7 +360,8 @@
 				
 				<section class="section reg_list" >			
 					<div class="section_content ">
-						<span class="loading"  :class="members.length  !== undefined? '' : 'show'">Loading... </span>
+                  <span class="update_status" v-text="members.length > 0? 'Records => '+ members.length : 'connecting...' "></span>
+						<span class="loading"  :class="members.length> 0? '' : 'show'">Loading... </span>
 					
 						<div class="search_panel">
 							<div class="input_wrapper">
@@ -427,7 +428,7 @@
 	
 	<script>
 		import Vue from 'vue'
-		import { mapGetters } from 'vuex'
+		import { mapGetters, mapState } from 'vuex'
 		import Router from 'vue-router'
 		
 		Vue.use(Router);
@@ -460,6 +461,8 @@
 			
 			
 			computed: {
+            ...mapState({    
+            }),
 				...mapGetters({
 					conventionInfo	: 'conventionInfo',
 					user		   	: 'user',
@@ -565,7 +568,7 @@
 				
 			},
 			
-			mounted: function() {
+			mounted: ()=> {
 				
 			},
 			
@@ -1139,6 +1142,7 @@
 			font-size: .85rem;
 			color: var(--altColor);
 			letter-spacing: .05em;
+         font-weight: 100;
 		}
 		.section.reg_list .attending .name {
 			font-size: 1rem;
