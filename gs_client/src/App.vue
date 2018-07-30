@@ -67,7 +67,7 @@
 		  
 		  computed: {
 			pageName() {
-				return this.$route.name;				
+				return this.$route.name;
 			},
 		  },
 		  

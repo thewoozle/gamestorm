@@ -25,12 +25,20 @@
                   [list by name (filter location, attendance, age, price, reg date, ), badge, staff, guest GM (elegable/accepted), contact, volunteer, GM interest, industry guest, transaction, ]
             </pre>
             
+            <div class="">
+               <span>FILTER BY STATE</span>
+               <div v-for="state in memberFilter('state')" >{{state.name}} - {{state.num}}</div>
+            </div>
+            
             
 						<span class="text">Number of Registered Members</span>
-						<span class="value" v-text="regReport.registeredMembers || '-'"></span>
+						<span class="value" v-text="regReport.registeredMembers || '-'"></span>                  
+               {{regReport}}
+               <p style="color: white" v-for="(item, key) in regReport">{{key}} - {{item}}</p>
                   </div>
                </div>
-            </section>   
+               
+            </section> 
          </div>
       </div>
 	</template>
@@ -60,7 +68,8 @@
 			
 			components: {
 			},
-			
+         
+         
 			
 			computed: {
 			...mapGetters({
@@ -73,6 +82,7 @@
                staffPositions	: 'staffPositions',				
 					regReport      : 'regReport',
             }),
+            
 			},
 			
 			created() {
@@ -88,6 +98,27 @@
 			
 			methods: {
 				
+            memberFilter: function(filter)  {
+               var   vm = this,
+                     inState = false,
+                     states = [];
+               vm.members.forEach((member)=>{
+                  if(member.con_status) {
+                     //check to see if state is in array and wither ++ or append
+                     states.forEach((state)=>{
+                        if(state.name == member.state) {
+                           state.num ++;
+                           inState = true;
+                        }
+                     });   
+                     inState? '' : states.push({"name": member.state, 'num' : 1});
+                         
+                     inState = false;
+                  }   
+               });
+               return states;
+            }
+            
 			}
 			
 		}
