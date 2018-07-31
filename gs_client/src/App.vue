@@ -671,6 +671,12 @@
 		.control_button:active { 	
 			transform:translateY(1px);
 		}
+		.control_button .text {
+         display: flex;
+         padding-left: .5rem;
+         font-family: Dosis, sans-serif;
+         letter-spacing: .05em;
+      }
 		
 			
 		

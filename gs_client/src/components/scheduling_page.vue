@@ -47,6 +47,22 @@
                         </pre>
                         
                         </div>
+                        <div class="list_controls">
+                           <button  type="button" :title="'Reset locations for '+currentCon.name" class="control_button fal fa-redo-alt"><span class="text" v-text="'Reset '+currentCon.short_name"></span></button>
+                           
+                           <div class="selects">
+                              <select class="select" v-model="selectVenueLocs">
+                                 <option value="" style="display: none">Select Venue...</option>
+                                 <option v-for="venue in venues" :value="venue.id" v-text="venue.venue_name"></option>
+                              </select> 
+                              <select class="select" v-model="copyConLocations">
+                                 <option value="" style="display: none">Select Con...</option>
+                                 <option v-for="con in conventions" :value="con.id" v-text="con.short_name"></option>
+                              </select>
+                           </div>   
+                        </div>
+                        
+                        
                      </header>
                      
 							<div class="list_element">
@@ -317,7 +333,8 @@
                editEvent         : {},
                formErrors        : [],
                submissionSystem  : {},
-					
+					selectVenueLocs   : {},
+               copyConLocations  : {},
 				}
 			},
 			
@@ -353,7 +370,8 @@
                venues      : 'venues',
                eventTypes  : 'eventTypes',
                eventTracks : 'eventTracks',
-               ageGroups   : 'ageGroups'
+               ageGroups   : 'ageGroups',
+               conventions : 'conventions',
 				}),
             
 				filteredEvents:  () => {
@@ -409,7 +427,7 @@
 				
 				check_user() {
 					var vm = this;
-					vm.user.permissions.scheduling >= 10? '' : vm.$router.go('/');  
+               vm.user.permissions.scheduling >= 10? '' : vm.$router.go('/'); 
 				},
 			},
 			
@@ -528,7 +546,8 @@
    
 	.scheduling_panel .tab_box .box_header {
       display: flex;
-      flex-wrap: wrap;
+         flex-wrap: wrap;
+         justify-content: space-around;
       width: 100%;
    }
 	.scheduling_panel .tab_box .box_header .title {
@@ -541,8 +560,9 @@
    }
 	.scheduling_panel .tab_box .box_header .header_content {
       display: flex;
-      width: 100%;
+      width: 50%;
       color: black;
+      
    }
    
 	.scheduling_panel .tab_box p {
@@ -562,6 +582,40 @@
       display: flex;
       width: 100%;
 	}
+   
+   .scheduling_panel .box .list_controls {
+      display: flex;
+         justify-content: space-around;
+         align-items: center;
+      width: 20rem;
+      background: var(--backHighlight);
+      border: solid 1px var(--borderColor3);
+      border-radius: var(--borderRadius);
+      padding: .5rem;      
+   }   
+   .scheduling_panel .box .list_controls .selects {
+      display: flex;
+         flex-wrap: wrap;
+      width: 8rem;   
+   }
+   .scheduling_panel .box .list_controls .control_button {
+      width: auto;
+      align-items: center;
+      padding: 0 .75rem;
+      font-size: 1rem;
+      height: auto;
+      width: 6rem;
+   }
+   .scheduling_panel .box .list_controls .select {
+      color: black;
+      background: var(--lightColor);
+   }
+   
+   
+   
+   /* --------------------------------------------------------------------------------
+                        EVENTS BOX
+      --------------------------------------------------------------------------------*/
    .scheduling_panel .box.events .event_time_row {
       position: relative;
    }
@@ -587,6 +641,16 @@
       font-size: .95rem;
       height: 1.5rem;
    }
+   
+   
+   /* --------------------------------------------------------------------------------
+                        LOCATIONS BOX
+      --------------------------------------------------------------------------------*/
+   .scheduling_panel .box.locations  {
+      
+   }
+   
+   
 	
 	
 	

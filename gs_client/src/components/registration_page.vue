@@ -236,7 +236,7 @@
 								
 								<div class="meta_input">
 									<div class="input_wrapper">
-										<input  class="text_box" type="number" min="0" max="17" name="age" v-model="member.age" title="Age IF under 18 at the time of the con"/>
+										<input  class="text_box" type="number" min="0" max="18" name="age" v-model="member.age" title="Age IF under 18 at the time of the con, enter '18' if adult"/>
 										<label>Age<br /> (if under 18)</label>
 									</div>	
 								</div>		
@@ -255,7 +255,6 @@
 												<select class="select" name="transaction_method" v-model="member.transaction_method" @click="formErrors.transaction_method = null" >
 													<option value="" style="display: none" >Method...</option>														
 													<option value="" v-for="method in paymentMethods" :value="method.id" v-text="method.method"></option>
-													
 												</select>
 												<label>Method</label>
 												<span class="form_error" v-if="formErrors.transaction_method" v-text="formErrors.transaction_method? 'Method required' : ''"></span>

@@ -119,7 +119,14 @@
                return states;
             }
             
-			}
+			},
+         
+         errorCaptured(err, component, info) {
+            console.log('error: ', err);
+            console.log('component: ',component);
+            console.log('info: ',info);
+            return false;
+         }
 			
 		}
 	</script>
