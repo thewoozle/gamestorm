@@ -124,7 +124,7 @@
 				var vm = this;				
 				vm.$store.dispatch('update_page_status', {pageReady: 'ready'}).then(() => {
 					vm.pageClasses = this.$store.state.pageStatus;	
-					vm.$store.dispatch('get_events').then(() => {});
+					vm.$store.dispatch('get_con_events').then(() => {});
 				});
 					
 			},

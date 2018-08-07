@@ -4,6 +4,7 @@
 	import main_page from '@/components/main_page'
 	import gamestorm_page from '@/components/gamestorm_page'
 	import convention_page from '@/components/convention_page'
+   import account_page from '@/components/account_page'
 	import events_page from '@/components/events_page'
 	import community_page from '@/components/community_page'
 	import connect_page from '@/components/connect_page'
@@ -37,7 +38,12 @@
 			path		: '/connect',
 			name		: 'connectpage', 
 			component: connect_page
-		},
+		}, {
+         path     : '/account',
+         name     : 'accountpage',
+         component: account_page   
+      },
+      
 
 		//	ADMIN LINKS
 		{

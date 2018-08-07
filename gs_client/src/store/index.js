@@ -30,6 +30,7 @@
 		news           : {},
 		pageStatus     : {},
 		user           : {},
+      userInfo       : {},
 		regSettings    : {},
 		memberTypes    : {},
 		departments    : {},
@@ -63,7 +64,7 @@
 		},
 		
 		// GET EVENTS
-		get_events({commit}) {
+		get_con_events({commit}) {
 			return new Promise((resolve, reject) => {
 				Axios.get(apiDomain+'_get_con_events').then((response) => {
 					commit('set_con_events', {events: response.data.con_events});
@@ -74,7 +75,7 @@
 			});	
 		},
 		
-		
+      
 		
 		// UPDATE CURRENTCON
 		update_currentCon({commit}, {convention}) {
@@ -130,6 +131,27 @@
             });
          });
          
+      },
+      
+      
+      // GET USER INFO
+      get_user_info({commit}, uuid) {
+         
+         var formData = new FormData();
+         formData.set('uuid', uuid);
+         
+         Axios.post(apiDomain + '_get_user_info', formData, {
+               headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+            }).then((response) => {		
+            commit ('set_userInfo', response.data);
+            
+         }, (err) => {
+            if (err.response.data.errors) {
+               errors.errors = err.response.data.errors;
+               resolve(errors);
+            }						
+            console.log(err.statusText+' - ' + JSON.stringify(err.response.data.errors));
+         });
       },
 		
       
@@ -230,10 +252,11 @@
 				console.log(err.statusText);
 			});
 		},
+      
 		
-		/*-----------------------------------------------------------
-                  SCHEDULING DATA 
-      ----------------------------------------------------------- */
+		/* -----------------------------------------------------------
+                     SCHEDULING DATA 
+         ----------------------------------------------------------- */
 		// get scheduling data (con locations, con events, con signups, events)
    
 		get_scheduling_data({commit}, selectedCon) {         
@@ -254,9 +277,36 @@
 			},(err) => {
 				console.log(err.statusText);
 			});
-      
-      
 		},
+      
+      update_convention({commit}, convention) {
+         
+         var vm = this,
+            newConvention,
+            _formData = new FormData();
+            
+         Object.entries(convention).forEach((item)=>{
+            console.log(item[0], item[1]);
+            _formData.append(item[0], item[1]);	
+         });
+         
+         
+         Axios.post(apiDomain+'_update_convention', _formData).then((response)=>{
+            console.log(response.data);
+         });
+      },
+      
+      // COPY CON LOCATIONS (copy work done on server)
+      copy_con_locations({commit}, targetCon) {
+         console.log(targetCon);
+         // get [con]_locations
+         Axios.get(apiDomain+'_copy_con_locations', {params: {conNum : targetCon }}).then((response)=>{
+            commit('set_con_locations', response.data);            
+         });
+      },
+      
+      
+		
       
     
 	}
@@ -322,6 +372,14 @@
 		set_user: (state,{ user}) => {
 			state.user = user;
 		},
+      
+      
+      //SET USER INFO   
+      set_userInfo: (state, {userInfo}) => {
+         console.log(userInfo);
+         Vue.set(state, 'userInfo', userInfo);
+      },
+      
 		
 		// SET MEMBERS (chunks of 20%)
 		set_members: (state, { members, action }) => {
@@ -404,6 +462,13 @@
 			state.paymentMethods= paymentMethods;
 			state.staffPositions= staffPositions;
 		},
+      
+      // SET LOCATIONS FOR SCHEDULING 
+      set_con_locations: (state, {locations}) => {
+         state.conLocations = locations;
+      },
+     
+     
 	}
 	
 	const getters = {
@@ -416,6 +481,7 @@
 		conventionInfo	: state => state.conventionInfo,
 		currentCon		: state => state.currentCon,
 		user			   : state => state.user,
+      userInfo       : state => state.userInfo,
 		
 		// reg getters
 		regReport 		: state => state.regReport,

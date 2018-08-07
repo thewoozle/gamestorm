@@ -24,11 +24,11 @@
 				</div>
 				
 				<div class="section_content">
-					<form class="con_form" @submit="update_convention" >
+					<form class="con_form" @submit.prevent="update_convention" >
 						<div class="form_row">
 								<label>Convention Name</label>
 							<div class="input_wrapper">
-								<input type="text" class="text_box" v-model="currentCon.name" />
+								<input type="text" class="text_box" name="con_name" v-model="currentCon.name" />
 							</div>
 						</div>
 						
@@ -127,7 +127,7 @@
 						<div class="form_row">
 							<div class="input_wrapper">
 								<label>Convention Venue</label>
-								<select class="select"  v-model="currentCon.venue" >
+								<select class="select" name="venue" v-model="currentCon.venue" >
 									<option value="" style="display: none;">Select Venue...</option>
 									<option v-for="venue in venues" :value="venue.id">{{venue.venue_name}}</option>
 								</select>
@@ -230,9 +230,12 @@
 			
 			
 			methods: {
-				update_convention() {
-					
-					console.log('UPDATE CONVENTION FUNCTION NEEDED');
+				update_convention(e) {
+					var vm = this;
+               console.log(vm.currentCon);
+               vm.$store.dispatch('update_convention', vm.currentCon).then(()=>{
+                  vm.showConInfo	 = false;
+               });
 				},
 				
 				

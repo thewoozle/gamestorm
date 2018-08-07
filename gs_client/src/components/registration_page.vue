@@ -593,7 +593,7 @@
 							} 
 						} 
 					}					
-					vm.userPass? '' : vm.$router.push('/');					
+					vm.userPass? '' : vm.$router.push('/');
 				},
 				
 				// UPDATE REG SETTINGS

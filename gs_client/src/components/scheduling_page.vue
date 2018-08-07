@@ -49,15 +49,15 @@
                         </div>
                         <div class="list_controls">
                            <button  type="button" :title="'Reset locations for '+currentCon.name" class="control_button fal fa-redo-alt"><span class="text" v-text="'Reset '+currentCon.short_name"></span></button>
-                           
+                          
                            <div class="selects">
-                              <select class="select" v-model="selectVenueLocs">
-                                 <option value="" style="display: none">Select Venue...</option>
-                                 <option v-for="venue in venues" :value="venue.id" v-text="venue.venue_name"></option>
+                              <select class="select" v-model="selectVenueLocs" @change="copy_venue_locations" title="this will clear the convention's established locations and replace them with the venue's location list">
+                                 <option value="0" style="display: none">Venue Locations...</option>
+                                 <option v-for="venue in venues" :selected="currentCon.venue == 1"  :value="venue.id" v-text="venue.venue_name"></option>
                               </select> 
-                              <select class="select" v-model="copyConLocations">
-                                 <option value="" style="display: none">Select Con...</option>
-                                 <option v-for="con in conventions" :value="con.id" v-text="con.short_name"></option>
+                              <select class="select" v-model="copyConLocations" @change="copy_con_locations" title="this will copy the target convention's locations to this convention, it will not replace any established locations">
+                                 <option value="0" style="display: none">copy from  Con...</option>
+                                 <option v-for="con in conventions" :value="con.tag_name" v-text="con.short_name"></option>
                               </select>
                            </div>   
                         </div>
@@ -313,7 +313,7 @@
 	<script>
 		import Vue from 'vue'
       import moment from 'moment'
-		import { mapGetters } from 'vuex'
+		import { mapGetters, mapState } from 'vuex'
 		import Router from 'vue-router'
 		import convention_select from '@/components/includes/convention_select'
 		import scheduling_control_panel from '@/components/includes/scheduling_control_panel'
@@ -333,8 +333,8 @@
                editEvent         : {},
                formErrors        : [],
                submissionSystem  : {},
-					selectVenueLocs   : {},
-               copyConLocations  : {},
+					selectVenueLocs   : 0,
+               copyConLocations  : 0,
 				}
 			},
 			
@@ -361,17 +361,20 @@
          },
 			
 			computed: {
+            ...mapState({
+					user        : 'user',  
+               venues      : 'venues',
+               conventions : 'conventions',
+            }),
+            
 				...mapGetters({
-					user        : 'user',
 					conEvents	: 'conEvents',
 					currentCon	: 'currentCon',
                allEvents   : 'allEvents',
                conLocations: 'conLocations',
-               venues      : 'venues',
                eventTypes  : 'eventTypes',
                eventTracks : 'eventTracks',
                ageGroups   : 'ageGroups',
-               conventions : 'conventions',
 				}),
             
 				filteredEvents:  () => {
@@ -424,11 +427,27 @@
 				},
 				
 				
-				
 				check_user() {
 					var vm = this;
                vm.user.permissions.scheduling >= 10? '' : vm.$router.go('/'); 
 				},
+            
+            copy_venue_locations(e) {
+               console.log('non functioning');
+            },
+            
+            copy_con_locations(e) {
+               console.log(e.target.value);
+               var   vm = this,
+                     targetCon;
+               targetCon = e.target.value;      
+               vm.$store.dispatch('copy_con_locations', targetCon).then(()=>{
+                  
+               });
+               // get selected convention [con]_locations table and update current con locations table, replacing or adding copied con's locations
+               
+               
+            }
 			},
 			
 		}
@@ -596,7 +615,7 @@
    .scheduling_panel .box .list_controls .selects {
       display: flex;
          flex-wrap: wrap;
-      width: 8rem;   
+      width: 12rem;   
    }
    .scheduling_panel .box .list_controls .control_button {
       width: auto;
