@@ -8,6 +8,7 @@
 	
 	import { siteContent } from './site_content'
 	import { statesList } from './states_list'
+   import { devNotes } from './dev_notes'
 	
 	Vue.use(Vuex);
 	Vue.use(VueAxios, Axios);
@@ -15,6 +16,7 @@
 	const state = {
 		siteContent    : siteContent, 
 		statesList     : statesList,
+      devNotes       : devNotes,
 		showMenu       : false,
 		siteSettings   : {},
 		currentCon     : {},
@@ -92,6 +94,31 @@
 		update_user({commit}, user) {
 			commit('set_user', {user});
 		},
+      
+      
+      // UPDATE USER INFO
+      update_user_info({commit}, userInfo) {
+         console.log(userInfo);
+         return new Promise((resolve, reject) => {
+            var   vm = this,
+                  _formData = new FormData();
+            for (var key in userInfo) {
+               _formData.append(key, userInfo[key]);
+            }      
+            Axios.post(apiDomain+'_update_create_user', _formData, {headers : 
+                  {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+            }).then((response) => {
+                  
+                  resolve(response.data);
+                  commit('set_userInfo', {userInfo});
+                  
+               }, (err) => {
+                  reject(err.response.data.errors);
+                  console.log(err.statusText);
+            });
+         });
+         
+      },
       
       // SUBMIT LOGIN
       submit_login({commit}, loginInfo) {

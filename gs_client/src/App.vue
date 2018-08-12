@@ -17,7 +17,13 @@
 			<router-view class="main_view"/>
 			
 			<page_footer v-if="pageType == 'public' " />
-		
+		<div class="data_view dev_notes" :class="showDevNotes? 'show' : ''">
+         <button type="button" class="control_button fal fa-times" v-if="showDevNotes" @click="showDevNotes? showDevNotes = false : showDevNotes = true " ></button>
+         <button type="button" class="title" @click="showDevNotes? showDevNotes = false : showDevNotes = true">DEV NOTES</button>
+         <pre class="todo_list">{{devNotes.todo}}</pre>
+         <pre class="notes">{{devNotes.dev_notes}}</pre>
+      
+      </div>
 		</main>			
 		
 	  </div>
@@ -36,7 +42,8 @@
 		import Router from 'vue-router'
 		
 		import page_footer from '@/components/includes/page_footer'	
-		import {apiDomain} from './config';
+		import {apiDomain} from './config'
+      import {mapState} from 'vuex'
 		
 		Vue.use(Router)
 		export default {
@@ -46,8 +53,9 @@
 			return {
 				pageClasses	: [],
 				topdistance	: 0,
-				pageType	: '',
-				showSignIn	: false,
+				pageType	   : '',
+				showSignIn  : false,
+            showDevNotes: false,
 			}
 		},  
 		  
@@ -66,6 +74,9 @@
 		  },
 		  
 		  computed: {
+           ...mapState({
+              devNotes  : 'devNotes',
+           }),
 			pageName() {
 				return this.$route.name;
 			},
@@ -422,9 +433,8 @@
 			color: #222;
 			width: 100%;
 			justify-content: center;
-			alilgn-items: center;
+			align-items: center;
 			line-height: 1em;
-			pointer-events: none;
 		}
 		.data_view:hover {
 			opacity: 1;		

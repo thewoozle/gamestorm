@@ -94,8 +94,8 @@
                      
                      
                   	<div class="aside_section intro" :class="accountSection == 'my_profile' ? 'show': ''">	
-							<span class="section_title">My Profile</span>
-                     
+                        <span class="section_title">My Profile</span>
+                        <edit_profile/>
                      </div>
                      
                      
@@ -134,6 +134,7 @@
 	<script>
 			import Vue from 'vue'
 			import { mapGetters } from 'vuex'
+         import edit_profile from '@/components/edit_profile'
 			
 			export default{
 				name: 'account_page',
@@ -147,6 +148,10 @@
 				watch: {
 					
 				},
+            
+            components: {
+               'edit_profile' : edit_profile,
+            },
 				
 				computed: {
 					...mapGetters({
@@ -182,7 +187,9 @@
 	
 	/*		-----------------------	SECTION ACCOUNT	----------------------- 	*/
 	.section.account_section {
-		background: var(--altColor);
+		border-radius: var(--borderRadius);
+      background: #2a2b2d;
+      box-shadow: var(--blackBoxShadow);
 		padding: 3rem 0;
       justify-content: space-between;
 	}

@@ -125,14 +125,23 @@
 						
 						
 						<div class="form_row">
-							<div class="input_wrapper">
-								<label>Convention Venue</label>
-								<select class="select" name="venue" v-model="currentCon.venue" >
-									<option value="" style="display: none;">Select Venue...</option>
-									<option v-for="venue in venues" :value="venue.id">{{venue.venue_name}}</option>
-								</select>
-								
-							</div>
+							<div class="form_element">
+                        <div class="input_wrapper">
+                           <label>Convention Venue</label>
+                           <select class="select" name="venue" v-model="currentCon.venue" >
+                              <option value="" style="display: none;">Select Venue...</option>
+                              <option v-for="venue in venues" :value="venue.id">{{venue.venue_name}}</option>
+                           </select>
+                           
+                        </div>
+                     </div>
+
+							<div class="form_element">
+                        <div class="input_wrapper checkbox_wrapper">
+                           <input class="checkbox" type="checkbox" name="con_active" :class="currentCon.active? 'checked' : ''"  v-model="currentCon.active" />
+                        </div>
+
+                     </div>
 						</div>
                   
                   <div class="form_row">
@@ -172,7 +181,7 @@
 
 	<script>
 		import Vue from 'vue'
-		import { mapGetters } from 'vuex'
+		import { mapGetters, mapState } from 'vuex'
 		import { Datetime } from 'vue-datetime'
 		import 'vue-datetime/dist/vue-datetime.css'
 		
@@ -193,12 +202,14 @@
 			},
 			
 			computed: {
+            ...mapState({
+					venues 		: 'venues',
+					user 		: 'user',              
+            }),
 				...mapGetters({
 					conventions	: 'conventions',
 					siteContent	: 'siteContent',
-					venues 		: 'venues',
-					currentCon	: 'currentCon',					
-					user 		: 'user',
+					currentCon	: 'currentCon',	
 				}),
 				
 				selectedCon() {
