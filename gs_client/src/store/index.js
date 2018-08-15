@@ -323,6 +323,17 @@
          });
       },
       
+      get_con_locations({commit}, selectedCon) {        
+			var vm = this,
+            _formData = new FormData();
+			_formData.append('con', selectedCon);			
+      
+			Axios.post(apiDomain+'_get_con_locations', _formData).then((response) => {
+            console.log(response.data);
+				commit('set_con_locations', response.data); 
+            });
+      },
+      
       // COPY CON LOCATIONS (copy work done on server)
       copy_con_locations({commit}, targetCon) {
          console.log(targetCon);

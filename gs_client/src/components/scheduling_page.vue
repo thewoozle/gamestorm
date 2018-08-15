@@ -10,7 +10,7 @@
 			<section class="section scheduling_header">
 
 				<div class="con_controls">
-					<convention_select/>
+					<convention_select  :_selectedCon = "selectedCon" @setCon = "set_con" />
 				</div>
 				
 				<div class="scheduling_report ">
@@ -48,8 +48,6 @@
                         
                         </div>
                         <div class="list_controls">
-                           <button  type="button" :title="'Reset locations for '+currentCon.name" class="control_button fal fa-redo-alt"><span class="text" v-text="'Reset '+currentCon.short_name"></span></button>
-                          
                            <div class="selects">
                               <select class="select" v-model="selectVenueLocs" @change="copy_venue_locations" title="this will clear the convention's established locations and replace them with the venue's location list">
                                  <option value="0" style="display: none">Venue Locations...</option>
@@ -59,10 +57,10 @@
                                  <option value="0" style="display: none">copy from  Con...</option>
                                  <option v-for="con in conventions" :value="con.tag_name" v-text="con.short_name"></option>
                               </select>
-                           </div>   
-                        </div>
-                        
-                        
+                           </div>
+                           
+                           <button  type="button" :title="'Reset locations for '+currentCon.name" class="control_button fal fa-redo-alt"><span class="text" v-text="'Reset '+currentCon.short_name"></span></button>
+                        </div>    
                      </header>
                      
 							<div class="list_element">
@@ -414,17 +412,29 @@
 			methods: {
 				get_scheduling_data() {
 				//GET STORE DATA
-					var vm = this;
-               
+					var vm = this;               
                
                if (localStorage) {
 						if (localStorage.selectedCon) {
 							var vm = this;
 							vm.selectedCon = localStorage.selectedCon;
-						}
-					}					
-					vm.$store.dispatch('get_scheduling_data', vm.selectedCon).then(()=>{});					
+						} else {
+                     vm.selectedCon = vm.currentCon.tag_name;
+                  }                  
+					}	else {
+                     vm.selectedCon = vm.currentCon.tag_name;
+               }				
+					vm.$store.dispatch('get_scheduling_data', vm.selectedCon).then(()=>{});	
+					vm.$store.dispatch('get_con_locations', vm.selectedCon).then(()=>{});	               
 				},
+            
+            
+            
+            set_con(con) {
+               var vm = this;               
+               vm.selectedCon == con? '' : vm.selectedCon = con;                  
+					vm.$store.dispatch('get_con_locations', vm.selectedCon).then(()=>{});	  
+            },
 				
 				
 				check_user() {
@@ -606,7 +616,7 @@
       display: flex;
          justify-content: space-around;
          align-items: center;
-      width: 20rem;
+      width: 24rem;
       background: var(--backHighlight);
       border: solid 1px var(--borderColor3);
       border-radius: var(--borderRadius);
@@ -620,10 +630,14 @@
    .scheduling_panel .box .list_controls .control_button {
       width: auto;
       align-items: center;
-      padding: 0 .75rem;
+      padding: .75rem;
       font-size: 1rem;
       height: auto;
-      width: 6rem;
+      width: 7rem;
+   }
+   .scheduling_panel .box .list_controls .control_button:before {
+      font-size: 2.5rem;
+      opacity: .2;
    }
    .scheduling_panel .box .list_controls .select {
       color: black;

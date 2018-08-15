@@ -684,6 +684,7 @@
 		.control_button .text {
          display: flex;
          padding-left: .5rem;
+         line-height: 1.25em;
          font-family: Dosis, sans-serif;
          letter-spacing: .05em;
       }
