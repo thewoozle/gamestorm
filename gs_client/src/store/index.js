@@ -335,10 +335,8 @@
       },
       
       // COPY CON LOCATIONS (copy work done on server)
-      copy_con_locations({commit}, targetCon) {
-         console.log(targetCon);
-         // get [con]_locations
-         Axios.get(apiDomain+'_copy_con_locations', {params: {conNum : targetCon }}).then((response)=>{
+      copy_con_locations({commit}, conData) {
+         Axios.get(apiDomain+'_copy_con_locations', {params: conData}).then((response)=>{
             commit('set_con_locations', response.data);            
          });
       },

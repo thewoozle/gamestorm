@@ -451,7 +451,9 @@
                var   vm = this,
                      targetCon;
                targetCon = e.target.value;      
-               vm.$store.dispatch('copy_con_locations', targetCon).then(()=>{
+               console.log(vm.selectedCon, targetCon);
+               
+               vm.$store.dispatch('copy_con_locations', {'selectedCon' : vm.selectedCon, 'targetCon' : targetCon}).then(()=>{
                   
                });
                // get selected convention [con]_locations table and update current con locations table, replacing or adding copied con's locations
@@ -600,8 +602,12 @@
    
    .scheduling_panel .box .list_element {
       display: flex;
-      flex-direction: column;
-      width: 30%;
+         flex-wrap: wrap;
+      width: 40%;
+      max-height: 50rem;
+      margin: 0 auto;
+      overflow: hidden;
+      overflow-y: auto;
    }
    .scheduling_panel .box .edit_element {
       display: flex;
