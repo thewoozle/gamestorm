@@ -313,7 +313,6 @@
             _formData = new FormData();
             
          Object.entries(convention).forEach((item)=>{
-            console.log(item[0], item[1]);
             _formData.append(item[0], item[1]);	
          });
          
@@ -339,6 +338,26 @@
          Axios.get(apiDomain+'_copy_con_locations', {params: conData}).then((response)=>{
             commit('set_con_locations', response.data);            
          });
+      },
+      
+      update_location({commit}, location) {
+         var   vm = this,
+               _formData = new FormData();
+          
+         Object.entries(location).forEach((item)=>{
+            console.log(item[0], item[1]);
+            _formData.append(item[0], item[1]);	
+         });
+         
+         Axios.post(apiDomain+'_update_location', _formData).then((response)=>{
+            
+            //commit('set_location', location);          
+         }, (err) => {
+				  console.log('error: '+err.statusText);
+			              
+         });
+         
+         
       },
       
       

@@ -186,7 +186,7 @@
 			--borderColor2			: #0c485f;
 			--borderColor3			: #0076A3;			
 			--lightColor			: #fff;
-			--contrastColor		: #735896;
+			--contrastColor		: #665976;
 			--passColor				: #7adc8a;					
 			--button2				: #42634e;
 			--textColor				: #fbffea;
@@ -206,6 +206,7 @@
 			
 			--altBackground		: #f9f7ec;
 			--altColor				: #ebeeff;
+         --altBackground2     : #c4decd;
 							
 			
 			--borderRadius			: .25rem;
