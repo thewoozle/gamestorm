@@ -147,7 +147,7 @@
                               </div>
                               
                               <div class="controls">
-                                 <button type="button" class="button" v-text="editLocation.id? 'Update Location' : 'Add Location'" @click.prevent="$store.dispatch('update_location',editLocation).then(()=>{});"></button> 
+                                 <button type="button" class="button" v-text="editLocation.id? 'Update Location' : 'Add Location'" @click.prevent="() =>{set_location_form_data(); $store.dispatch('update_location',editLocation).then(()=>{})}"></button> 
                               </div>
                            </form>
                         </div>   
@@ -371,6 +371,7 @@
 				var vm = this;
 				vm.check_user();
 				vm.get_scheduling_data();    
+            vm.set_location_form_data();
 			},
          
          mounted() {
@@ -456,6 +457,12 @@
                   location.id == id? parentLocation = location.location_name : '';
                });
                return parentLocation;
+            },
+            
+            set_location_form_data() {
+               var vm = this;
+               vm.editLocation.selectedCon = vm.selectedCon;
+               vm.editLocation.venue = vm.currentCon.venue;
             },
             
             

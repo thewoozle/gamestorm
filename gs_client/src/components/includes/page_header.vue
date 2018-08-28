@@ -254,6 +254,9 @@
                         vm.loginUsers = response.users;
                      }	
                      
+               }, (err) => {
+                     vm.submitErrors = err;
+                  vm.showLoginLoading = false;
                });
 					
 				},
