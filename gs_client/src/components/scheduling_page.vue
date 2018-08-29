@@ -157,6 +157,7 @@
 						
                   
                   
+                  
 						<div class="box events" :class="schedulingTab == 'events'? 'active' : '' " >
                      <header class="box_header">                        
                         <span class="title">Events</span>
@@ -164,7 +165,8 @@
                      
 							<div class="list_element">
                         <pre style="color: red"> paginate</pre>
-                        <div class="list_item" v-for="event in allEvents">
+                        <div class="box_loading" v-if="conEvents.length <1">Loading...</div>
+                        <div class="list_item" v-else  v-for="event in conEvents">
                            <button type="button" style="color: #222;" @click.prevent="editEvent = event">{{event.event_name}} - {{event.track}} </button>
                            <button type="button" class="activate_button fas" :class="event.event_active? 'fa-ban' : 'fa-circle'" ></button>
                         </div>
@@ -481,8 +483,9 @@
             
             set_con(con) {
                var vm = this;               
-               vm.selectedCon == con? '' : vm.selectedCon = con;                  
-					vm.$store.dispatch('get_con_locations', vm.selectedCon).then(()=>{});	  
+               vm.selectedCon == con? '' : vm.selectedCon = con;
+					vm.$store.dispatch('get_con_locations', vm.selectedCon).then(()=>{});
+					vm.$store.dispatch('get_con_events', vm.selectedCon).then(()=>{});	 
             },
 				
 				
@@ -658,12 +661,21 @@
       display: flex;
          flex-wrap: wrap;
          justify-content: center;
+         align-items: flex-start;
       width: 45%;
       margin: 1rem 0;
       padding: 1rem 0;
       max-height: 50rem;
       overflow: hidden;
       overflow-y: auto;
+   }
+   .scheduling_panel .tab_box .box_loading {
+      display: flex;
+         justify-content: center;
+         align-items: center;
+      width: 100%;
+      font-size: 1.5rem;
+      color: var(--warningColor);
    }
    .scheduling_panel .box .list_element .control_bar {
       position: absolute;

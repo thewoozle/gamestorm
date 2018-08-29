@@ -322,6 +322,7 @@
          });
       },
       
+      // GET CON LOCATIONS
       get_con_locations({commit}, selectedCon) {        
 			var vm = this,
             _formData = new FormData();
@@ -330,6 +331,18 @@
 			Axios.post(apiDomain+'_get_con_locations', _formData).then((response) => {
             console.log(response.data);
 				commit('set_con_locations', response.data); 
+            });
+      },
+      
+      //GET CON EVENTS
+      get_con_events({commit}, selectedCon) {        
+			var vm = this,
+            _formData = new FormData();
+			_formData.append('con', selectedCon);			
+      
+			Axios.post(apiDomain+'_get_con_events', _formData).then((response) => {
+            console.log(response.data);
+				commit('set_con_events', response.data); 
             });
       },
       
@@ -521,6 +534,11 @@
       // SET LOCATIONS FOR SCHEDULING 
       set_con_locations: (state, {locations}) => {
          state.conLocations = locations;
+      },
+     
+      // SET EVENTS FOR SCHEDULING 
+      set_con_events: (state, {events}) => {
+         state.conEvents = events;
       },
      
      
