@@ -459,6 +459,27 @@
 			font-size: 1.1rem;
 			font-weight: 300;
 		}
+      
+      .list_button {
+         display: flex;
+            justify-content: center;
+         font-size: 1.5rem;
+         height: 1.15em;
+         line-height: 1.15em;
+         width: 1.15em;         
+         color: var(--button);
+         border-radius: .15rem;
+         cursor: pointer;
+         background: none;
+      }
+      .list_button + .list_button {
+         margin-left: .5rem;
+      }
+      .list_button:hover {
+         background: var(--buttonHighlight);
+         opacity: .65;
+         color: var(--lightColor);
+      }
 		
 		/*	------------	MINI REPORT	------------	*/
 		.mini_report {
@@ -649,7 +670,7 @@
 			position: absolute;
 				top: 0;
 				right: 0;
-				z-index: 10;
+				z-index: 25;
 			width: 3rem;
 			margin: .5rem .5rem 0 0;
 			display: flex;
@@ -681,6 +702,10 @@
 		}
 		.control_button:active { 	
 			transform:translateY(1px);
+         
+		}
+		.control_button.active { 	
+         box-shadow: inset 1px 1px 4px rgba(0,0,0,0.65);
 		}
 		.control_button .text {
          display: flex;
