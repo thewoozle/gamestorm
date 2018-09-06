@@ -463,6 +463,7 @@
       .list_button {
          display: flex;
             justify-content: center;
+            text-align: center;
          font-size: 1.5rem;
          height: 1.15em;
          line-height: 1.15em;
@@ -471,9 +472,6 @@
          border-radius: .15rem;
          cursor: pointer;
          background: none;
-      }
-      .list_button + .list_button {
-         margin-left: .5rem;
       }
       .list_button:hover {
          background: var(--buttonHighlight);
@@ -1502,7 +1500,8 @@
 		}
 		.form_element {
 			display: flex;
-			flex: 1; 
+            flex-wrap: wrap;
+            flex: 1; 
 			margin: 0 .2
 			5rem;
 			flex-wrap: wrap;
@@ -1578,6 +1577,14 @@
 			line-height: 1em;
 			color: var(--textColor3);
 		}
+      .label.top {
+         width: 90%;
+         padding: 0 0 .5rem 1rem;
+         border-right: 0;
+         text-align: left;
+         justify-content: flex-start;
+         flex-wrap: nowrap;
+      }
 		label .password_show {
 			position: absolute;
 				bottom: 0;

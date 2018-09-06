@@ -130,7 +130,7 @@
                               <div class="form_row" >
                                  <label>Location Parent</label>
                                  <div class="input_wrapper">
-                                    <select class="select" name="location_parent" v-model="editLocation.location_parent || ''">
+                                    <select class="select" name="location_parent" v-model="editLocation.location_parent">
                                        <option value="" style="display: none" >select...</option>
                                        <option v-for="location in conLocations" :value="location.id" :selected="location.id == editLocation.location_parent" v-text="location.location_name"></option>
                                     </select>
@@ -232,7 +232,7 @@
                               <div class="form_element">
                                  <label class="label">Event Track</label>
                                  <div class="input_wrapper">
-                                    <select class="input select" name="event_track" v-model="editEvent.event_track || ''"   >
+                                    <select class="input select" name="event_track" v-model="editEvent.event_track"   >
                                        <option value="" style="display: none">event track...</option>
                                        <option v-for="track in eventTracks" :value="track.id" v-text="track.track_name" :selected="editEvent.event_track == 1" ></option>
                                     </select>
@@ -242,7 +242,7 @@
                               <div class="form_element">
                                  <label class="label">Event Type</label>
                                  <div class="input_wrapper">
-                                    <select class="input select" name="event_type" v-model="editEvent.event_type || ''"   >
+                                    <select class="input select" name="event_type" v-model="editEvent.event_type"   >
                                        <option value="" style="display: none">event type...</option>
                                        <option v-for="type in eventTypes" :value="type.id" v-text="type.type_name" :selected="editEvent.event_type == 1" ></option>
                                     </select>
@@ -265,22 +265,32 @@
                                  </div>
                               </div>
                               
-                              <div class="form_element presenters" >
+                              <div class="form_element presenters" v-if="editEvent.presenters">
+                                 <div class="titles">
+                                    <span class="name">Name</span>
+                                    <div class="buttons">
+                                       <span class="cntrl">email</span>
+                                       <span class="cntrl">remove</span>
+                                       <span class="cntrl">player</span>
+                                    </div>   
+                                 </div>
                               
                                  <div v-if="editEvent.presenters" v-for="presenter in editEvent.presenters" class="presenter">
                                     <span class="text" v-text="presenter.first_name+' '+presenter.last_name"></span>
-                                    <button type="button" class="list_button fal fa-envelope" title="email presenter NON WORKING"></button>   
-                                    <button type="button" class="list_button fal fa-ban" title="remove presenter" @click="remove_presenter(presenter.uuid)"></button>   
-                                    <button type="button" class="list_button fal" 
-                                       :class="presenter.member_role=='presenter'? 'fa-check-square' : 'fa-square'" 
-                                       title="presenter is seated player" 
-                                       @click="set_presenter_player(presenter.uuid)"
-                                    ></button>   
+                                    <div class="buttons">
+                                       <button type="button" class="list_button fal fa-envelope" title="email presenter NON WORKING"></button>   
+                                       <button type="button" class="list_button fal fa-ban" title="remove presenter" @click="remove_presenter(presenter.uuid)"></button> 
+                                       <button type="button" class="list_button fal" 
+                                          :class="presenter.member_role=='presenter'? 'fa-check-square' : 'fa-square'" 
+                                          title="presenter is seated player" 
+                                          @click="set_presenter_player(presenter.uuid)"
+                                       ></button>   
+                                    </div>   
                                  </div>
                                  
-                                 <span v-else class="text">This event has no presenter</span>
                                  
                               </div>
+                              <div class="form_element" v-else ><span class="text">This event has no presenter</span></div>
                            </div>
                            
                            
@@ -298,8 +308,9 @@
                            <div class="form_row event_time_row">
                               <div class="form_element">	
                                  <div class="input_wrapper">
+                                    <label class="label top">Start Time</label>
                                     <select class="select"  v-model="editEvent.event_start_time" name="event_start_time">
-                                    <option value="" style="display: none" >select start time...</option>
+                                       <option value="" style="display: none" >select start time...</option>
                                        <option v-for="timeblock in timeblocks" :selected="editEvent.event_start_time == sql_date_time(timeblock)" :value="sql_date_time(timeblock)" v-text="date_time(timeblock)"></option>
                                     </select>
                                     <div class="buttons">
@@ -308,19 +319,10 @@
                               </div>   
 
                               <div class="form_element">	
-                                 <select class="select" v-model="editEvent.duration || '' " name="event_duration">
-                                    <option value="" style="display: none" >select duration...</option>
-                                    <option value="30" >30 minutes</option>
-                                    <option value="60" >one hour</option>
-                                    <option value="90" >90 minutes</option>
-                                    <option value="120" >Two hours</option>
-                                    <option value="180" >Three hours</option>
-                                    <option value="240" >Four hours</option>
-                                    <option value="300" >Five hours</option>
-                                    <option value="360" >Six hours</option>
-                                    <option value="480" >Eight hours</option>
-                                    <option value="600" >Ten hours</option>
-                                    <option value="720" >Twelve hours</option>
+                                 <label class="label top">Event Duration</label>
+                                 <select class="select" v-model="editEvent.duration" name="event_duration">
+                                    <option value="" style="display: none"  >select duration...</option>
+                                    <option v-for="duration in eventDuration" :selected="editEvent.duration == duration" :value="duration.time" v-text="duration.text"></option>
                                  </select>
                               </div>
                            </div>
@@ -328,34 +330,89 @@
                            
                            <div class="form_row players ">
                               <div class="form_element">
-                                 <label class="label">Total number of players<br/>(including presenter)</label>
+                                 <label class="label">Total player positions</label>
                                  <div class="input_wrapper">
                                     <input class="text_box num_players_box" type="number" min="1" max="100" v-model="editEvent.seats"  name="event_players" placeholder="1"   />
                                  </div>	
                               </div>
+                              
+                              <div class="form_element">
+											<label class="label">Requested Table</label>
+                                    <div class="input_wrapper">
+                                       <select class="select" name="table_requested" v-model="editEvent.table_requested" >
+                                          <option value="" style="display: none">select table shape</option>
+                                          <option value="none" >None</option>
+                                          <option value="noPref" >No Preference</option>
+                                          <option value="round" >Round</option>
+                                          <option value="square" >Square</option>
+                                          <option value="long" >Long</option>
+                                          <option value="custom" >Special (as noted below)</option>
+                                       </select>	
+                                    </div>
+                                    <span class="input_message" v-if="formErrors.table_requested" >Please select a table, 'none', or 'special'</span>
+										</div>
                            </div>	
-                           
-                           <pre style="color: purple">[active, table type, player experience, age group, info url, short description, long description, notes, (hidden-event status) ]</pre>
-                           
-                           
-                           
-                              <div class="form_element">	
-                                 <label class="label">GM is Designer</label>
-                                 <div class="checkbox_wrapper input_wrapper">
-                                    <input class="checkbox" type="checkbox" name="gm_designer" v-model="editEvent.gm_designer"  value="1" /> 
-                                 </div>
-                                 <span class="input_message" v-if="formErrors.gm_designer" v-text="formErrors.gm_designer"></span> 
+                              
+                              
+                           <div class="form_row players ">
+                              <div class="form_element">
+                                 <label class="label top">Recommended experience level</label>
+                                 <select class="select" v-model="editEvent.experience_level" >
+                                    <option value="" style="display: none"  >select experience level...</option>
+                                    <option v-for="level in experienceLevels" :selected="editEvent.experience_level == level.level" :value="level.level" v-text="level.text"></option>
+                                 </select>
                               </div>
                               
+                              <div class="form_element">
+                                 <label class="label top">Recommended age level</label>
+                                 <select class="select" v-model="editEvent.experience_level" >
+                                    <option value="" style="display: none"  >select age group...</option>
+                                    <option v-for="group in ageGroups" :selected="editEvent.age_category == group.id" :value="group.id" v-text="group.age_text"></option>                                 
+                                 </select>
+                              </div>
+                           </div>	
+                           
+                           <div class="form_row">
+                              <label class="label">Short Description</label>
+                              <div class="input_wrapper">
+                                 <textarea class="textarea" name="short_description" placeholder="400 char max."  v-model="editEvent.short_description" maxlength = "400"  /></textarea> 
+                              </div>
+                              <span class="input_message" v-if="formErrors.short_description" v-text="formErrors.short_description" ></span> 
+                           </div>
                               
+                           <div class="form_row">
+                              <label class="label">Description</label>
+                              <div class="input_wrapper">
+                                 <textarea class="textarea" name="event_description"  v-model="editEvent.event_description" placeholder="2500 char max. uses Short Description if blank" maxlength = "2500" /> </textarea>		
+                              </div>
+                           </div>
                               
-                              
+                           <div class="form_row">
+                              <label class="label">Notes for Scheduler</label>
+                              <div class="input_wrapper">
+                                 <textarea class="textarea" name="event_notes"  v-model="editEvent.event_notes" placeholder="400 char max." maxlength="400" /></textarea>
+                              </div>	
+                           </div>
                            
                            
                            
-                           
+                           <div class="form_row">
+                              <label class="label">Event Link</label>                                 
+                              <div class="input_wrapper">
+                                 <input class="text_box"  v-model="editEvent.event_url" />
+                              </div>
+                              <span class="form_error" v-if="formErrors.event_url" v-text="formErrors.event_url? 'Event URL!' : ''"></span>
+                           </div>
                            
                            <div class="controls">
+                              <div class="form_element event_active ">
+                                 <label class="label top">Event Active</label>
+                                 <div class="checkbox_wrapper input_wrapper">
+                                    <input type="checkbox" class="checkbox" :class="editEvent.event_active? 'checked' : ''" v-model="editEvent.event_active"  />
+                                 </div>
+                              </div>
+                              
+                           
                               <button type="button" @click="submit_event" class="button" :disable="!editEvent" v-text="editEvent.event_id? 'Update Event' : 'Add Event'"></button> 
                            </div>
                         </form>   
@@ -478,9 +535,11 @@
                eventTypes  : 'eventTypes',
                eventTracks : 'eventTracks',
                ageGroups   : 'ageGroups',
+               experienceLevels: 'experienceLevels',
 					currentCon	: 'currentCon',  
                allEvents   : 'allEvents',    
                memberList  : 'memberList',
+               eventDuration:'eventDuration',
             }),
             
 				...mapGetters({
@@ -1069,13 +1128,42 @@
    
    .scheduling_panel .edit_element .presenters {
       display: flex;
-         flex-direction: column;         
+         flex-direction: column;  
+      padding: .25rem;
+      border-radius: .1rem;
+      border: solid 1px var(--borderColor);   
+   }
+   
+   .scheduling_panel .edit_element .presenters .titles {
+      display: flex;
+         justify-content: space-between;
+      width: 100%;
+      color: var(--textColor2);
+   }
+   .scheduling_panel .edit_element .presenters .name  {
+      display: flex;
+      padding-left: 2rem;
+      color: inherit;
+      font-size: .85rem;
+   }
+   .scheduling_panel .edit_element .presenters .buttons {
+      display: flex;
+      justify-content: space-between;
+      color: inherit;
+      width: 7rem;
+   }
+   .scheduling_panel .edit_element .presenters .cntrl {
+      display: flex;
+      color: inherit;
+      width: 2rem;
+      font-size: .65rem;
+      justify-content: center;      
    }
    .scheduling_panel .edit_element .presenters .presenter {
       display: flex;
          align-items: center;
       height: 1.65rem;
-      justify-content: flex-end;
+      justify-content: between;
       width: 100%;      
    }
    .scheduling_panel .edit_element .presenters .text {
@@ -1084,6 +1172,11 @@
       padding-left: .5rem;
       margin-right: auto;
       color: var(--textColor4);
+   }
+   .scheduling_panel .edit_element .presenters .buttons {
+      display: flex;
+      justify-content: space-between;
+      width: 7rem;
    }
    
    

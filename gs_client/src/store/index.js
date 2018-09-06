@@ -8,7 +8,7 @@
 	import {apiDomain} from '../config'
 	
 	import { siteContent } from './site_content'
-	import { statesList } from './states_list'
+   import {statesList, eventDuration, experienceLevels } from './lists'
    import { devNotes } from './dev_notes'
 	
 	Vue.use(Vuex);
@@ -18,6 +18,8 @@
 		siteContent    : siteContent, 
 		statesList     : statesList,
       devNotes       : devNotes,
+      eventDuration  : eventDuration,
+      experienceLevels: experienceLevels,
 		showMenu       : false,
 		siteSettings   : {},
 		currentCon     : {},

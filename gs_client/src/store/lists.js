@@ -1,4 +1,5 @@
 
+
 	const statesList = [		
 		{ 'state'	: 'AL',	'name'	: 'Alabama'},
 		{ 'state'	: 'AK',	'name'	: 'Alaska'},
@@ -75,4 +76,30 @@
 		{ 'state'	: 'YT',	'name' 	: 'Yukon'},		
 	]
 	
-	export { statesList }
+   
+   const eventDuration =  [
+      { 'time': '30', 'text': '30 minutes'},
+      { 'time': '60', 'text' : 'one hour'},
+      { 'time': '90', 'text' : '90 minutes'},
+      { 'time': '120', 'text': 'Two hours'},
+      { 'time': '180', 'text': 'Three hours'},
+      { 'time': '240', 'text': 'Four hours'},
+      { 'time': '300', 'text': 'Five hours'},
+      { 'time': '360', 'text': 'Six hours'},
+      { 'time': '480', 'text': 'Eight hours'},
+      { 'time': '600', 'text': 'Ten hours'},
+      { 'time': '720', 'text': 'Twelve hours'},
+   ]
+            
+   
+   const experienceLevels = [
+      {'level' : '1', 'text': 'beginner'},
+      {'level' : '2', 'text': 'familiar'},
+      {'level' : '3', 'text': 'expert'},
+   ]
+
+   
+   
+	export { statesList, eventDuration, experienceLevels }
+
+   
