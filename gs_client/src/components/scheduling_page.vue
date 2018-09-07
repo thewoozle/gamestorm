@@ -211,211 +211,7 @@
                      
                      <div class="edit_element">
                         <span class="title">Event Details</span>
-                        
-                        <form class="form edit_event_form">
-                        
-                           <p style="color: red;">add or update event for master Events table. Does not schudule unless event is deactivated.</p>
-                           <input type="hidden" name="event_id" v-model="editEvent.event_id" />
-                           
-									event tag: <span class="text"  v-text="editEvent.event_tag || '-'"></span>
-                           
-                           
-                           <div class="form_row">
-                              <label>Event Name</label>
-                              <div class="input_wrapper">
-                                 <input class="text_box" name="event_name" v-model="editEvent.event_name" />
-                              </div>
-                              <span class="form_error" v-if="formErrors.event_name" v-text="formErrors.event_name? 'Event Name!' : ''"></span>
-                           </div>
-                              
-                           <div class="form_row">
-                              <div class="form_element">
-                                 <label class="label">Event Track</label>
-                                 <div class="input_wrapper">
-                                    <select class="input select" name="event_track" v-model="editEvent.event_track"   >
-                                       <option value="" style="display: none">event track...</option>
-                                       <option v-for="track in eventTracks" :value="track.id" v-text="track.track_name" :selected="editEvent.event_track == 1" ></option>
-                                    </select>
-                                 </div>	
-                                 <span class="input_message" v-if="formErrors.event_track" v-text="formErrors.event_track"></span> 		
-                              </div>
-                              <div class="form_element">
-                                 <label class="label">Event Type</label>
-                                 <div class="input_wrapper">
-                                    <select class="input select" name="event_type" v-model="editEvent.event_type"   >
-                                       <option value="" style="display: none">event type...</option>
-                                       <option v-for="type in eventTypes" :value="type.id" v-text="type.type_name" :selected="editEvent.event_type == 1" ></option>
-                                    </select>
-                                 </div>	
-                                 <span class="input_message" v-if="formErrors.event_type" v-text="formErrors.event_type"></span> 		
-                              </div>
-                           </div>
-                           
-                           
-                           <div class="form_row">
-                              <div class="form_element select_presenter">	
-                                 <label class="label">Presenter(s)</label>
-                                 <div class="input_wrapper">
-                                    <select class="select" @change="add_presenter" v-model="presenterSelect"  >
-                                       <option value="" style="display: none">presenter...</option>
-                                       <option v-for="member in memberList" :value="member.uuid" v-text="member.first_name+' '+member.last_name"></option>
-                                    </select>
-                                    
-                                    
-                                 </div>
-                              </div>
-                              
-                              <div class="form_element presenters" v-if="editEvent.presenters">
-                                 <div class="titles">
-                                    <span class="name">Name</span>
-                                    <div class="buttons">
-                                       <span class="cntrl">email</span>
-                                       <span class="cntrl">remove</span>
-                                       <span class="cntrl">player</span>
-                                    </div>   
-                                 </div>
-                              
-                                 <div v-if="editEvent.presenters" v-for="presenter in editEvent.presenters" class="presenter">
-                                    <span class="text" v-text="presenter.first_name+' '+presenter.last_name"></span>
-                                    <div class="buttons">
-                                       <button type="button" class="list_button fal fa-envelope" title="email presenter NON WORKING"></button>   
-                                       <button type="button" class="list_button fal fa-ban" title="remove presenter" @click="remove_presenter(presenter.uuid)"></button> 
-                                       <button type="button" class="list_button fal" 
-                                          :class="presenter.member_role=='presenter'? 'fa-check-square' : 'fa-square'" 
-                                          title="presenter is seated player" 
-                                          @click="set_presenter_player(presenter.uuid)"
-                                       ></button>   
-                                    </div>   
-                                 </div>
-                                 
-                                 
-                              </div>
-                              <div class="form_element" v-else ><span class="text">This event has no presenter</span></div>
-                           </div>
-                           
-                           
-                           
-                           <div class="form_row" v-if="editEvent.event_track == '14'" >
-                              <div class="form_element expanding_row" v-bind:class="submissionSystem">
-                                 <label class="label">Game System</label>
-                                 <div class="input_wrapper">
-                                    <input class="input text_box" type="text"  v-model="editEvent.event_system"  name="event_system" /> 	
-                                 </div>	
-                              </div>
-                           </div>
-                           
-                           
-                           <div class="form_row event_time_row">
-                              <div class="form_element">	
-                                 <div class="input_wrapper">
-                                    <label class="label top">Start Time</label>
-                                    <select class="select"  v-model="editEvent.event_start_time" name="event_start_time">
-                                       <option value="" style="display: none" >select start time...</option>
-                                       <option v-for="timeblock in timeblocks" :selected="editEvent.event_start_time == sql_date_time(timeblock)" :value="sql_date_time(timeblock)" v-text="date_time(timeblock)"></option>
-                                    </select>
-                                    <div class="buttons">
-                                    </div>
-                                 </div>
-                              </div>   
-
-                              <div class="form_element">	
-                                 <label class="label top">Event Duration</label>
-                                 <select class="select" v-model="editEvent.duration" name="event_duration">
-                                    <option value="" style="display: none"  >select duration...</option>
-                                    <option v-for="duration in eventDuration" :selected="editEvent.duration == duration" :value="duration.time" v-text="duration.text"></option>
-                                 </select>
-                              </div>
-                           </div>
-                           
-                           
-                           <div class="form_row players ">
-                              <div class="form_element">
-                                 <label class="label">Total player positions</label>
-                                 <div class="input_wrapper">
-                                    <input class="text_box num_players_box" type="number" min="1" max="100" v-model="editEvent.seats"  name="event_players" placeholder="1"   />
-                                 </div>	
-                              </div>
-                              
-                              <div class="form_element">
-											<label class="label">Requested Table</label>
-                                    <div class="input_wrapper">
-                                       <select class="select" name="table_requested" v-model="editEvent.table_requested" >
-                                          <option value="" style="display: none">select table shape</option>
-                                          <option value="none" >None</option>
-                                          <option value="noPref" >No Preference</option>
-                                          <option value="round" >Round</option>
-                                          <option value="square" >Square</option>
-                                          <option value="long" >Long</option>
-                                          <option value="custom" >Special (as noted below)</option>
-                                       </select>	
-                                    </div>
-                                    <span class="input_message" v-if="formErrors.table_requested" >Please select a table, 'none', or 'special'</span>
-										</div>
-                           </div>	
-                              
-                              
-                           <div class="form_row players ">
-                              <div class="form_element">
-                                 <label class="label top">Recommended experience level</label>
-                                 <select class="select" v-model="editEvent.experience_level" >
-                                    <option value="" style="display: none"  >select experience level...</option>
-                                    <option v-for="level in experienceLevels" :selected="editEvent.experience_level == level.level" :value="level.level" v-text="level.text"></option>
-                                 </select>
-                              </div>
-                              
-                              <div class="form_element">
-                                 <label class="label top">Recommended age level</label>
-                                 <select class="select" v-model="editEvent.experience_level" >
-                                    <option value="" style="display: none"  >select age group...</option>
-                                    <option v-for="group in ageGroups" :selected="editEvent.age_category == group.id" :value="group.id" v-text="group.age_text"></option>                                 
-                                 </select>
-                              </div>
-                           </div>	
-                           
-                           <div class="form_row">
-                              <label class="label">Short Description</label>
-                              <div class="input_wrapper">
-                                 <textarea class="textarea" name="short_description" placeholder="400 char max."  v-model="editEvent.short_description" maxlength = "400"  /></textarea> 
-                              </div>
-                              <span class="input_message" v-if="formErrors.short_description" v-text="formErrors.short_description" ></span> 
-                           </div>
-                              
-                           <div class="form_row">
-                              <label class="label">Description</label>
-                              <div class="input_wrapper">
-                                 <textarea class="textarea" name="event_description"  v-model="editEvent.event_description" placeholder="2500 char max. uses Short Description if blank" maxlength = "2500" /> </textarea>		
-                              </div>
-                           </div>
-                              
-                           <div class="form_row">
-                              <label class="label">Notes for Scheduler</label>
-                              <div class="input_wrapper">
-                                 <textarea class="textarea" name="event_notes"  v-model="editEvent.event_notes" placeholder="400 char max." maxlength="400" /></textarea>
-                              </div>	
-                           </div>
-                           
-                           
-                           
-                           <div class="form_row">
-                              <label class="label">Event Link</label>                                 
-                              <div class="input_wrapper">
-                                 <input class="text_box"  v-model="editEvent.event_url" />
-                              </div>
-                              <span class="form_error" v-if="formErrors.event_url" v-text="formErrors.event_url? 'Event URL!' : ''"></span>
-                           </div>
-                           
-                           <div class="controls">
-                              <div class="form_element event_active ">
-                                 <label class="label top">Event Active</label>
-                                 <div class="checkbox_wrapper input_wrapper">
-                                    <input type="checkbox" class="checkbox" :class="editEvent.event_active? 'checked' : ''" v-model="editEvent.event_active"  />
-                                 </div>
-                              </div>
-                              
-                           
-                              <button type="button" @click="submit_event" class="button" :disable="!editEvent" v-text="editEvent.event_id? 'Update Event' : 'Add Event'"></button> 
-                           </div>
-                        </form>   
+                        <event_form :_editEvent = "editEvent" @clearEvent = "clear_event" />
                         
                      </div>
                      
@@ -471,6 +267,7 @@
 		import Vue from 'vue'
       import moment from 'moment'
 		import { mapGetters, mapState } from 'vuex'
+      import event_form from '@/components/includes/event_form'
 		import Router from 'vue-router'
 		import convention_select from '@/components/includes/convention_select'
 		import scheduling_control_panel from '@/components/includes/scheduling_control_panel'
@@ -507,6 +304,7 @@
 			components: {
 				'convention_select'	: convention_select,
 				'scheduling_control_panel' : scheduling_control_panel,
+            'event_form' : event_form,
 			},
 			
 			
@@ -583,9 +381,9 @@
                }	
 					vm.$store.dispatch('get_scheduling_data', vm.selectedCon).then(()=>{});	
                vm.get_con_locations();              
-					vm.get_con_events();
-               vm.get_timeblocks();
-               vm.get_event_signups();
+					// vm.get_con_events();
+               // vm.get_timeblocks();
+               // vm.get_event_signups();
 				},
             
             // DETERMINE LOCATION PARENT
@@ -648,9 +446,9 @@
                var vm = this;               
                vm.selectedCon == con? '' : vm.selectedCon = con;
 					vm.get_con_locations();
-               vm.get_con_events();
-               vm.get_timeblocks();
-               vm.get_event_signups();
+               //vm.get_con_events();
+              // vm.get_timeblocks();
+              // vm.get_event_signups();
             },
             
             get_con_locations() {
@@ -662,27 +460,27 @@
                });	     
             },
             
-            get_con_events() {
-               var vm = this;
-               vm.conEvents = [];
-					vm.$store.dispatch('get_con_events', vm.selectedCon).then((response)=>{
-                  vm.get_timeblocks();
-                  if(response.events && response.events.length > 0) {
-                     vm.conEvents = response.events;
-                  } else {
-                     vm.conEvents = null;
-                  }
-               });	                
-            },
+            // get_con_events() {
+               // var vm = this;
+               // vm.conEvents = [];
+					// vm.$store.dispatch('get_con_events', vm.selectedCon).then((response)=>{
+                  // vm.get_timeblocks();
+                  // if(response.events && response.events.length > 0) {
+                     // vm.conEvents = response.events;
+                  // } else {
+                     // vm.conEvents = null;
+                  // }
+               // });	                
+            // },
             
-            get_event_signups() {
-               var vm = this;
+            // get_event_signups() {
+               // var vm = this;
                
-               vm.$store.dispatch('get_event_signups', vm.selectedCon).then((response)=>{
-                  console.log(response);
-               });
+               // vm.$store.dispatch('get_event_signups', vm.selectedCon).then((response)=>{
+                  // console.log(response);
+               // });
                
-            },
+            // },
             
             
             get_timeblocks() {               
@@ -731,43 +529,49 @@
                
             },
             
-            // ADD PRESENTER 
-            add_presenter(e) {
-               var   vm       = this,
-                     uuid     = e.target.value,
-                     presenter= {};
-               
-               Object.entries(vm.memberList).forEach(([key,member]) => {
-                  if( member.uuid == uuid) {
-                     presenter = member;
-                  }
-               });
-               
-               presenter.member_role = 'presenter';
-               
-               if(vm.editEvent.presenters) {
-                  var newUuid = true;
-                  Object.entries(vm.editEvent.presenters).forEach(([key, _presenter]) => {
-                     _presenter.uuid == presenter.uuid? newUuid = false : '';
-                  });
-                  newUuid? vm.editEvent.presenters.push(presenter) : '';
-               } else {
-                  vm.editEvent.presenters = [presenter]
-               }
-               
-               
-               vm.presenterSelect = null;
+            clear_event() {
+               var vm = this;
+               console.log('CLEARING');
+               vm.editEvent = {};
             },
             
-            // SUBMIT EVENT 
-            submit_event() {
-               var vm = this;
-               vm.$store.dispatch('submit_event', vm.editEvent).then(()=>{                  
-                  vm.editEvent = {};
-                  vm.get_con_events();
-               });
+            // // ADD PRESENTER 
+            // add_presenter(e) {
+               // var   vm       = this,
+                     // uuid     = e.target.value,
+                     // presenter= {};
                
-            }
+               // Object.entries(vm.memberList).forEach(([key,member]) => {
+                  // if( member.uuid == uuid) {
+                     // presenter = member;
+                  // }
+               // });
+               
+               // presenter.member_role = 'presenter';
+               
+               // if(vm.editEvent.presenters) {
+                  // var newUuid = true;
+                  // Object.entries(vm.editEvent.presenters).forEach(([key, _presenter]) => {
+                     // _presenter.uuid == presenter.uuid? newUuid = false : '';
+                  // });
+                  // newUuid? vm.editEvent.presenters.push(presenter) : '';
+               // } else {
+                  // vm.editEvent.presenters = [presenter]
+               // }
+               
+               
+               // vm.presenterSelect = null;
+            // },
+            
+            // // SUBMIT EVENT 
+            // submit_event() {
+               // var vm = this;
+               // vm.$store.dispatch('submit_event', vm.editEvent).then(()=>{                  
+                  // vm.editEvent = {};
+                  // vm.get_con_events();
+               // });
+               
+            // }
 			},
 			
 		}
@@ -977,17 +781,7 @@
          flex-wrap: wrap;
          flex-direction: column;
       width: 55%;
-      padding: 1rem 3rem 0 0;
-   }
-   .scheduling_panel .box .edit_element form {
-      position: relative;
-   }
-   .scheduling_panel .box .edit_element form .select,
-   .scheduling_panel .box .edit_element form .text_box {
-      color: var(--textColor4);
-   }
-   .scheduling_panel .box .edit_element form .select {
-      font-size: .95rem;      
+      padding: 1rem 3rem 1rem 0;
    }
    
    .scheduling_panel .box .edit_element .control_button {
@@ -1022,6 +816,7 @@
       border-radius: var(--borderRadius);
       padding: .5rem;      
    }   
+   
    .scheduling_panel .box .location_controls .selects {
       display: flex;
          flex-wrap: wrap;
@@ -1042,37 +837,6 @@
    .scheduling_panel .box .location_controls .select {
       color: black;
       background: var(--lightColor);
-   }
-   
-   
-   
-   /* --------------------------------------------------------------------------------
-                        EVENTS BOX
-      --------------------------------------------------------------------------------*/
-   .scheduling_panel .box.events .event_time_row {
-      position: relative;
-   }
-   .scheduling_panel .box.events .event_time_row .buttons {
-      display: flex;
-      flex-wrap: wrap;
-      position: absolute;
-         top: 0;
-         left: 0;
-      width: 12rem;
-      max-height: 1.5rem;
-      overflow: hidden;
-      transition: max-height .3s;
-   }
-   .scheduling_panel .box.events .event_time_row .buttons:hover {
-      max-height: 25rem;
-      overflow-y: auto;
-   }
-   .scheduling_panel .box.events .event_time_row .time_button {
-      display: flex;
-      width: 100%;
-      color: var(--button);
-      font-size: .95rem;
-      height: 1.5rem;
    }
    .scheduling_panel .box.events .list_element {
       justify-content: flex-start;
@@ -1100,16 +864,6 @@
    .scheduling_panel .box.events .list.all_list.show {
       left: .25rem;      
    }
-   .scheduling_panel .box.events .select_presenter  .input_wrapper {
-      align-items: center;
-   }
-   .scheduling_panel .box.events .select_presenter .text_box{
-      border: solid 1px var(--mainColor);
-      border-radius: .15rem;
-   }
-   
-   
-   
    .scheduling_panel .edit_element .title  {
       display: flex;
       width: 100%;
@@ -1125,62 +879,12 @@
       width: 100%;
       color: var(--textColor2);
    }
-   
-   .scheduling_panel .edit_element .presenters {
-      display: flex;
-         flex-direction: column;  
-      padding: .25rem;
-      border-radius: .1rem;
-      border: solid 1px var(--borderColor);   
-   }
-   
-   .scheduling_panel .edit_element .presenters .titles {
-      display: flex;
-         justify-content: space-between;
-      width: 100%;
-      color: var(--textColor2);
-   }
-   .scheduling_panel .edit_element .presenters .name  {
-      display: flex;
-      padding-left: 2rem;
-      color: inherit;
-      font-size: .85rem;
-   }
-   .scheduling_panel .edit_element .presenters .buttons {
-      display: flex;
-      justify-content: space-between;
-      color: inherit;
-      width: 7rem;
-   }
-   .scheduling_panel .edit_element .presenters .cntrl {
-      display: flex;
-      color: inherit;
-      width: 2rem;
-      font-size: .65rem;
-      justify-content: center;      
-   }
-   .scheduling_panel .edit_element .presenters .presenter {
-      display: flex;
-         align-items: center;
-      height: 1.65rem;
-      justify-content: between;
-      width: 100%;      
-   }
-   .scheduling_panel .edit_element .presenters .text {
-      display: flex;
-      width: auto;
-      padding-left: .5rem;
-      margin-right: auto;
+   .scheduling_panel form .textarea {
+      font-weight: 300;
       color: var(--textColor4);
+      font-size: .95rem;
+      padding: .5rem;
    }
-   .scheduling_panel .edit_element .presenters .buttons {
-      display: flex;
-      justify-content: space-between;
-      width: 7rem;
-   }
-   
-   
-   
    
    /* --------------------------------------------------------------------------------
                         LOCATIONS BOX
@@ -1203,7 +907,10 @@
          flex-wrap: wrap;
       width: calc(100% - 10rem);
    }
-   
+   .scheduling_panel .controls .button {
+      color: #fff;
+      text-shadow: -1px -1px 1px rgba(0,0,0,0.5);
+   }
    
 	
 	

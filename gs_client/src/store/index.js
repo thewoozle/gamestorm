@@ -373,14 +373,26 @@
       
       // SUBMIT EVENT 
       submit_event({commit}, event) {
-         var vm = this;
-         console.log('works');
-         Axios.post(apiDomain+'_submit_event', event).then((response)=>{
-            console.log(response.data);
-         }, (err) => {
-            console.log(err.statusText);
+         var vm = this,
+            _formData = new FormData();
+            
+         Object.entries(event).forEach((item)=>{
+            _formData.append(item[0], item[1]);	
          });
          
+         return new Promise((resolve, reject) => {
+            
+            console.log('add to on if checked');
+            
+            
+            Axios.post(apiDomain+'_submit_event', _formData).then((response)=>{
+               console.log(response.data);
+               resolve(response.data);
+            }, (err) => {
+               console.log(err.statusText);
+               reject(err.response.data.errors);
+            });
+         });
          
          
          

@@ -252,6 +252,7 @@
 		.admin_page .article_content .label,
 		.article .title,
 		.article .article_meta .title,
+      textarea,
 		select,
 		input,
 		* {
@@ -467,7 +468,7 @@
          font-size: 1.5rem;
          height: 1.15em;
          line-height: 1.15em;
-         width: 1.15em;         
+         width: 2rem;         
          color: var(--button);
          border-radius: .15rem;
          cursor: pointer;
