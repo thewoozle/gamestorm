@@ -8,35 +8,42 @@
                            
 									event tag: <span class="text"  v-text="editEvent.event_tag || '-'"></span>
                            
-                           
                            <div class="form_row">
                               <label>Event Name</label>
                               <div class="input_wrapper">
-                                 <input class="text_box" name="event_name" v-model="editEvent.event_name" />
+                                 <input class="text_box" name="event_name" v-model="editEvent.event_name" @keyup="clear_error('event_name')" />
                               </div>
-                              <span class="form_error" v-if="formErrors.event_name" v-text="formErrors.event_name? 'Event Name!' : ''"></span>
+                              <span class="form_error fas fa-exclamation-triangle" v-if="formErrors.event_name">
+                                 <span class="text" v-text="formErrors.event_name? '( Event Name Required )' : ''"></span>
+                              </span>
                            </div>
                               
                            <div class="form_row">
                               <div class="form_element">
                                  <label class="label">Event Track</label>
                                  <div class="input_wrapper">
-                                    <select class="input select" name="event_track" v-model="editEvent.event_track"   >
+                                    <select class="input select" name="event_track" v-model="editEvent.event_track" @change="clear_error('event_track')"  >
                                        <option value="" style="display: none">event track...</option>
                                        <option v-for="track in eventTracks" :value="track.id" v-text="track.track_name" :selected="editEvent.event_track == 1" ></option>
                                     </select>
                                  </div>	
-                                 <span class="input_message" v-if="formErrors.event_track" v-text="formErrors.event_track"></span> 		
+                                 <span class="form_error fas fa-exclamation-triangle" v-if="formErrors.event_track">
+                              <span class="form_error fas fa-exclamation-triangle" v-if="formErrors.event_track">
+                                 <span class="text" v-text="formErrors.event_track? '( Event Track Required )' : ''"></span>
+                              </span>
+                                 </span>
                               </div>
                               <div class="form_element">
                                  <label class="label">Event Type</label>
                                  <div class="input_wrapper">
-                                    <select class="input select" name="event_type" v-model="editEvent.event_type"   >
+                                    <select class="input select" name="event_type" v-model="editEvent.event_type"  @change="clear_error('event_type')" >
                                        <option value="" style="display: none">event type...</option>
                                        <option v-for="type in eventTypes" :value="type.id" v-text="type.type_name" :selected="editEvent.event_type == 1" ></option>
                                     </select>
                                  </div>	
-                                 <span class="input_message" v-if="formErrors.event_type" v-text="formErrors.event_type"></span> 		
+                              <span class="form_error fas fa-exclamation-triangle" v-if="formErrors.event_type">
+                                 <span class="text" v-text="formErrors.event_type? '( Event Type Required )' : ''"></span>
+                              </span>		
                               </div>
                            </div>
                            
@@ -49,8 +56,6 @@
                                        <option value="" style="display: none">presenter...</option>
                                        <option v-for="member in memberList" :value="member.uuid" v-text="member.first_name+' '+member.last_name"></option>
                                     </select>
-                                    
-                                    
                                  </div>
                               </div>
                               
@@ -166,7 +171,9 @@
                               <div class="input_wrapper">
                                  <textarea class="textarea" name="short_description" placeholder="400 char max."  v-model="editEvent.short_description" maxlength = "400"  /></textarea> 
                               </div>
-                              <span class="input_message" v-if="formErrors.short_description" v-text="formErrors.short_description" ></span> 
+                              <span class="form_error fas fa-exclamation-triangle" v-if="formErrors.short_description">
+                                 <span class="text" v-text="formErrors.short_description? '( Short Description required )' : ''"></span>
+                              </span>
                            </div>
                               
                            <div class="form_row">
@@ -244,17 +251,21 @@
                eventSignups         : [],
                presenterSearch      : '',
                presenterSelect      : null,
+               editEvent            : {},
 				}
          },
          
          props : {
             _editEvent: {
                type: Object
+            },
+            _selected_con: {
+               type: String
             }
          },
          
 			created() {
-				var vm = this;
+				var vm = this;    
 				vm.check_user();
 				vm.get_scheduling_data();    
             vm.set_location_form_data();
@@ -275,7 +286,6 @@
                eventDuration:'eventDuration',
             }),
             
-            editEvent() { return this._editEvent},
             
             currentVenue() {
                var   vm = this,
@@ -288,9 +298,18 @@
                return currentVenue;
             },
          },
+         
+         watch: {
+            '_editEvent' : function(newVal, oldVal)  {this.editEvent = newVal},
+            '_selected_con': function(newVal, oldVal) {this.selectedCon = newVal},
+         },
       
          methods : {
             
+            clear_error(field) {
+               var   vm = this;                      
+               Vue.delete(vm.formErrors, field);
+            },
             
             get_scheduling_data() {
             //GET STORE DATA
@@ -486,14 +505,18 @@
             // SUBMIT EVENT 
             submit_event() {
                var vm = this;
-               vm.editEvent.selected_con = vm.selectedCon;
-               vm.$store.dispatch('submit_event', vm.editEvent).then((response)=>{                  
-                  vm.editEvent = {};
-                  console.log(response);
-                  vm.$emit('clearEvent', 'clearEvent');
-                  vm.get_con_events();
-               });
+               if(vm.formErrors.length < 1) {
                
+                  vm.editEvent.selected_con = vm.selectedCon;
+                  vm.$store.dispatch('submit_event', vm.editEvent).then((response)=>{                  
+                     vm.editEvent = {};
+                     console.log(response);
+                     vm.$emit('clearEvent', 'clearEvent');
+                     vm.get_con_events();
+                  }, (err) => {                  
+                     vm.formErrors = err;
+                  });
+               }   
             }
          },
          

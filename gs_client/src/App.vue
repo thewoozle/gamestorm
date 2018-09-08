@@ -1500,6 +1500,7 @@
 			padding: .25rem 0;
 		}
 		.form_element {
+         position: relative;
 			display: flex;
             flex-wrap: wrap;
             flex: 1; 
@@ -1516,7 +1517,7 @@
 			line-height: inherit;
 			flex-wrap: wrap;
 		}
-		.input_wrapper .form_error{
+		.form_row  .form_error{
 			position: absolute;
 				top: 100%;
 				left: 0;
@@ -1531,6 +1532,7 @@
 			background: rgba(0,0,0,0.1);
 			text-shadow: -1px -1px 1px rgba(0,0,0,0.1);
 		}
+      
 		
 		.reg_form .form_content.main .form_element .half {
 			width: 50%;

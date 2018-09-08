@@ -211,7 +211,7 @@
                      
                      <div class="edit_element">
                         <span class="title">Event Details</span>
-                        <event_form :_editEvent = "editEvent" @clearEvent = "clear_event" />
+                        <event_form  :_editEvent = "editEvent"  :_selected_con = "selectedCon"  @clearEvent = "clear_event" />
                         
                      </div>
                      
@@ -878,6 +878,21 @@
       display: flex;
       width: 100%;
       color: var(--textColor2);
+   }
+   .scheduling_panel form .form_error {
+      transform: translateY(-.65rem);
+      width: auto;
+      max-width: 100%;
+      background: rgba(255,255,255,.65);
+      font-size: .9rem;
+      padding: .15rem .5rem;
+      font-style: normal;
+      color: var(--warningColor);      
+   }
+   .scheduling_panel form .form_error .text {
+      font-size: .9rem;
+      font-style: italic;
+      margin: 0 .5rem;
    }
    .scheduling_panel form .textarea {
       font-weight: 300;
