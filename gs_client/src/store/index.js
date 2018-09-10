@@ -381,7 +381,7 @@
          });
          
          return new Promise((resolve, reject) => {
-            
+            console.log(JSON.stringify(event));
             console.log('add to on if checked');
             
             

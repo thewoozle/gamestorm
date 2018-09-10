@@ -114,10 +114,11 @@
 
                               <div class="form_element">	
                                  <label class="label top">Event Duration</label>
-                                 <select class="select" v-model="editEvent.event_duration" name="event_duration">
+                                 <select class="select" v-model="editEvent.event_duration" name="event_duration" @change="clear_error('event_duration')"  >
                                     <option value="" style="display: none"  >select duration...</option>
                                     <option v-for="duration in eventDuration" :selected="editEvent.duration == duration" :value="duration.time" v-text="duration.text"></option>
                                  </select>
+                                 <span class="text" v-text="formErrors.event_duration? '( Duration required )' : ''"></span>
                               </div>
                            </div>
                            
@@ -199,16 +200,16 @@
                               </div>
                               <span class="form_error" v-if="formErrors.event_url" v-text="formErrors.event_url? 'Event URL!' : ''"></span>
                            </div>
-                           <label>FIX THE BLOODY CHECK BOXES</label>
+                           
                            <div class="form_row ">
-                              <div class="form_element event_active ">
+                              <div class="form_element  ">
                                  <label class="label">Event Active</label>
                                  <div class="checkbox_wrapper input_wrapper">
-                                    <input type="checkbox" class="checkbox" :class="editEvent.event_active? 'checked' : ''" value="1" :checked = "editEvent.event_active? 'checked' : ''"  />
+                                    <input type="checkbox" class="checkbox" :class="editEvent.event_active? 'checked' : ''" v-model="editEvent.event_active" />
                                  </div>
                               </div>
-                              <div class="form_element event_active ">
-                                 <label class="label">Add to [con]</label>
+                              <div class="form_element ">
+                                 <label class="label" v-text="'Add to '+ currentCon.short_name "></label>
                                  <div class="checkbox_wrapper input_wrapper">
                                     <input type="checkbox" class="checkbox" :class="editEvent.in_con? 'checked' : ''" v-model="editEvent.in_con"  />
                                  </div>
@@ -508,12 +509,13 @@
                if(vm.formErrors.length < 1) {
                
                   vm.editEvent.selected_con = vm.selectedCon;
-                  vm.$store.dispatch('submit_event', vm.editEvent).then((response)=>{                  
-                     vm.editEvent = {};
+                  vm.$store.dispatch('submit_event', vm.editEvent).then((response)=>{   
                      console.log(response);
                      vm.$emit('clearEvent', 'clearEvent');
                      vm.get_con_events();
-                  }, (err) => {                  
+                     vm.formErrors = [];
+                  }, (err) => {  
+console.log(err);                  
                      vm.formErrors = err;
                   });
                }   

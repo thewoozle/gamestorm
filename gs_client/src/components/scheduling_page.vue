@@ -209,9 +209,12 @@
                      </div>
                      
                      
-                     <div class="edit_element">
+                     <div class="edit_element">  
+                     
+                        <button type="button" class="control_button clear_button fal fa-undo-alt" @click="clear_event"></button>
+                         
                         <span class="title">Event Details</span>
-                        <event_form  :_editEvent = "editEvent"  :_selected_con = "selectedCon"  @clearEvent = "clear_event" />
+                        <event_form  :_editEvent.sync = "editEvent"  :_selected_con = "selectedCon"  @clearEvent = "clear_event" />
                         
                      </div>
                      
@@ -531,8 +534,8 @@
             
             clear_event() {
                var vm = this;
-               console.log('CLEARING');
                vm.editEvent = {};
+               vm.$forceUpdate();
             },
             
             // // ADD PRESENTER 
@@ -777,6 +780,7 @@
    }
    
    .scheduling_panel .box .edit_element {
+      position: relative;
       display: flex;
          flex-wrap: wrap;
          flex-direction: column;
@@ -899,6 +903,13 @@
       color: var(--textColor4);
       font-size: .95rem;
       padding: .5rem;
+   }
+   .scheduling_panel .edit_element .clear_button {
+      position: absolute;
+         top: 0;
+         right: 0;
+      margin: .5rem;   
+      
    }
    
    /* --------------------------------------------------------------------------------
