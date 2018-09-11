@@ -296,7 +296,6 @@
                showEventControls    : false,
                showEventsList       : 'con',
                conLocations         : [],
-					conEvents	         : null,
                timeblocks           : [],
                eventSignups         : [],
                presenterSearch      : '',
@@ -344,6 +343,7 @@
             }),
             
 				...mapGetters({
+               conEvents   : 'conEvents'
 				}),
             
 				filteredEvents:  () => {
@@ -847,9 +847,10 @@
       padding-top: 0;
    }
    .scheduling_panel .box.events .list {
+      flex-direction: column;
+      align-items: flex-start;
       width: 100%;      
       height: 100%;
-      align-items: flex-start;
       min-height: 35rem;
       background: var(--lightColor);
       border: solid 1px var(--borderColor);

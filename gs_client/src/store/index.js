@@ -70,17 +70,7 @@
 			  });
 		},
 		
-		// GET EVENTS
-		get_con_events({commit}) {
-			return new Promise((resolve, reject) => {
-				Axios.get(apiDomain+'_get_con_events').then((response) => {
-					commit('set_con_events', {events: response.data.con_events});
-					resolve();
-				},(err) => {
-					console.log(err.statusText);
-				});
-			});	
-		},
+		
 		
       
 		
@@ -358,17 +348,42 @@
       },
       
       //GET CON EVENTS
-      get_con_events({commit}, selectedCon) {        
-			var vm = this,
+      // get_con_events({commit}, selectedCon) {        
+			// var vm = this,
+            // _formData = new FormData();
+			// _formData.append('con', selectedCon);
+         
+         // return new Promise((resolve, reject) => {
+            // Axios.post(apiDomain+'_get_con_events', _formData).then((response) => {
+               // resolve(response.data);
+            // });
+         // });   
+      // },
+      // GET EVENTS
+		get_con_events({commit}, selectedCon) {
+         var vm = this,
             _formData = new FormData();
 			_formData.append('con', selectedCon);
          
-         return new Promise((resolve, reject) => {
-            Axios.post(apiDomain+'_get_con_events', _formData).then((response) => {
-               resolve(response.data);
-            });
-         });   
-      },
+         // check localStorage and set_con_events
+         if(localStorage) {
+            if(localStorage.conEvent) {               
+               commit('set_con_events', {
+                  conEvents : JSON.parse(localStorage.conEvents),
+               });
+            }
+         }             
+         
+         Axios.post(apiDomain+'_get_con_events', _formData).then((response) => {
+            if(localStorage) {
+               localStorage.setItem('conEvents', JSON.stringify(response.data.events));
+            }   
+            
+            commit('set_con_events', response.data.events);
+         },(err) => {
+            console.log(err.statusText);
+         });
+		},
       
       
       // SUBMIT EVENT 
@@ -497,9 +512,15 @@
 			state.currentCon = convention;
 		},
 		
-		//SET EVENTS
-		set_con_events: (state, {conEvents}) =>{
-			state.conEvents = conEvents;
+		//SET CON EVENTS
+		set_con_events: (state, conEvents) =>{
+         console.log(conEvents);
+         
+         // THIS
+         
+         
+         
+			Vue.set(state, 'conEvents', conEvents);
 		},
             
             
@@ -615,14 +636,9 @@
       },
      
       // SET EVENTS FOR SCHEDULING 
-      set_con_events: (state, {events}) => {
-         state.conEvents = events;
-      },
-      
-      
-      
-     
-     
+      // set_con_events: (state, {events}) => {
+         // state.conEvents = events;
+      // },
 	}
 	
 	const getters = {

@@ -105,7 +105,7 @@
                                     <label class="label top">Start Time</label>
                                     <select class="select"  v-model="editEvent.event_start_time" name="event_start_time">
                                        <option value="" style="display: none" >select start time...</option>
-                                       <option v-for="timeblock in get_timeblocks()" :selected="editEvent.event_start_time == sql_date_time(timeblock)" :value="sql_date_time(timeblock)" v-text="date_time(timeblock)"></option>
+                                       <option v-for="timeblock in get_timeblocks()" :selected="sql_date_time(editEvent.event_start_time) == sql_date_time(timeblock)" :value="sql_date_time(timeblock)" v-text="date_time(timeblock)"></option>
                                     </select>
                                     <div class="buttons">
                                     </div>
@@ -247,7 +247,6 @@
                showEventControls    : false,
                showEventsList       : 'con',
                conLocations         : [],
-					conEvents	         : null,
                timeblocks           : [],
                eventSignups         : [],
                presenterSearch      : '',
@@ -285,6 +284,10 @@
                allEvents   : 'allEvents',    
                memberList  : 'memberList',
                eventDuration:'eventDuration',
+            }),
+            
+            ...mapGetters({
+               conEvents   : 'conEvents'
             }),
             
             
@@ -406,14 +409,7 @@
             
             get_con_events() {
                var vm = this;
-               vm.conEvents = [];
-               vm.$store.dispatch('get_con_events', vm.selectedCon).then((response)=>{
-                  if(response.events && response.events.length > 0) {
-                     vm.conEvents = response.events;
-                  } else {
-                     vm.conEvents = null;
-                  }
-               });	                
+               vm.$store.dispatch('get_con_events', vm.selectedCon).then((response)=>{});	                
             },
             
             get_event_signups() {
@@ -427,7 +423,8 @@
             
             
             get_timeblocks() {               
-               var   vm    = this;
+               var   vm    = this,
+                     timeblocks;
                
                if(vm.timeblocks.length < 1) {               
                   var   times = [],
@@ -445,10 +442,12 @@
                         }
                      }
                   } 
-                  vm.timeblocks = times;                   
-               } 
+                  timeblocks = times;                   
+               } else {
+                  timeblocks = vm.timeblocks;
+               }
                
-               return vm.timeblocks;   
+               return timeblocks;   
             },
             
             
