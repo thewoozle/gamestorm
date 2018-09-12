@@ -514,12 +514,7 @@
 		
 		//SET CON EVENTS
 		set_con_events: (state, conEvents) =>{
-         console.log(conEvents);
-         
-         // THIS
-         
-         
-         
+         console.log(conEvents);         
 			Vue.set(state, 'conEvents', conEvents);
 		},
             

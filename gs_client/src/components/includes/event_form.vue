@@ -211,7 +211,7 @@
                               <div class="form_element ">
                                  <label class="label" v-text="'Add to '+ currentCon.short_name "></label>
                                  <div class="checkbox_wrapper input_wrapper">
-                                    <input type="checkbox" class="checkbox" :class="editEvent.in_con? 'checked' : ''" v-model="editEvent.in_con"  />
+                                    <input type="checkbox" class="checkbox" :class="editEvent.con_event_id? 'checked' : ''" v-model="editEvent.icon_event_id" @click="editEvent.con_event_id? editEvent.con_event_id = null : editEvent.con_event_id = true"  />
                                  </div>
                               </div>
                            </div>
@@ -509,13 +509,20 @@
                if(vm.formErrors.length < 1) {
                
                   vm.editEvent.selected_con = vm.selectedCon;
+                  if(!vm.editEvent.con_event_id) {
+                     vm.editEvent.event_active = '1';
+                     vm.editEvent.in_con = '1';
+                  }
+                  vm.editEvent.event_active? vm.editEvent.event_active = '1' : vm.editEvent.in_con = '0';
+                  vm.editEvent.in_con? vm.editEvent.in_con = '1': vm.editEvent.in_con = '0';
+                  
                   vm.$store.dispatch('submit_event', vm.editEvent).then((response)=>{   
                      console.log(response);
                      vm.$emit('clearEvent', 'clearEvent');
                      vm.get_con_events();
                      vm.formErrors = [];
                   }, (err) => {  
-console.log(err);                  
+                     console.log(err);
                      vm.formErrors = err;
                   });
                }   
