@@ -75,7 +75,7 @@
                                        <button type="button" class="list_button fal fa-envelope" title="email presenter NON WORKING"></button>   
                                        <button type="button" class="list_button fal fa-ban" title="remove presenter" @click="remove_presenter(presenter.uuid)"></button> 
                                        <button type="button" class="list_button fal" 
-                                          :class="presenter.member_role=='presenter'? 'fa-check-square' : 'fa-square'" 
+                                          :class="presenter.player=='1'? 'fa-check-square' : 'fa-square'" 
                                           title="presenter is seated player" 
                                           @click="set_presenter_player(presenter.uuid)"
                                        ></button>   
@@ -364,16 +364,18 @@
             },
             
             set_presenter_player(uuid) {
+               
                var   vm    = this,
                      target= null,
                      role  = '';
                
                Object.entries(vm.editEvent.presenters).forEach(([key,member]) => {
                  member.uuid == uuid?  target = key : '';
-                 member.member_role == 'presenter'? role = '' : role = 'presenter';
                });
-               target? vm.editEvent.presenters[target].member_role = role : '';
-               vm.$forceUpdate();   
+               if(target) {
+                  vm.editEvent.presenters[target].player == '1'? vm.editEvent.presenters[target].player = 0 : vm.editEvent.presenters[target].player = '1';
+                  vm.$forceUpdate();   
+               }
             },
             
             remove_presenter(uuid) {
@@ -488,6 +490,7 @@
                });
                
                presenter.member_role = 'presenter';
+               presenter.player = '1';
                
                if(vm.editEvent.presenters) {
                   var newUuid = true;
@@ -516,14 +519,14 @@
                   vm.editEvent.event_active? vm.editEvent.event_active = '1' : vm.editEvent.in_con = '0';
                   vm.editEvent.in_con? vm.editEvent.in_con = '1': vm.editEvent.in_con = '0';
                   
-                  vm.$store.dispatch('submit_event', vm.editEvent).then((response)=>{   
-                     console.log(response);
+                  vm.$store.dispatch('submit_event', vm.editEvent).then((response)=>{
                      vm.$emit('clearEvent', 'clearEvent');
                      vm.get_con_events();
                      vm.formErrors = [];
+                     vm.$forceUpdate();
                   }, (err) => {  
                      console.log(err);
-                     vm.formErrors = err;
+                     vm.formErrors = err.errors;
                   });
                }   
             }

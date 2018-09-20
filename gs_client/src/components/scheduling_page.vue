@@ -195,7 +195,11 @@
                            <div class="box_loading" v-else-if="conEvents && conEvents.length < 1">Loading...</div>
                            
                            <div class="list_item" v-else  v-for="event in conEvents">
-                              <button type="button" class="link" @click.prevent="editEvent = event">{{event.event_name}} - {{event.track}} </button>
+                              <button type="button" class="link" @click.prevent="editEvent = event">                              
+                                 <span class="element tag" v-text="event.con_event_tag"></span>
+                                 <span class="element name" v-text="event.event_name"></span>
+                                 <span class="element track" v-text="event.track"></span>
+                              </button>
                               <button type="button" class="activate_button fas" :class="event.event_active? 'fa-ban' : 'fa-circle'" ></button>
                            </div>
                         </div>
@@ -203,7 +207,10 @@
                         <div class="title list all_list" :class="showEventsList == 'all'? 'show' : ''">  
                            <span class="title list_title">All Events</span>                      
                            <div class="list_item" v-for="event in allEvents">
-                              <button type="button" class="link" @click.prevent="editEvent = event">{{event.event_name}} - {{event.track}} </button>
+                              <button type="button" class="link" @click.prevent="() =>{editEvent = event}">
+                                 <span class="element name" v-text="event.event_name"></span>
+                                 <span class="element track" v-text="event.track"></span>
+                              </button>
                            </div>                        
                         </div>                        
                      </div>
