@@ -347,18 +347,15 @@
          });      
       },
       
-      //GET CON EVENTS
-      // get_con_events({commit}, selectedCon) {        
-			// var vm = this,
-            // _formData = new FormData();
-			// _formData.append('con', selectedCon);
-         
-         // return new Promise((resolve, reject) => {
-            // Axios.post(apiDomain+'_get_con_events', _formData).then((response) => {
-               // resolve(response.data);
-            // });
-         // });   
-      // },
+      // REMOVE PRESENTER
+      remove_presenter({commit}, conData) {        
+			var vm = this;
+         Axios.get(apiDomain+'_remove_presenter', {params: conData}, {headers : 
+         {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}}).then((response) => {
+         });
+      },
+      
+      
       // GET EVENTS
 		get_con_events({commit}, selectedCon) {
          var vm = this,
@@ -388,13 +385,8 @@
       
       // SUBMIT EVENT 
       submit_event({commit}, event) {
-         var vm = this,
-            _formData = new FormData();
+         var vm = this;
             
-         // Object.entries(event).forEach((item)=>{
-            // _formData.append(item[0], item[1]);	
-         // });
-         
          return new Promise((resolve, reject) => {            
             Axios.post(apiDomain+'_submit_event', event, {headers : 
             {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}}).then((response) => {		

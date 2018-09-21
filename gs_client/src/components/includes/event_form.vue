@@ -73,7 +73,7 @@
                                     <span class="text" v-text="presenter.first_name+' '+presenter.last_name"></span>
                                     <div class="buttons">
                                        <button type="button" class="list_button fal fa-envelope" title="email presenter NON WORKING"></button>   
-                                       <button type="button" class="list_button fal fa-ban" title="remove presenter" @click="remove_presenter(presenter.uuid)"></button> 
+                                       <button type="button" class="list_button fal fa-ban" title="remove presenter" @click="remove_presenter(presenter.uuid, editEvent.event_id)"></button> 
                                        <button type="button" class="list_button fal" 
                                           :class="presenter.player=='1'? 'fa-check-square' : 'fa-square'" 
                                           title="presenter is seated player" 
@@ -378,7 +378,7 @@
                }
             },
             
-            remove_presenter(uuid) {
+            remove_presenter(uuid, event_id) {
                var   vm = this,
                      target = null;
                
@@ -387,6 +387,8 @@
                      target = key;
                   }
                });
+               
+               vm.$store.dispatch('remove_presenter', {'event_id' : event_id, 'uuid' : uuid, 'conNum' : vm.selectedCon}).then(()=>{});
                
                target? vm.editEvent.presenters.splice(target,1): '';
                vm.$forceUpdate();

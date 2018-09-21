@@ -193,25 +193,29 @@
                            <span class="title list_title">Con Events</span>
                            <div class="box_loading" v-if="!conEvents">No Events Found</div>
                            <div class="box_loading" v-else-if="conEvents && conEvents.length < 1">Loading...</div>
-                           
-                           <div class="list_item" v-else  v-for="event in conEvents">
-                              <button type="button" class="link" @click.prevent="editEvent = event">                              
-                                 <span class="element tag" v-text="event.con_event_tag"></span>
-                                 <span class="element name" v-text="event.event_name"></span>
-                                 <span class="element track" v-text="event.track"></span>
-                              </button>
-                              <button type="button" class="activate_button fas" :class="event.event_active? 'fa-ban' : 'fa-circle'" ></button>
+                             
+                           <div class="list_wrapper" v-else>
+                              <div class="list_item"   v-for="event in conEvents">
+                                 <button type="button" class="link" @click.prevent="editEvent = event">
+                                    <span class="element tag" v-text="event.con_event_tag"></span>
+                                    <span class="element name" v-text="event.event_name"></span>
+                                    <span class="element track" v-text="event.track"></span>
+                                 </button>
+                                 <button type="button" class="activate_button fas" :class="event.event_active? 'fa-ban' : 'fa-circle'" ></button>
+                              </div>
                            </div>
                         </div>
                         
-                        <div class="title list all_list" :class="showEventsList == 'all'? 'show' : ''">  
-                           <span class="title list_title">All Events</span>                      
-                           <div class="list_item" v-for="event in allEvents">
-                              <button type="button" class="link" @click.prevent="() =>{editEvent = event}">
-                                 <span class="element name" v-text="event.event_name"></span>
-                                 <span class="element track" v-text="event.track"></span>
-                              </button>
-                           </div>                        
+                        <div class="list all_list" :class="showEventsList == 'all'? 'show' : ''">  
+                           <span class="title list_title">All Events</span>   
+                           <div class="list_wrapper">
+                              <div class="list_item" v-for="event in allEvents">
+                                 <button type="button" class="link" @click.prevent="() =>{editEvent = event}">
+                                    <span class="element name" v-text="event.event_name"></span>
+                                    <span class="element track" v-text="event.track"></span>
+                                 </button>
+                              </div>
+                           </div>   
                         </div>                        
                      </div>
                      
@@ -737,7 +741,6 @@
       padding: 1rem 0;
       max-height: 50rem;
       overflow: hidden;
-      overflow-y: auto;
    }
    .scheduling_panel .tab_box .box_loading {
       display: flex;
@@ -751,6 +754,7 @@
       position: absolute;
          top: 0;
          right: 0;  
+      background: var(--altBackground);
       margin-right: 1.25rem;
    }
    .scheduling_panel .box .list_element .slide_in {
@@ -776,6 +780,10 @@
       width: 25rem;
    }
    .scheduling_panel .box .list_element .list .list_title {
+      position: absolute;
+         top: 0;
+         left: 0;
+         z-index: 10;
       color: var(--button);
       display: flex;
       width: 100%;
@@ -783,7 +791,8 @@
       justify-content: center;
       font-weight: bold;
       line-height: 1.5em;
-      height: 1.5em;
+      padding: .5rem 0;
+      height: 2em;
    }
    
    .scheduling_panel .box .edit_element {
@@ -858,20 +867,26 @@
       align-items: flex-start;
       width: 100%;      
       height: 100%;
-      min-height: 35rem;
       background: var(--lightColor);
       border: solid 1px var(--borderColor);
       border-radius: .15rem;
-      padding: 1rem 4rem 0 .75rem;
+      padding: 1rem 0 0 .75rem;
+   }
+   .scheduling_panel .box.events .list .list_wrapper {
+      display: flex;
+      width: 100%;
+      flex-wrap: wrap;    
       overflow: hidden;
-      overflow-Y: auto;
+      overflow-Y: auto;  
    }
    .scheduling_panel .box.events .list.all_list {
       position: absolute;
          top: 0;
          left: 100%;
          z-index: 10;
-      transition: left .3s;   
+      transition: left .3s; 
+      overflow: hidden;
+      overflow-y: auto;  
    }
    .scheduling_panel .box.events .list.all_list.show {
       left: .25rem;      
