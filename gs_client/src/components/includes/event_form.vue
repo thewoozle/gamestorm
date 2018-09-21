@@ -426,27 +426,27 @@
             },
             
             
-            get_timeblocks() {               
+            get_timeblocks() {
                var   vm    = this,
                      timeblocks;
                
-               if(vm.timeblocks.length < 1) {               
+               if(vm.timeblocks.length < 1) {
                   var   times = [],
                         day   = '',
                         con   = {};
                   if(vm.conventions.length > 0) {
                      vm.conventions.forEach((convention) => {
-                        convention.tag_name == vm.selectedCon? con = convention : '' ;         
+                        convention.tag_name == vm.selectedCon? con = convention : '';
                      });
                      
                      for(var timeBlock = moment(con.start_date_time); moment(timeBlock).diff(con.end_date_time, 'hours') <=0; timeBlock.add(30, 'minutes') ) { 
-                        //var _day = moment(timeBlock).format('ddd');                  
+                        //var _day = moment(timeBlock).format('ddd');
                         if(parseInt(timeBlock.format('HH')) >= 9 || timeBlock.format('HH') == '00') { 
                            times.push(moment(timeBlock));
                         }
                      }
                   } 
-                  timeblocks = times;                   
+                  timeblocks = times;
                } else {
                   timeblocks = vm.timeblocks;
                }

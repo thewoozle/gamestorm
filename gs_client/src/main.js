@@ -37,6 +37,10 @@
             return moment(date).format('MMM Do hh:mm a');
          },
          
+         tag_time(date) {
+            return moment(date).format('hh:mm a');
+         },
+         
          sql_date_time(date) {
            return moment(date).format('YYYY-MM-DD HH:MM:SS'); 
          },

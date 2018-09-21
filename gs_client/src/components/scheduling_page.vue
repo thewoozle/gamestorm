@@ -163,7 +163,7 @@
                                                 EVENTS                  
                         - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 						<div class="box events" :class="schedulingTab == 'events'? 'active' : '' " >
-                     <header class="box_header">                        
+                     <header class="box_header">
                         <span class="title">Events</span>
                      </header>
                      
@@ -232,8 +232,23 @@
 						</div>
 						
 						
+                  <!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                SCHEDULE                  
+                        - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 						<div class="box schedule" :class="schedulingTab == 'schedule'? 'active' : '' " >
-							SCHEDULE</br>
+                     <header class="box_header">
+                        <span class="title">Schedule</span>
+                     </header>
+                     
+                     
+                     <schedule_grid :_selected_con = "selectedCon" />
+                     
+                     
+                     
+                     <div class="shedule_list">
+                        <span class="title list_title">Schedule List</span>
+                     </div>
+                     
 							<p>big schedule grid of locations and timeblocks with list of unscheduled events. </p>
 							<p>color-coded event-type, status-flag, presenter, and info-dropdown. </p>
 							<p>click on event to highlight start-time in area. click on location to place event. event may be copied or moved. </p>
@@ -284,6 +299,7 @@
       import event_form from '@/components/includes/event_form'
 		import Router from 'vue-router'
 		import convention_select from '@/components/includes/convention_select'
+      import schedule_grid from '@/components/includes/schedule_grid'
 		import scheduling_control_panel from '@/components/includes/scheduling_control_panel'
 		
 		Vue.use(Router);
@@ -315,9 +331,10 @@
 			},
 			
 			components: {
-				'convention_select'	: convention_select,
+				'convention_select'	      : convention_select,
 				'scheduling_control_panel' : scheduling_control_panel,
-            'event_form' : event_form,
+            'event_form'               : event_form,
+            'schedule_grid'            : schedule_grid
 			},
 			
 			
@@ -961,9 +978,6 @@
       text-shadow: -1px -1px 1px rgba(0,0,0,0.5);
    }
    
-	
-	
-	
 	
 	
 	/*
