@@ -249,9 +249,8 @@
                      <div class="list_element">
                         <div class="schedule_list list">
                            <span class="title list_title">Schedule List</span>
-                           <pre style="color: red">
-                           show events by status 
-                           </pre>
+                           
+                           
                         </div>
                      </div>
                      

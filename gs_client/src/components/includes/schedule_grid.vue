@@ -26,14 +26,7 @@
                                  <span class="time" v-for="timeblock in get_timeblocks()" v-text="tag_time(timeblock)"></span>
                               </div>
                               
-                              <div class="locations">
-                                 <div class="location_list" >
-                                    <span class="location" v-for="location in conLocations" v-bind:title="location.name">{{location.location_tag}}</span>
-                                 </div>
-                           
-                                 <div class="timeblock_list" v-for="location in conLocations">
-                                    <span class="time_block" v-for="timeblock in get_timeblocks()" >{{display_event(timeblock, location.location_tag) || '-'}}</span>
-                                 </div>
+                              <div class="locations" v-html="create_locations()">
                               
                               </div>
                            
@@ -45,7 +38,6 @@
    </template>
    
    <script>
-   
 		import Vue from 'vue'
       import moment from 'moment'
 		import { mapGetters, mapState } from 'vuex'
@@ -93,22 +85,60 @@
          
          methods: {
             
-            display_event(timeblock, location) {
-               var   vm = this,
-                     displayEvent = false;
-               if(vm.conEvents.length > 0) {   
-                  vm.conEvents.forEach((event) => {
+            
+            /*
+                                 <div class="location_list" >
+                                 
+                                    <span class="location" v-for="location in conLocations" v-bind:title="location.name">{{location.location_tag}}</span>
+                                 </div>
+                           
+                                 <div class="timeblock_list" v-for="location in conLocations">
+                                    <span class="time_block" v-for="timeblock in get_timeblocks()" >{{display_event(timeblock, location.location_tag) || '-'}}</span>
+                                 </div>
+            */                     
+                                 
+            create_locations() {
+               var   vm          = this,
+                     locations   = '<div>',
+                     timeblocks  = vm.get_timeblocks(),
+                     parent      = null;
                      
+                  vm.conLocations.forEach((location) => {
+                     if(!location.location_parent) {
+                        locations += '</div><div class="location_title">'+location.location_name+'</div><div class="accordion">';
+                     } 
                      
-                     if(vm.sql_date_time(event.event_start_time) == vm.sql_date_time(timeblock)) {
-                        if(event.event_location == location) {
-                           displayEvent = event;                           
-                        }
-                     }
+                        vm.conLocations.forEach((location2) => {
+                           if (location2.location_parent == location.id) {
+                              locations += '<div class="location">';
+                              locations += '<span class="location_name">'+location2.location_tag.replace(/_/gi, ' ')+'</span>';
+                              
+                              //console.log(location2.location_parent +' - '+location.id);
+                              timeblocks.forEach((timeblock) => {
+                                 var conEvent = ' - ';
+                                 if(vm.conEvents.length > 0) {   
+                                    vm.conEvents.forEach((event) => {
+                                       
+                                       
+                                       if(vm.sql_date_time(event.event_start_time) == vm.sql_date_time(timeblock)) {
+                                          if(event.event_location == location) {
+                                             conEvent = event;
+                                          }
+                                       }
+                                    });
+                                 }
+                                 locations+= '<span class="time_block" >'+ conEvent +'</span>';
+                                 
+                              });
+                              locations += '</div>';
+                           }
+                        });
+                    
+                     
                   });
-               }
-               //console.log(timeblock+' / ' + location);
-               return displayEvent;
+               
+               
+               return locations;
             },
             
             get_timeblocks() {
@@ -227,23 +257,32 @@
       overflow-Y: auto;
       padding: 0 1rem;
    }
-   .schedule_grid .location_list {
+   .schedule_grid .location_title {
       display: flex;
-         flex-wrap: wrap;
-      width: 5rem;
-   }
-   .schedule_grid .location_list .location {
-      display: flex;
-      width: 5rem;
-      color: black;
-   }
-   .schedule_grid .locations .list_item {
-      display: flex;
-      flex-wrap: nowrap;
-      width: auto;
+      width: 100%;
+      color: var(--titleColor);
    }
    
-   .schedule_grid .locations .time_block {
+   .schedule_grid .accordion {
+      display: flex;
+      flex-wrap: wrap;
+      width: auto;
+   }
+   .schedule_grid .accordion .location {
+      display: flex;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      width: 100%;
+   }
+   .schedule_grid .accordion .location_name {
+      display: flex;
+      justify-content: flex-end;
+      text-align: right;
+      padding: 0 .5rem 0 0;
+      width: 5rem;
+      color: var(--contrastColor);
+   }
+   .schedule_grid .locations .accordion .time_block {
       display: flex;
       width: 4rem;
       color: red;
