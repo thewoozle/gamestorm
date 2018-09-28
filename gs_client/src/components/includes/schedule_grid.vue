@@ -16,25 +16,28 @@
                         
                         
                         
-                        <div class="grid_wrapper"  >
-                           <span class="loading">Loading . . .</span>
-                           
-                           <div class="grid">
+                        <div class="grid_wrapper"  >                        
+                           <div class="box_loading" v-if="!conEvents">No Events Found</div>
+                           <div class="box_loading" v-else-if="conEvents && conEvents.length < 1">Loading...</div>
+                                                        
+                           <div class="grid" v-else>
                               <span class="title list_title">Schedule Grid</span>
                               <div class="times">
                                  <span class="time" v-for="timeblock in get_timeblocks()" v-text="tag_time(timeblock)"></span>
                               </div>
                               
                               <div class="locations">
-                                 <div class="location_list"></div>
-                                 <div class="location_blocks"></div>
+                                 <div class="location_list" >
+                                    <span class="location" v-for="location in conLocations" v-bind:title="location.name">{{location.location_tag}}</span>
+                                 </div>
+                           
+                                 <div class="timeblock_list" v-for="location in conLocations">
+                                    <span class="time_block" v-for="timeblock in get_timeblocks()" >{{display_event(timeblock, location.location_tag) || '-'}}</span>
+                                 </div>
                               
                               </div>
                            
-                           
                            </div>
-                           
-                        
                         
                         </div>
                      </div>
@@ -54,14 +57,14 @@
             return{
 					selectedCon		      : null,
                showScheduleControls : false,
-               timeblocks           : [],               
+               timeblocks           : [],  
+               conLocations         : [],
             }
          },
          
          props: {            
-            _selected_con: {
-               type: String
-            }
+            _selected_con: String,
+            _conLocations : Array,
          },
          
          created() {
@@ -70,6 +73,7 @@
          },
          watch: {
             '_selected_con': function(newVal, oldVal) {this.selectedCon = newVal},
+            '_conLocations': function(newVal, oldVal) {this.conLocations = newVal},
          },
          
          computed: {
@@ -79,6 +83,7 @@
                eventTracks : 'eventTracks',
                ageGroups   : 'ageGroups',
                experienceLevels: 'experienceLevels',
+               conEvents   : 'conEvents',
 					currentCon	: 'currentCon',  
                allEvents   : 'allEvents',    
                
@@ -87,6 +92,24 @@
          },
          
          methods: {
+            
+            display_event(timeblock, location) {
+               var   vm = this,
+                     displayEvent = false;
+               if(vm.conEvents.length > 0) {   
+                  vm.conEvents.forEach((event) => {
+                     
+                     
+                     if(vm.sql_date_time(event.event_start_time) == vm.sql_date_time(timeblock)) {
+                        if(event.event_location == location) {
+                           displayEvent = event;                           
+                        }
+                     }
+                  });
+               }
+               //console.log(timeblock+' / ' + location);
+               return displayEvent;
+            },
             
             get_timeblocks() {
                var   vm    = this,
@@ -115,6 +138,8 @@
                
                return timeblocks;   
             },
+            
+            
          }
       }   
          
@@ -128,34 +153,34 @@
    .scheduling_panel .box.schedule .schedule_grid {
       position: relative;
       display: flex;
-      width: 60%;
+      width: 70%;
       max-height: 50rem;
       overflow: hidden;
    }
-   .scheduling_panel .box.schedule .schedule_grid .slide_in {
+   .schedule_grid .slide_in {
       position: absolute;
          top: 0;
          right: -22rem;
       width: 22rem;
       transition: right .4s;
    }
-   .scheduling_panel .box.schedule .schedule_grid .slide_in.show {
+   .schedule_grid .slide_in.show {
       right: 0;
    }
-   .scheduling_panel .box.schedule .schedule_grid .grid_wrapper {
+   .schedule_grid .grid_wrapper {
       display: flex;
       width: 100%;
       min-height: 25rem;
       overflow: hidden;
       overflow-X: auto;
    }
-   .scheduling_panel .box.schedule .schedule_grid .grid_wrapper .grid {
+   .schedule_grid .grid_wrapper .grid {
       display: flex;
       flex-wrap: wrap;
       position: relative;
       width: 100%;
    }
-   .scheduling_panel .box.schedule .schedule_grid .grid_wrapper .grid .title {
+   .schedule_grid .grid_wrapper .grid .title {
       position: absolute;
       top: 0;
       left: 0;
@@ -175,41 +200,59 @@
       height: 2em;      
    }
    
-   .scheduling_panel .box.schedule .schedule_grid .times {
+   .schedule_grid .times {
       display: flex;
       min-width: 100%;
       height: 3rem;
+      padding-left: 5rem;
    }
-   .scheduling_panel .box.schedule .schedule_grid .times .time {
+   .schedule_grid .times .time {
       display: flex;
-      width: 3rem;
+      width: 4rem;
       justify-content: flex-end;
+      flex-wrap: nowrap;
+      white-space: nowrap;
       height: 2rem;
       line-height: 2rem;
       padding: .5rem; 
       color: var(--button2);
    }
 	
-   .scheduling_panel .box.schedule .schedule_grid .locations {
+   .schedule_grid .locations {
       display: flex;
+      flex-wrap: wrap;
       width: 100%;
+      height: 100%;
+      overflow: hidden;
+      overflow-Y: auto;
+      padding: 0 1rem;
    }
-   .scheduling_panel .box.schedule .schedule_grid .location_list {
+   .schedule_grid .location_list {
       display: flex;
+         flex-wrap: wrap;
       width: 5rem;
    }
-   .scheduling_panel .box.schedule .schedule_grid .location_blocks {
+   .schedule_grid .location_list .location {
       display: flex;
-      width: 100%;
-      flex-wrap: wrap;
+      width: 5rem;
+      color: black;
    }
+   .schedule_grid .locations .list_item {
+      display: flex;
+      flex-wrap: nowrap;
+      width: auto;
+   }
+   
+   .schedule_grid .locations .time_block {
+      display: flex;
+      width: 4rem;
+      color: red;
+   }
+   
+   
+   
 	
    
 	
 	
-	
-   .scheduling_panel .box.schedule .schedule_list {
-      display: flex;
-      width: 40%;      
-   }
    </style>

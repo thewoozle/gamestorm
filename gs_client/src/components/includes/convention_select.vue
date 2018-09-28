@@ -3,7 +3,7 @@
 		<div id="convention_select" class="convention_select">
 			<div class="cons">
 				<span class="con" 
-					:class="convention.tag_name == selectedCon? 'active' : ''" 
+					:class="convention.tag_name == _selectedCon? 'active' : ''" 
 					v-for="convention in conventions" 
 					v-text="convention.short_name" 
 					@click="[ $emit('setCon', convention.tag_name), update_currentCon(convention)]"
@@ -194,6 +194,7 @@
 				return {
 					convention 		: {},
 					showConInfo		: false,
+               
 				}
 			},
 			
@@ -240,9 +241,14 @@
 			},
 			
 			mounted() {
+            this.set_currentCon();
 			},
 			
          props: ['_selectedCon'],
+         
+         watch: {
+            '_selecteCon': function(newVal, oldVal) {this.set_currentCon()},
+         },
 			
 			methods: {
 				update_convention(e) {
@@ -266,11 +272,22 @@
                   }
                return tagName;
             },
+            
+            set_currentCon() {
+               var vm = this;
+               if(vm.conventions.length > 0) {
+               console.log('works');
+                  vm.conventions.forEach((con) => {
+                     console.log(con);
+                     con.tag_name== vm._selectedCon? vm.update_currentCon(con) : '';
+                  });
+               }
+            },
 				
 				
 				update_currentCon(convention) {
 					var vm = this;
-               
+               console.log(convention);
                if(!vm.currentCon.tag_name) {
                   vm.currentCon.tag_name = vm.currentCon.short_name.replace(/ /gi, '_').toLowerCase();
                }
