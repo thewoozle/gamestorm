@@ -197,7 +197,7 @@
                            <div class="box_loading" v-else-if="conEvents && conEvents.length < 1">Loading...</div>
                              
                            <div class="list_wrapper" v-else>
-                              <div class="list_item"   v-for="event in conEvents">
+                              <div class="list_item"   v-for="event in filtered_con_events">
                                  <button type="button" class="link" @click.prevent="editEvent = event">
                                     <span class="element tag" v-text="event.con_event_tag"></span>
                                     <span class="element track" v-text="event.track"></span>
@@ -211,7 +211,7 @@
                         <div class="list all_list" :class="showEventsList == 'all'? 'show' : ''">  
                            <span class="title list_title">All Events</span>   
                            <div class="list_wrapper">
-                              <div class="list_item" v-for="event in allEvents">
+                              <div class="list_item" v-for="event in filtered_events">
                                  <button type="button" class="link" @click.prevent="() =>{editEvent = event}">
                                     <span class="element name" v-text="event.event_name"></span>
                                     <span class="element track" v-text="event.track"></span>
@@ -249,15 +249,31 @@
                      <div class="list_element">
                         <div class="schedule_list list">
                            <span class="title list_title">Schedule List</span>
+                           <div style="color: red">
+                              <p>big schedule grid of locations and timeblocks with list of unscheduled events. </p>
+                              <p>color-coded event-type, status-flag, presenter, and info-dropdown. </p>
+                              <p>click on event to highlight start-time in area. click on location to place event. event may be copied or moved. </p>
+                           </div>   
+                           <div class="event_list">
+                              <div class="event" v-for="event in conEvents" :class="'event_'+event.event_status">
+                                 <span class="element tag" v-text="event.con_event_tag"></span>
+                                 <div class="element times">
+                                    <span class="element start_time" v-text="day_time(event.event_start_time)"></span>
+                                    <span class="element duration" v-text="event_duration(event.event_start_time, event.event_end_time)"></span>
+                                 </div>   
+                                 <span class="element name" v-text="event.event_name"></span>
+                                 <div class="element meta">
+                                    <span class="element type" v-text="event.event_type"></span>
+                                    <span class="element track" v-text="event.event_track"></span>
+                                 </div>
+                              </div>
+                           </div>
                            
                            
                         </div>
                      </div>
                      
                      
-							<p>big schedule grid of locations and timeblocks with list of unscheduled events. </p>
-							<p>color-coded event-type, status-flag, presenter, and info-dropdown. </p>
-							<p>click on event to highlight start-time in area. click on location to place event. event may be copied or moved. </p>
 						</div>
 						
 						
@@ -327,6 +343,8 @@
                copyConLocations     : 0,
                showLocationControls : false,
                showEventControls    : false,
+               eventSort		      : 'event_tag',
+               conEventSort		   : 'event_tag',
                showEventsList       : 'con',
                conLocations         : [],
                timeblocks           : [],
@@ -380,9 +398,68 @@
                conEvents   : 'conEvents'
 				}),
             
-				filteredEvents:  () => {
-					var vm = this;
-					return vm.allEvents;
+            
+				filtered_events() {          
+					var vm = this,
+						eventName,
+						eventLocation,
+						lastName,
+						eventTag;
+               // if(vm.conEvents ) {   
+                  // if(vm.conEvents.length > 0) {
+                     // var events =  vm.conEvents.sort((a, b) => a[vm.eventSort].toString().localeCompare(b[vm.eventSort]));	
+                     
+                     // return events;
+                     // return events.filter(function(events) {
+                        // events.event_name? eventName	= events.event_name : '';
+                        // //events.last_name? lastName 	= events.last_name : '';
+                        // events.event_location? eventLocation	= events.event_location : '';
+                        // //events.table_num? tableNumber = events.table_num : '';
+                        // events.event_tag? eventTag	= events.event_tag : '';
+                        
+                           // return 	eventName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
+                                    // //lastName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
+                                    // eventLocation.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
+                                    // //tableNumber.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1  || 
+                                    // eventTag.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1;
+                     // });
+                  // //return vm.conEvents;
+                  // }
+               // } 
+				},
+            
+				filtered_con_events() {          
+					var vm = this,
+						eventName,
+						eventLocation,
+						lastName,
+						eventTag;                  
+                  
+               if(vm.conEvents ) {   
+                  if(vm.conEvents.length > 0) {
+                     var events =  vm.conEvents.sort((a, b) => a[vm.conEventSort].toString().localeCompare(b[vm.conEventSort]));	
+                     
+                     
+                     //return events;
+                     return events.filter(function(events) {
+                        events.event_name? eventName	= events.event_name : '';
+                        //events.last_name? lastName 	= events.last_name : '';
+                        events.event_location? eventLocation	= events.event_location : '';
+                        //events.table_num? tableNumber = events.table_num : '';
+                        events.con_event_tag? eventTag	= events.con_event_tag : '';
+                        
+                        
+                     console.log(eventName+' / '+eventLocation+' / ' + eventTag);
+                        
+                           return 	eventName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
+                                    //lastName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
+                                    eventLocation.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
+                                    //tableNumber.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1  || 
+                                    eventTag.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1;
+                     });
+                  //return vm.conEvents;
+                  }
+               } 
 				},
             
             currentVenue() {
@@ -863,7 +940,9 @@
    }
    .scheduling_panel .box .list_item .link .element.tag {
       display: inline-flex;
-      width: 2.5rem;
+      width: 4rem;
+      font-weight: bold;
+      text-shadow: none;
    }
    .scheduling_panel .box .list_item .link .element.track {
       display: inline-flex;
@@ -1028,11 +1107,57 @@
 	
    .scheduling_panel .box.schedule .schedule_list {
       display: flex;
-      width: 40%;      
+      width: 100%;      
    }
    .scheduling_panel .box.schedule .list_element{
       display: flex;
       width: 30%;
+   }
+   .scheduling_panel .box.schedule .schedule_list .event_list {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+   }
+   .scheduling_panel .box.schedule .schedule_list .event {
+      display: flex; 
+      flex-wrap: wrap;      
+      position: relative;
+      width: 100%;   
+      height: 3rem;
+      padding: .5rem 1rem;
+   }
+   .scheduling_panel .box.schedule .schedule_list .event + .event {
+      margin-top: .5rem;
+   }
+   .scheduling_panel .box.schedule .schedule_list .event .element {
+      display: flex;
+      width: 100%;
+      color: inherit;
+      text-shadow: inherit;
+   }
+   .scheduling_panel .box.schedule .schedule_list .event .element.tag {
+      position: absolute;
+      top: 0;
+      left: 0;
+      margin: .5rem 1rem;
+      font-size: 1.5rem;
+   }
+   .scheduling_panel .box.schedule .schedule_list .event .element.times {
+      margin-left: 5rem;
+   }
+   .scheduling_panel .box.schedule .schedule_list .event .element.start_time {
+      width: 12rem;
+   }
+   .scheduling_panel .box.schedule .schedule_list .event .element.duration {
+      eidth: 3rem;
+   }
+   .scheduling_panel .box.schedule .schedule_list .event .element {
+      
+   }
+   .scheduling_panel .box.schedule .schedule_list .event_0 {
+      background: var(--warningColor);
+      color: var(--lightColor);
+      text-shadow: -1px -1px 1px rgba(0,0,0,0.15);
    }
 	
 	

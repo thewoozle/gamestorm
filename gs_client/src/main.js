@@ -41,9 +41,20 @@
             return moment(date).format('hh:mm a');
          },
          
+         day_time(date) {
+            return moment(date).format('ddd hh:mm a');            
+         },
+         
          sql_date_time(date) {
            return moment(date).format('YYYY-MM-DD HH:MM:SS'); 
          },
+         
+         event_duration(startTime, endTime) {
+            startTime= moment(startTime);
+            endTime  = moment(endTime);   
+            
+            return endTime.diff(startTime, 'minutes')+' min.';
+         }
 		}
 	});
 

@@ -390,10 +390,11 @@
          return new Promise((resolve, reject) => {            
             Axios.post(apiDomain+'_submit_event', event, {headers : 
             {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}}).then((response) => {		
-               if(response.data.errors) {
+               if(response.data.errors.length > 0) {
                   reject(response.data);                  
                } else {
-                  resolve(response.data);                  
+                  commit('set_con_event', response.data.event);
+                  resolve(response.data);            
                }
             }, (err) => {
                console.log(err.statusText);
@@ -503,6 +504,12 @@
 			state.currentCon = convention;
 		},
 		
+      // SET CON (NEW) EVENT
+      set_con_event: (state, conEvent) => {
+         // add or update event in conEvents
+         console.log(conEvent);
+      }, 
+      
 		//SET CON EVENTS
 		set_con_events: (state, conEvents) =>{
          //console.log(conEvents);         
