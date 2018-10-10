@@ -114,6 +114,7 @@
                               locations += '<span class="location_name">'+location2.location_tag.replace(/_/gi, ' ')+'</span>';
                               
                               //console.log(location2.location_parent +' - '+location.id);
+                              console.log(timeblocks.length);
                               timeblocks.forEach((timeblock) => {
                                  var conEvent = ' - ';
                                  if(vm.conEvents.length > 0) {   

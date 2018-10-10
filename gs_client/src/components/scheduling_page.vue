@@ -202,6 +202,7 @@
                                     <span class="element tag" v-text="event.con_event_tag"></span>
                                     <span class="element track" v-text="event.track"></span>
                                     <span class="element name" v-text="event.event_name"></span>
+                                    
                                  </button>
                                  <button type="button" class="activate_button fas" :class="event.event_active? 'fa-ban' : 'fa-circle'" @click="deactivate_event(event.con_event_id)"></button>
                               </div>
@@ -253,20 +254,39 @@
                               <p>big schedule grid of locations and timeblocks with list of unscheduled events. </p>
                               <p>color-coded event-type, status-flag, presenter, and info-dropdown. </p>
                               <p>click on event to highlight start-time in area. click on location to place event. event may be copied or moved. </p>
+                              <p>ON HOVER, SHOW CONTROLS FOR EDIT, ASSIGN, APPROVE/UNAPPROVE, </p>
                            </div>   
                            <div class="event_list">
-                              <div class="event" v-for="event in conEvents" :class="'event_'+event.event_status">
-                                 <span class="element tag" v-text="event.con_event_tag"></span>
+                              <span class="title element_title" >Unapproved</span>
+                              <div class="event" v-for="event in conEvents" v-if="event.event_status == '0'" :class="'event_0'">
+                                 <span class="element tag" v-text="event.con_event_tag.replace(/_/g, ' ')"></span>
                                  <div class="element times">
                                     <span class="element start_time" v-text="day_time(event.event_start_time)"></span>
                                     <span class="element duration" v-text="event_duration(event.event_start_time, event.event_end_time)"></span>
                                  </div>   
-                                 <span class="element name" v-text="event.event_name"></span>
                                  <div class="element meta">
-                                    <span class="element type" v-text="event.event_type"></span>
-                                    <span class="element track" v-text="event.event_track"></span>
+                                    <span class="element type" v-text="event.type"></span>
+                                    <span class="element track" v-text="event.track.replace(/_/g, ' ')"></span>
                                  </div>
+                                 <span class="element name" v-text="event.event_name"></span>
                               </div>
+                              
+                              
+                              <span class="title element_title" >Approved, unscheduled</span>
+                              <div class="event" v-for="event in conEvents" v-if="event.event_status >= 20 && event.event_status < 30" :class="'event_20'">
+                                  <span class="element tag" v-text="event.con_event_tag.replace(/_/g, ' ')"></span>
+                                 <div class="element times">
+                                    <span class="element start_time" v-text="day_time(event.event_start_time)"></span>
+                                    <span class="element duration" v-text="event_duration(event.event_start_time, event.event_end_time)"></span>
+                                 </div>   
+                                 <div class="element meta">
+                                    <span class="element type" v-text="event.type"></span>
+                                    <span class="element track" v-text="event.track.replace(/_/g, ' ')"></span>
+                                 </div>
+                                 <span class="element name" v-text="event.event_name"></span>
+                              </div>
+                              
+                              
                            </div>
                            
                            
@@ -344,7 +364,6 @@
                showLocationControls : false,
                showEventControls    : false,
                eventSort		      : 'event_tag',
-               conEventSort		   : 'event_tag',
                showEventsList       : 'con',
                conLocations         : [],
                timeblocks           : [],
@@ -403,62 +422,69 @@
 					var vm = this,
 						eventName,
 						eventLocation,
-						lastName,
-						eventTag;
-               // if(vm.conEvents ) {   
-                  // if(vm.conEvents.length > 0) {
-                     // var events =  vm.conEvents.sort((a, b) => a[vm.eventSort].toString().localeCompare(b[vm.eventSort]));	
+						lastName,	
+                  eventSort,
+                  searchQuery,
+                  events,
+						eventTag;      
+                  
+                  vm.searchQuery? searchQuery = vm.searchQuery.toLowerCase() : searchQuery = '';
+               if(vm.allEvents ) {   
+                  if(vm.allEvents.length > 0) {                     
+                     eventSort   = 'event_track';
+                     events  =  vm.allEvents.sort((a, b) => a[eventSort].toString().localeCompare(b[eventSort]));	
                      
-                     // return events;
-                     // return events.filter(function(events) {
-                        // events.event_name? eventName	= events.event_name : '';
-                        // //events.last_name? lastName 	= events.last_name : '';
-                        // events.event_location? eventLocation	= events.event_location : '';
-                        // //events.table_num? tableNumber = events.table_num : '';
-                        // events.event_tag? eventTag	= events.event_tag : '';
+                     return events.filter(function(events) {
+                        events.event_name? eventName	= events.event_name.toLowerCase() : '';
+                        //events.last_name? lastName 	= events.last_name : '';
+                        events.event_location? eventLocation	= events.event_location.toLowerCase() : '';
+                        //events.table_num? tableNumber = events.table_num : '';
+                        events.event_tag? eventTag	= events.event_tag.toLowerCase() : '';
                         
-                           // return 	eventName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
-                                    // //lastName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
-                                    // eventLocation.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
-                                    // //tableNumber.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1  || 
-                                    // eventTag.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1;
-                     // });
-                  // //return vm.conEvents;
-                  // }
-               // } 
+                           return 	eventName.indexOf(searchQuery ) !== -1 || 
+                                    //lastName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
+                                    eventLocation.indexOf(searchQuery) !== -1 || 
+                                    //tableNumber.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1  || 
+                                    eventTag.indexOf(searchQuery) !== -1;
+                     });
+                     
+                  }
+                
+               } 
 				},
             
 				filtered_con_events() {          
 					var vm = this,
 						eventName,
 						eventLocation,
-						lastName,
-						eventTag;                  
+						lastName,	
+                  events,
+                  eventSort,
+                  searchQuery,
+						eventTag;      
                   
+                  vm.searchQuery? searchQuery = vm.searchQuery.toLowerCase() : searchQuery = '';
+               
                if(vm.conEvents ) {   
-                  if(vm.conEvents.length > 0) {
-                     var events =  vm.conEvents.sort((a, b) => a[vm.conEventSort].toString().localeCompare(b[vm.conEventSort]));	
+                  if(vm.conEvents.length > 0) {                     
+                     eventSort   = 'con_event_tag';
+                     events  =  vm.conEvents.sort((a, b) => a[eventSort].toString().localeCompare(b[eventSort]));	
                      
-                     
-                     //return events;
                      return events.filter(function(events) {
-                        events.event_name? eventName	= events.event_name : '';
+                        events.event_name? eventName	= events.event_name.toLowerCase() : '';
                         //events.last_name? lastName 	= events.last_name : '';
-                        events.event_location? eventLocation	= events.event_location : '';
+                        events.event_location? eventLocation	= events.event_location.toLowerCase() : '';
                         //events.table_num? tableNumber = events.table_num : '';
-                        events.con_event_tag? eventTag	= events.con_event_tag : '';
+                        events.event_tag? eventTag	= events.event_tag.toLowerCase() : '';
                         
-                        
-                     console.log(eventName+' / '+eventLocation+' / ' + eventTag);
-                        
-                           return 	eventName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
+                           return 	eventName.indexOf(searchQuery ) !== -1 || 
                                     //lastName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
-                                    eventLocation.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
+                                    eventLocation.indexOf(searchQuery) !== -1 || 
                                     //tableNumber.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1  || 
-                                    eventTag.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1;
+                                    eventTag.indexOf(searchQuery) !== -1;
                      });
-                  //return vm.conEvents;
                   }
+                
                } 
 				},
             
@@ -1116,18 +1142,39 @@
    .scheduling_panel .box.schedule .schedule_list .event_list {
       display: flex;
       flex-direction: column;
-      width: 100%;
+      width: calc(100% - 1rem);
+      margin: 0 .5rem;
    }
    .scheduling_panel .box.schedule .schedule_list .event {
       display: flex; 
       flex-wrap: wrap;      
       position: relative;
       width: 100%;   
+      cursor: pointer;
       height: 3rem;
       padding: .5rem 1rem;
    }
+   .scheduling_panel .box.schedule .schedule_list .event:hover {
+      opacity: .8;
+   }
+   
    .scheduling_panel .box.schedule .schedule_list .event + .event {
       margin-top: .5rem;
+   }
+   .scheduling_panel .box.schedule .schedule_list .element_title + .event {
+      margin-top: .5rem;
+   }
+   
+   .scheduling_panel .box.schedule .schedule_list .element_title {
+      display: flex;
+      justify-content: center;
+      text-align: center;
+      width: calc(100% - 2rem);
+      margin: 0 1rem;
+      text-transform: uppercase;
+      padding: .25rem 0;      
+      border-bottom: solid 1px var(--borderColor);
+      color: var(--textColor2);
    }
    .scheduling_panel .box.schedule .schedule_list .event .element {
       display: flex;
@@ -1136,26 +1183,61 @@
       text-shadow: inherit;
    }
    .scheduling_panel .box.schedule .schedule_list .event .element.tag {
+      align-items: center;      
       position: absolute;
-      top: 0;
-      left: 0;
-      margin: .5rem 1rem;
+         top: 0;
+         left: 0;
+      height: 100%;
+      width: 4rem;
+      padding: 0 0 0 .5rem;
       font-size: 1.5rem;
    }
    .scheduling_panel .box.schedule .schedule_list .event .element.times {
-      margin-left: 5rem;
+      margin-left: 4rem;
+      width: 9rem;
    }
    .scheduling_panel .box.schedule .schedule_list .event .element.start_time {
-      width: 12rem;
+      width: 5rem;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      font-size: .85rem;
    }
    .scheduling_panel .box.schedule .schedule_list .event .element.duration {
-      eidth: 3rem;
+      width: 4rem;
+      text-align: right;
+      font-size: .85rem;
+      padding: 0 .5rem 0 0;
+      justify-content: flex-end;
    }
-   .scheduling_panel .box.schedule .schedule_list .event .element {
-      
+   
+   .scheduling_panel .box.schedule .schedule_list .event .element.meta {
+      position: absolute;
+         top: .35rem;
+         right: .5rem;
+      flex-wrap: wrap;   
+      width: calc(100% - 13rem);
+   }
+   .scheduling_panel .box.schedule .schedule_list .event .element.type, 
+   .scheduling_panel .box.schedule .schedule_list .event .element.track {
+      width: 100%;
+      font-size: .8rem;
+      line-height: 1em;
+      padding-left: 1rem;
+      justify-content: center;
+      text-align: center;
+   }
+   .scheduling_panel .box.schedule .schedule_list .event .element.name {
+      padding-left: 4rem;
+      font-weight: 100;
    }
    .scheduling_panel .box.schedule .schedule_list .event_0 {
       background: var(--warningColor);
+      color: var(--lightColor);
+      text-shadow: -1px -1px 1px rgba(0,0,0,0.15);
+   }
+   
+   .scheduling_panel .box.schedule .schedule_list .event_20 {
+      background: var(--borderColor2);
       color: var(--lightColor);
       text-shadow: -1px -1px 1px rgba(0,0,0,0.15);
    }

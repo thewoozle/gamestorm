@@ -50,10 +50,24 @@
          },
          
          event_duration(startTime, endTime) {
+            var returnTime, hours, minutes;
             startTime= moment(startTime);
             endTime  = moment(endTime);   
             
-            return endTime.diff(startTime, 'minutes')+' min.';
+            minutes = endTime.diff(startTime, 'minutes');
+            
+            if (minutes > 180) {
+               hours    = parseInt(minutes/60);
+               minutes  = minutes % 60; 
+               console.log(hours+' / ' + minutes);
+               returnTime = hours +' hrs';
+               minutes? returnTime+= ', '+minutes+' min' : '';
+               
+            } else {
+               returnTime = minutes+' min';
+            }           
+            
+            return returnTime;
          }
 		}
 	});

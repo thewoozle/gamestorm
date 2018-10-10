@@ -276,9 +276,7 @@
             set_currentCon() {
                var vm = this;
                if(vm.conventions.length > 0) {
-               console.log('works');
                   vm.conventions.forEach((con) => {
-                     console.log(con);
                      con.tag_name== vm._selectedCon? vm.update_currentCon(con) : '';
                   });
                }
@@ -287,7 +285,6 @@
 				
 				update_currentCon(convention) {
 					var vm = this;
-               console.log(convention);
                if(!vm.currentCon.tag_name) {
                   vm.currentCon.tag_name = vm.currentCon.short_name.replace(/ /gi, '_').toLowerCase();
                }
