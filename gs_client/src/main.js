@@ -59,7 +59,6 @@
             if (minutes > 180) {
                hours    = parseInt(minutes/60);
                minutes  = minutes % 60; 
-               console.log(hours+' / ' + minutes);
                returnTime = hours +' hrs';
                minutes? returnTime+= ', '+minutes+' min' : '';
                

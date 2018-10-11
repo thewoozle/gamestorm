@@ -50,13 +50,11 @@
 					selectedCon		      : null,
                showScheduleControls : false,
                timeblocks           : [],  
-               conLocations         : [],
             }
          },
          
          props: {            
             _selected_con: String,
-            _conLocations : Array,
          },
          
          created() {
@@ -65,7 +63,6 @@
          },
          watch: {
             '_selected_con': function(newVal, oldVal) {this.selectedCon = newVal},
-            '_conLocations': function(newVal, oldVal) {this.conLocations = newVal},
          },
          
          computed: {
@@ -77,6 +74,7 @@
                experienceLevels: 'experienceLevels',
                conEvents   : 'conEvents',
 					currentCon	: 'currentCon',  
+               conLocations: 'conLocations',
                allEvents   : 'allEvents',    
                
             }),
@@ -114,7 +112,7 @@
                               locations += '<span class="location_name">'+location2.location_tag.replace(/_/gi, ' ')+'</span>';
                               
                               //console.log(location2.location_parent +' - '+location.id);
-                              console.log(timeblocks.length);
+                              //console.log(timeblocks.length);
                               timeblocks.forEach((timeblock) => {
                                  var conEvent = ' - ';
                                  if(vm.conEvents.length > 0) {   

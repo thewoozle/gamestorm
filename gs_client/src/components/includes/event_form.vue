@@ -246,7 +246,6 @@
                showLocationControls : false,
                showEventControls    : false,
                showEventsList       : 'con',
-               conLocations         : [],
                timeblocks           : [],
                eventSignups         : [],
                presenterSearch      : '',
@@ -283,6 +282,7 @@
 					currentCon	: 'currentCon',  
                allEvents   : 'allEvents',    
                memberList  : 'memberList',
+               conLocations: 'conLocations',
                eventDuration:'eventDuration',
             }),
             
@@ -404,10 +404,7 @@
             
             get_con_locations() {
                var vm = this;
-               vm.conLocations = [];
                vm.$store.dispatch('get_con_locations', vm.selectedCon).then((response)=>{
-                  console.log(response);
-                  vm.conLocations = response.locations;
                });	     
             },
             

@@ -244,7 +244,7 @@
                      </header>
                      
                      
-                     <schedule_grid :_selected_con = "selectedCon" :_conLocations = "conLocations"   />
+                     <schedule_grid :_selected_con = "selectedCon"   />
                      
                      
                      <div class="list_element">
@@ -269,6 +269,22 @@
                                     <span class="element track" v-text="event.track.replace(/_/g, ' ')"></span>
                                  </div>
                                  <span class="element name" v-text="event.event_name"></span>
+                                 
+                                 <div class="event_controls">
+                                    <button type="button" class="event_control fal fa-edit" @click.prevent="edit_event(event.con_event_id)"></button>
+                                    <button  type="button" 
+                                             class="event_control fal" 
+                                             :class="event.event_status == '0'? 'fa-thumbs-up' : 'fa-thumbs-down'" 
+                                             @click.prevent="handle_event_status(event.con_event_id) "
+                                             title="Approve this event"
+                                    ></button>
+                                    <button  type="button" 
+                                             class="event_control fal "
+                                             :class="event.con_location? 'fa-minus-circle' : 'fa-list-alt'"
+                                             @click="handle_event_location(event.con_event_id)"
+                                    ></button>                                 
+                                 </div>
+                                 
                               </div>
                               
                               
@@ -284,6 +300,22 @@
                                     <span class="element track" v-text="event.track.replace(/_/g, ' ')"></span>
                                  </div>
                                  <span class="element name" v-text="event.event_name"></span>
+                                 
+                                 <div class="event_controls">
+                                    <button type="button" class="event_control fal fa-edit" @click.prevent="edit_event(event.con_event_id)"></button>
+                                     <button  type="button" 
+                                             class="event_control fal" 
+                                             :class="event.event_status == '0'? 'fa-thumbs-up' : 'fa-thumbs-down'" 
+                                             @click.prevent="handle_event_status(event.con_event_id) "
+                                             title="Un-approve this event"
+                                    ></button>
+                                    <button  type="button" 
+                                             class="event_control fal "
+                                             :class="event.con_location? 'fa-minus-circle' : 'fa-list-alt'"
+                                             @click="handle_event_location(event.con_event_id)"
+                                    ></button>                          
+                                 </div>
+                                 
                               </div>
                               
                               
@@ -365,7 +397,6 @@
                showEventControls    : false,
                eventSort		      : 'event_tag',
                showEventsList       : 'con',
-               conLocations         : [],
                timeblocks           : [],
                eventSignups         : [],
                presenterSearch      : '',
@@ -391,6 +422,7 @@
 				vm.check_user();
 				vm.get_scheduling_data();    
             vm.set_location_form_data();
+            vm.get_con_locations();
 			},
          
          mounted() {
@@ -411,6 +443,7 @@
                allEvents   : 'allEvents',    
                memberList  : 'memberList',
                eventDuration:'eventDuration',
+               conLocations: 'conLocations',
             }),
             
 				...mapGetters({
@@ -520,7 +553,6 @@
                      vm.selectedCon = vm.currentCon.tag_name;
                }	
 					vm.$store.dispatch('get_scheduling_data', vm.selectedCon).then(()=>{});	
-               vm.get_con_locations();              
 					// vm.get_con_events();
                // vm.get_timeblocks();
                // vm.get_event_signups();
@@ -593,34 +625,9 @@
             
             get_con_locations() {
                var vm = this;
-               vm.conLocations = [];
-					vm.$store.dispatch('get_con_locations', vm.selectedCon).then((response)=>{
-                  console.log(response);
-                  vm.conLocations = response.locations;
-               });	     
+					vm.$store.dispatch('get_con_locations', vm.selectedCon).then((response)=>{});	     
             },
             
-            // get_con_events() {
-               // var vm = this;
-               // vm.conEvents = [];
-					// vm.$store.dispatch('get_con_events', vm.selectedCon).then((response)=>{
-                  // vm.get_timeblocks();
-                  // if(response.events && response.events.length > 0) {
-                     // vm.conEvents = response.events;
-                  // } else {
-                     // vm.conEvents = null;
-                  // }
-               // });	                
-            // },
-            
-            // get_event_signups() {
-               // var vm = this;
-               
-               // vm.$store.dispatch('get_event_signups', vm.selectedCon).then((response)=>{
-                  // console.log(response);
-               // });
-               
-            // },
             
             
             get_timeblocks() {               
@@ -682,6 +689,34 @@
                vm.editEvent = {};
                vm.$forceUpdate();
             },
+            
+            
+            // EDIT SCHEDULE EVENT
+            edit_event(conEventId) {
+               console.log(conEventId);
+            },
+            
+            
+            // HANDLE EVENT STATUS  
+            handle_event_status(conEventId) {
+               var vm = this;
+               vm.conEvents.forEach((event) => {
+                  if(event.con_event_id == conEventId) {
+                     console.log(event);
+                     event.event_status == '0'? event.event_status = 20 : event.event_status = 0;
+                     vm.$store.dispatch('update_event_status', {'event': event}).then((response) => {});
+                  }
+               });
+            },
+            
+            // HANDLE EVENT SCHEDULE 
+            handle_event_location(conEventId) {
+               console.log('handle event location for '+ conEventId);
+              // event.event_location? event.event_status = 20 : event.event_status = 0;
+            },
+            
+            
+            
             
             // // ADD PRESENTER 
             // add_presenter(e) {
@@ -1152,10 +1187,37 @@
       width: 100%;   
       cursor: pointer;
       height: 3rem;
+      overflow: hidden;
       padding: .5rem 1rem;
    }
    .scheduling_panel .box.schedule .schedule_list .event:hover {
       opacity: .8;
+   }
+   .scheduling_panel .box.schedule .schedule_list .event_controls  {
+      position: absolute;
+      right: -10rem;
+      bottom: 0;
+      z-index: 10;
+      background: rgba(0,0,0,0.45);
+      cursor: default;
+      border-radius: .25rem 0 0 0;
+      border: none;      
+      width: 10rem;
+      transition: right .5s, border-color .5s;
+   }
+   .scheduling_panel .box.schedule .schedule_list .event:hover .event_controls {
+      right: 0;
+      border-left: solid 1px #000;
+      border-top: solid 1px #000;
+   }
+   .scheduling_panel .box.schedule .schedule_list .event_controls .event_control  {
+      font-size: 1.35rem;
+      background: none;
+      color: var(--borderColor);
+      cursor: pointer;
+   }
+   .scheduling_panel .box.schedule .schedule_list .event_controls .event_control:hover  {
+      color: var(--lightColor);      
    }
    
    .scheduling_panel .box.schedule .schedule_list .event + .event {
@@ -1169,6 +1231,7 @@
       display: flex;
       justify-content: center;
       text-align: center;
+      
       width: calc(100% - 2rem);
       margin: 0 1rem;
       text-transform: uppercase;

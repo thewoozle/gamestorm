@@ -49,6 +49,7 @@
       eventTracks    : {},
       eventTypes     : {},
       ageGroups      : {},  
+      conLocations   : {},
       memberList     : {},
       timeblocks     : [],
 	}
@@ -334,17 +335,33 @@
          });
       },
       
+      
       // GET CON LOCATIONS
       get_con_locations({commit}, selectedCon) {        
-			var vm = this,
-            _formData = new FormData();
-			_formData.append('con', selectedCon);			
+			var   vm = this,
+               conLocations,
+               _formData = new FormData();
+               _formData.append('con', selectedCon);	
+            
+         if(localStorage) {      
+            if(localStorage.conLocations) {
+               commit('set_con_locations', JSON.parse(localStorage.conLocations)); 
+            }   
+         }
+            
+         Axios.post(apiDomain+'_get_con_locations', _formData).then((response) => {
+            if(localStorage) {      
+               localStorage.setItem('conLocations', JSON.stringify(response.data.locations));
+            }
+            commit('set_con_locations', response.data.locations);   
+            
+         });
+         
+      },
       
-			return new Promise((resolve, reject) => {
-            Axios.post(apiDomain+'_get_con_locations', _formData).then((response) => {
-					resolve(response.data);   
-            });
-         });      
+      // UPDATE EVENT STATUS
+      update_event_status({commit}, event) {
+        console.log(event); 
       },
       
       // REMOVE PRESENTER
@@ -423,7 +440,7 @@
       // COPY CON LOCATIONS (copy work done on server)
       copy_con_locations({commit}, conData) {
          Axios.get(apiDomain+'_copy_con_locations', {params: conData}).then((response)=>{
-            commit('set_con_locations', response.data);            
+            commit('set_con_locations', response.data.locations);            
          });
       },
       
@@ -449,9 +466,6 @@
       get_event_signups({commit}, selectedCon) {
          return new Promise((resolve, reject) =>{
             Axios.get(apiDomain+'_get_event_signups', {params: {con : selectedCon}}).then((response) => {
-               
-               
-               console.log(response.data);
                
             }, (err) => {
                console.log(err.statusText);
@@ -520,7 +534,7 @@
 		//	 SCHEDULING DATA (for scheduling)
 		set_scheduling_data: (state, {venues, conLocations, allEvents, eventTypes, eventTracks, ageGroups, memberList}) => {
 			Vue.set(state, 'venues', venues);
-         Vue.set(state, 'conLocations', conLocations);
+        // Vue.set(state, 'conLocations', conLocations);
          Vue.set(state, 'allEvents', allEvents);
          Vue.set(state, 'eventTracks', eventTracks);
          Vue.set(state, 'eventTypes', eventTypes);
@@ -623,15 +637,11 @@
 			state.staffPositions= staffPositions;
 		},
       
-      // SET LOCATIONS FOR SCHEDULING 
-      set_con_locations: (state, {locations}) => {
-         state.conLocations = locations;
-      },
      
-      // SET EVENTS FOR SCHEDULING 
-      // set_con_events: (state, {events}) => {
-         // state.conEvents = events;
-      // },
+      // SET CON LOCATIONS 
+      set_con_locations: (state, conLocations) => {
+         state.conLocations = conLocations;
+      },
 	}
 	
 	const getters = {
@@ -665,6 +675,7 @@
       conLocations   : state => state.conLocations,		
       timeblocks     : state => state.timeblocks,
       memberList     : state => state.memberList,
+      conLocations   : state => state.conLocations,
 	}
 	
 	export default new Vuex.Store ({
