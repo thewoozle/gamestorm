@@ -140,11 +140,31 @@
                               </div>
                               
                               <div class="form_row">
-                                 <label>Location Active</label>
-                                 <div class="input_wrapper">
-                                    <input type="checkbox" class="checkbox_box" name="location_active" v-model="editLocation.location_active" />
+                                 <div class="form_section">
+                                    <label>Location Active</label>
+                                    <div class="input_wrapper">
+                                       <input type="checkbox" class="checkbox_box" name="location_active" v-model="editLocation.location_active" />
+                                    </div>
                                  </div>
+                                 <div class="form_section">
+                                    <label>Scheduling Area</label>
+                                    <div class="input_wrapper">
+                                       <select class="select" name="scheduling_area" v-model="editLocation.scheduling_area">
+                                          <option value="" style="display: none" >select...</option>
+                                          <option v-for="track in eventTracks" :value="track.id" :selected="track.id == editLocation.scheduling_area" v-text="track.track_name"></option>
+                                       </select>
+                                    </div>   
+                                 </div>
+                                 
                               </div>
+                              
+                              <div class="form_row">
+                                    <label>Sublocations have same scheduling area</label>
+                                    <div class="input_wrapper">
+                                       <input type="checkbox" class="checkbox_box" name="copy_schedule_area" v-model="editLocation.copy_schedule_area" @click="copy_location_schedule_areas(editLocation.location_id)" />                                       
+                                    </div>
+                              </div>
+                              
                               <div class="form_row">
                                  <label>Description</label>
                                  <div class="input_wrapper">
@@ -243,9 +263,32 @@
                         <span class="title">Schedule</span>
                      </header>
                      
+                     <div class="schedule_grid">
+                        <div class="control_bar">
+                           <button type="button" title="Show schedule settings" class="control_button fal fa-cog" @click="showScheduleControls? showScheduleControls = false : showScheduleControls = true"></button>
+                          
+                        </div>
+                        
+                        <div class="slide_in event_controls" :class="showScheduleControls? 'show' : ''">
+                           <button type="button" class="close_button fal fa-times" @click="showScheduleControls? showScheduleControls = false : showScheduleControls = true"></button>
+                           <div class="selects">
+                           </div>
+                           
+                        </div>
+                        <div class="slide_in event_schedule" :class="showEventSchedule? 'show' : ''">
+                           <button type="button" class="close_button fal fa-times" @click="showEventSchedule? showEventSchedule = false : showEventSchedule = true"></button>
+                           <div class="">
+                              <button type="button" class="" >Auto Schedule</button>
+                              
+                              <div class="">{{scheduleLocationList}}</div>
+                           </div>
+                           
+                        </div>
+                        
                      
-                     <schedule_grid :_selected_con = "selectedCon"   />
+                        <schedule_grid :_selected_con = "selectedCon"   />
                      
+                     </div>
                      
                      <div class="list_element">
                         <div class="schedule_list list">
@@ -388,11 +431,14 @@
 					schedulingTab	      : 'alerts',
                selectedVenue        : {},
                editLocation         : {},
+               showScheduleControls : false,
+               showEventSchedule    : false,
                editEvent            : {},
                formErrors           : [],
                submissionSystem     : {},
 					selectVenueLocs      : 0,
                copyConLocations     : 0,
+               scheduleLocationList : '',
                showLocationControls : false,
                showEventControls    : false,
                eventSort		      : 'event_tag',
@@ -628,6 +674,11 @@
 					vm.$store.dispatch('get_con_locations', vm.selectedCon).then((response)=>{});	     
             },
             
+            copy_location_schedule_areas(locationId) {
+               
+               console.log('copy_location_schedule_areas(editLocation.location_id)');
+            },
+            
             
             
             get_timeblocks() {               
@@ -702,6 +753,7 @@
                var vm = this;
                vm.conEvents.forEach((event) => {
                   if(event.con_event_id == conEventId) {
+                     event['selected_con'] = vm.selectedCon;
                      console.log(event);
                      event.event_status == '0'? event.event_status = 20 : event.event_status = 0;
                      vm.$store.dispatch('update_event_status', {'event': event}).then((response) => {});
@@ -712,7 +764,21 @@
             // HANDLE EVENT SCHEDULE 
             handle_event_location(conEventId) {
                console.log('handle event location for '+ conEventId);
-              // event.event_location? event.event_status = 20 : event.event_status = 0;
+               // in slideout, create list of locations in event track with clear time between start and stop 
+               // create override to show locations in area 
+               // create 'auto-schedule' button for first empty 'table' in area. 
+               // each event has a tag for track 
+               // user has area permissions and can only update events in their area (by track)
+               
+               var vm = this;
+               vm.showEventSchedule? vm.showEventSchedule = false : vm.showEventSchedule = true;
+               
+               vm.conEvents.forEach((event) => {
+                  if(event.con_event_id == conEventId) {
+                        console.log('track: '+event.event_track);
+                  }
+               });
+               vm.scheduleLocationList = "<p>list of locations for this track</p>";
             },
             
             
@@ -1303,6 +1369,17 @@
       background: var(--borderColor2);
       color: var(--lightColor);
       text-shadow: -1px -1px 1px rgba(0,0,0,0.15);
+   }
+   .schedule_grid .slide_in {
+      position: absolute;
+         top: 0;
+         right: -22rem;
+      width: 22rem;
+      transition: right .4s;
+   }
+   .schedule_grid .slide_in.show {
+      right: 0;
+      z-index: 10;
    }
 	
 	

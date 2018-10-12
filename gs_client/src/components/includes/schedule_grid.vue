@@ -1,19 +1,6 @@
 
    <template>
    
-                     <div class="schedule_grid">
-                        <div class="control_bar">
-                           <button type="button" title="Show schedule settings" class="control_button fal fa-cog" @click="showScheduleControls? showScheduleControls = false : showScheduleControls = true"></button>
-                          
-                        </div>
-                        
-                        <div class="slide_in event_controls" :class="showScheduleControls? 'show' : ''">
-                           <button type="button" class="close_button fal fa-times" @click="showScheduleControls? showScheduleControls = false : showScheduleControls = true"></button>
-                           <div class="selects">
-                           </div>
-                           
-                        </div>
-                        
                         
                         
                         <div class="grid_wrapper"  >                        
@@ -33,7 +20,6 @@
                            </div>
                         
                         </div>
-                     </div>
    
    </template>
    
@@ -48,7 +34,6 @@
          data() {
             return{
 					selectedCon		      : null,
-               showScheduleControls : false,
                timeblocks           : [],  
             }
          },
@@ -185,16 +170,6 @@
       width: 70%;
       max-height: 50rem;
       overflow: hidden;
-   }
-   .schedule_grid .slide_in {
-      position: absolute;
-         top: 0;
-         right: -22rem;
-      width: 22rem;
-      transition: right .4s;
-   }
-   .schedule_grid .slide_in.show {
-      right: 0;
    }
    .schedule_grid .grid_wrapper {
       display: flex;

@@ -361,6 +361,15 @@
       
       // UPDATE EVENT STATUS
       update_event_status({commit}, event) {
+         var vm = this;
+         
+         Axios.post(apiDomain+'_update_event_status', event.event, {headers : 
+            {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}}
+         ).then((response) => {
+            vm.dispatch('get_con_events', event.selected_con);
+         });
+         
+         
         console.log(event); 
       },
       
