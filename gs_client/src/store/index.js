@@ -4,6 +4,7 @@
 	import Axios from 'axios'
 	import VueAxios from 'vue-axios'
    import moment from 'moment'
+	import Router from 'vue-router'
 		
 	import {apiDomain} from '../config'
 	
@@ -11,6 +12,7 @@
    import {statesList, eventDuration, experienceLevels } from './lists'
    import { devNotes } from './dev_notes'
 	
+	Vue.use(Router);
 	Vue.use(Vuex);
 	Vue.use(VueAxios, Axios);
 	
@@ -46,6 +48,8 @@
 		staffPositions : {},
 		venues         : {},
       conLocations   : {},
+      schedulingPermissions: {},
+      schedulingAreas: {},
       eventTracks    : {},
       eventTypes     : {},
       ageGroups      : {},  
@@ -118,10 +122,10 @@
       
       // SUBMIT LOGIN
       submit_login({commit}, loginInfo) {
-         
-         return new Promise((resolve, reject) =>{
             var vm = this,
                _formData = new FormData();
+         
+         return new Promise((resolve, reject) =>{
                
             for(var key in loginInfo) {
                _formData.append(key, loginInfo[key]);
@@ -137,12 +141,19 @@
                         
                         commit('set_user', {user});
                         Vue.ls.set('user', response.data.user, (60*60*1000) *2); // one hour
+                        // Vue.ls.set('user', response.data.user, (10*1000)); // one minute
                         
                         // start one-hour-and-two-minutes timer then log-out 
                         setTimeout(function() {
                            console.log('LOG OUT timer expired');
-                           vm.logout();					
-                        },(61*60*1000) * 2);
+                          // vm.logout();					
+                           
+                           
+                     Vue.ls.remove('user');
+                     commit('set_user', {});
+               
+                  //},(10*1000));
+                  }, (60*60*1000) *2);
                }
                
                resolve(response.data);         
@@ -312,7 +323,9 @@
                eventTypes     : response.data.eventTypes,
                eventTracks    : response.data.eventTracks,
                ageGroups      : response.data.ageGroups,
-               memberList     : response.data.memberList
+               memberList     : response.data.memberList,
+               permissions    : response.data.permissions,
+               areas          : response.data.areas
             });
 			},(err) => {
 				console.log(err.statusText);
@@ -335,6 +348,17 @@
          });
       },
       
+      
+      // GET SCHEDULING PERMISSIONS 
+      get_scheduling_permissions({commit}) {
+         var cvm = this;
+         
+         Axios.get(apiDomain+'_get_scheduling_permissions').then((response) => {
+            console.log(response.data);
+            commit('set_scheduling_permissions', response.data);
+         });
+         
+      },
       
       // GET CON LOCATIONS
       get_con_locations({commit}, selectedCon) {        
@@ -541,7 +565,7 @@
             
             
 		//	 SCHEDULING DATA (for scheduling)
-		set_scheduling_data: (state, {venues, conLocations, allEvents, eventTypes, eventTracks, ageGroups, memberList}) => {
+		set_scheduling_data: (state, {venues, conLocations, allEvents, eventTypes, eventTracks, ageGroups, memberList, permissions, areas}) => {
 			Vue.set(state, 'venues', venues);
         // Vue.set(state, 'conLocations', conLocations);
          Vue.set(state, 'allEvents', allEvents);
@@ -549,11 +573,17 @@
          Vue.set(state, 'eventTypes', eventTypes);
          Vue.set(state, 'ageGroups', ageGroups);
          Vue.set(state, 'memberList', memberList);
+         Vue.set(state, 'schedulingPermissions', permissions);
+         Vue.set(state, 'schedulingAreas', areas);
 		},		
 		
 		// SET USER 
 		set_user: (state,{ user}) => {
-			state.user = user;
+         if(user) {
+            state.user = user;
+         } else {
+            state.user = {};
+         }
 		},
       
       
@@ -632,6 +662,7 @@
                sessionStorage.memberList = JSON.stringify(state.members); 
          }
 		},
+      
 		
 		// 	set reg settings	
 		set_reg_settings: (state, { regSettings }) => {

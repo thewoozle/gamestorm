@@ -375,6 +375,27 @@
 						<div class="box schedule" :class="schedulingTab == 'schedulers'? 'active' : '' " >
 							SCHEDULERS</br>
 							<p>list of areas with schedulers and area status. dropdown to add scheduler for area</p>
+                     <p>if user has scheduler permission, may add and update list</p>
+                     <p>{{user.first_name}} scheduling permission - {{user.permissions.scheduling}}</p>
+                     
+                     <div class="scheduling_permissions_form">
+                        <form class="form" action="" method="post" @submit.prevent="submit_scheduler">
+                           <div class="form_row">
+                              <div class="input_wrapper">
+                              <select class="select" v-model="editScheduler.area">
+                                 <option value="">select...</option>
+                                 <option value="area.area_id" v-for="area in schedulingAreas" v-text="area"></option>
+                              
+                              </select>
+                              </div>
+                           </div>
+                     area 
+                     scheduler 
+                     <button type="submit">Submit</button>
+                        </form>
+                     
+                     </div>
+                        <div class="" v-for="scheduler in schedulingPermissions">{{scheduler}}</div>
 						</div>
 					</div>				
 				</div>
@@ -439,6 +460,7 @@
 					selectVenueLocs      : 0,
                copyConLocations     : 0,
                scheduleLocationList : '',
+               editScheduler        : {},
                showLocationControls : false,
                showEventControls    : false,
                eventSort		      : 'event_tag',
@@ -490,6 +512,8 @@
                memberList  : 'memberList',
                eventDuration:'eventDuration',
                conLocations: 'conLocations',
+               schedulingPermissions: 'schedulingPermissions',
+               schedulingAreas: 'schedulingAreas',
             }),
             
 				...mapGetters({
@@ -779,6 +803,10 @@
                   }
                });
                vm.scheduleLocationList = "<p>list of locations for this track</p>";
+            },
+            
+            submit_scheduler() {
+               console.log('this');
             },
             
             
@@ -1366,7 +1394,7 @@
    }
    
    .scheduling_panel .box.schedule .schedule_list .event_20 {
-      background: var(--borderColor2);
+      background: #4f7cf8;
       color: var(--lightColor);
       text-shadow: -1px -1px 1px rgba(0,0,0,0.15);
    }

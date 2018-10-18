@@ -267,8 +267,8 @@
 					-----------------------------------------------------------	*/
 				logout(e) {
 					var vm = this;
-					vm.$store.dispatch('update_user', {});		
-					Vue.ls.remove('user');
+					vm.$store.dispatch('update_user', {});	
+               Vue.ls.remove('user');
 					vm.$router.go({name: 'mainpage'});
 				},
 				

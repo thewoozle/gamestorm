@@ -43,7 +43,7 @@
 		
 		import page_footer from '@/components/includes/page_footer'	
 		import {apiDomain} from './config'
-      import {mapState} from 'vuex'
+      import {mapState, mapGetters} from 'vuex'
 		
 		Vue.use(Router)
 		export default {
@@ -77,6 +77,9 @@
            ...mapState({
               devNotes  : 'devNotes',
            }),
+           ...mapGetters({
+              user      : 'user',
+           }),
 			pageName() {
 				return this.$route.name;
 			},
@@ -85,7 +88,11 @@
 		  watch: {
 				pageName(name) {
 					this.set_page_type(name);
-				}
+				},
+            user:function(newval, oldval) {
+               if(!newval.uuid) {this.$router.go({name: 'mainpage'});}
+            },
+            
 		  },
 		  
 		  mounted: function()  {
