@@ -332,6 +332,18 @@
 			});
 		},
       
+      update_schedulers({commit}, scheduler) {         
+         var vm = this,
+            _formData = new FormData();
+         Object.entries(scheduler).forEach((item)=>{
+            _formData.append(item[0], item[1]);	
+         });
+         
+         Axios.post(apiDomain+'_update_schedulers', _formData).then((response) => {
+            commit('set_schedulers', response.data.permissions);
+         });
+      },
+      
       update_convention({commit}, convention) {
          
          var vm = this,
@@ -682,6 +694,11 @@
       set_con_locations: (state, conLocations) => {
          state.conLocations = conLocations;
       },
+      
+      // SET SCHEDULERS
+      set_schedulers: (state, permissions) => {
+        Vue.set(state, 'schedulingPermissions', permissions);
+      },
 	}
 	
 	const getters = {
@@ -715,6 +732,7 @@
       conLocations   : state => state.conLocations,		
       timeblocks     : state => state.timeblocks,
       memberList     : state => state.memberList,
+      schedulingPermissions: state => state.schedulingPermissions,
       conLocations   : state => state.conLocations,
 	}
 	

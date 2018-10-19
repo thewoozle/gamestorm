@@ -372,8 +372,10 @@
 						</div>
 						
 						
-						<div class="box schedule" :class="schedulingTab == 'schedulers'? 'active' : '' " >
+						<div class="box schedulers" :class="schedulingTab == 'schedulers'? 'active' : '' " >
 							SCHEDULERS</br>
+                     
+                     <b>MAKE MEMBERLIST LOCAL STORAGE</b>
 							<p>list of areas with schedulers and area status. dropdown to add scheduler for area</p>
                      <p>if user has scheduler permission, may add and update list</p>
                      <p>{{user.first_name}} scheduling permission - {{user.permissions.scheduling}}</p>
@@ -381,21 +383,46 @@
                      <div class="scheduling_permissions_form">
                         <form class="form" action="" method="post" @submit.prevent="submit_scheduler">
                            <div class="form_row">
-                              <div class="input_wrapper">
-                              <select class="select" v-model="editScheduler.area">
-                                 <option value="">select...</option>
-                                 <option value="area.area_id" v-for="area in schedulingAreas" v-text="area"></option>
+                              <div class="form_element">
+                                 <label class="label">Scheduler</label>
+                                 <div class="search_box input_wrapper">
+                                    <input class="text_box" type="text" v-model="schedulerSearch" placeholder="name search"/>
+                                    <button type="button" class="control_button fal fa-redo-alt" @click="schedulerSearch = ''"></button>
+                                 </div>
+                              </div>
                               
-                              </select>
+                              <div class="form_element">
+                                 <label class="label">Area (track)</label>
+                                 <div class="input_wrapper">
+                                    <select class="select" v-model="editScheduler.area">
+                                       <option value="">select...</option>
+                                       <option :value="area.area_id" v-for="area in schedulingAreas" v-text="area.area_name"></option>                                 
+                                    </select>
+                                 </div>
+                              </div>
+                           </div>   
+                                 
+                           <div class="form_row">                           
+                              <div class="name_display form_element">
+                                 <div class="names">
+                                    <button type="button" class="name" v-for="member in filtered_memberList" @click="editScheduler.scheduler = member.uuid" v-text="member.first_name+ ' '+member.last_name"></button>
+                                 </div>
+                              </div>
+                           
+                              <div class="form_element controls">
+                                 <button type="submit" class="button" @click="update_scheduler">Submit</button>
                               </div>
                            </div>
-                     area 
-                     scheduler 
-                     <button type="submit">Submit</button>
                         </form>
                      
                      </div>
-                        <div class="" v-for="scheduler in schedulingPermissions">{{scheduler}}</div>
+                     
+                     <div class="scheduler_list">
+                           <button type="button" class="scheduler" v-for="scheduler in schedulingPermissions">
+                              {{scheduler.first_name+' '+scheduler.last_name}}</button>
+                      
+                     </div>
+                     
 						</div>
 					</div>				
 				</div>
@@ -461,6 +488,7 @@
                copyConLocations     : 0,
                scheduleLocationList : '',
                editScheduler        : {},
+               schedulerSearch      : '',
                showLocationControls : false,
                showEventControls    : false,
                eventSort		      : 'event_tag',
@@ -520,8 +548,34 @@
                conEvents   : 'conEvents'
 				}),
             
+            filtered_memberList() {
+               var   vm = this,
+                     memberList,
+                     schedulerSearch;
+               
+               vm.schedulerSearch? schedulerSearch = vm.schedulerSearch.toLowerCase() : schedulerSearch = '';
+               
+               //return vm.memberList;
+               
+               
+               if(vm.memberList) {
+                  if(vm.schedulerSearch.length > 1) {  
+                  console.log(vm.schedulerSearch.length);
+                     memberList = vm.memberList;
+                     return memberList.filter(function(memberList) {
+                        var fullname = memberList.first_name.toLowerCase() +' '+ memberList.last_name.toLowerCase();
+                        return  memberList.first_name.toLowerCase().indexOf(schedulerSearch) !== -1 ||
+                                 memberList.last_name.toLowerCase().indexOf(schedulerSearch) !== -1||
+                                 fullname.indexOf(schedulerSearch) !== -1;
+                     });
+                  } else {
+                    return vm.memberList;
+                  }
+               }
+            },
             
-				filtered_events() {          
+            
+				filtered_events() {
 					var vm = this,
 						eventName,
 						eventLocation,
@@ -529,7 +583,7 @@
                   eventSort,
                   searchQuery,
                   events,
-						eventTag;      
+						eventTag;
                   
                   vm.searchQuery? searchQuery = vm.searchQuery.toLowerCase() : searchQuery = '';
                if(vm.allEvents ) {   
@@ -769,6 +823,15 @@
             // EDIT SCHEDULE EVENT
             edit_event(conEventId) {
                console.log(conEventId);
+            },
+            
+            
+            //UPDATE SCHEDULER
+            update_scheduler() {
+               var vm = this;
+               console.log(vm.editScheduler);
+               vm.$store.dispatch('update_schedulers', vm.editScheduler);
+               
             },
             
             
@@ -1408,6 +1471,80 @@
    .schedule_grid .slide_in.show {
       right: 0;
       z-index: 10;
+   }
+   .schedulers .scheduling_permissions_form {
+      display: flex;
+      width: 50%;
+      justify-content: space-between;
+   }
+   .schedulers .scheduling_permissions_form .form {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+      padding: 0 1rem;
+   }
+   .schedulers .scheduling_permissions_form .form_element {
+      width: 50%;
+      align-items: flex-start;
+   }
+   .schedulers .scheduling_permissions_form .label {
+      border-right: none;
+      border-bottom: solid 1px #ccc;
+      width: calc(100% - 1rem);
+      margin: 0 auto;
+      margin-bottom: .65rem;
+      text-align: center;
+      justify-content: center;
+   }
+   .schedulers .scheduling_permissions_form .search_box {
+      display: flex;
+         justify-content: space-between;
+      width: 100%;
+      height: 3rem;
+   }
+   .schedulers .scheduling_permissions_form .search_box .text_box {
+      width: calc(100% - 4rem);
+   }
+   
+   
+   .schedulers .scheduling_permissions_form  {
+      display: flex;
+   }
+   .schedulers .name_display .names {
+      display: flex;
+         flex-wrap: wrap;
+      width: 100%;
+      height: 20rem;
+      border: solid 1px var(--borderColor);
+      border-radius: .25rem;
+      overflow: hidden;
+      overflow-Y: auto;
+   }
+   .schedulers .name_display .name {
+      display: flex;
+      width: 100%;
+      padding: .15rem .5rem .15rem 1rem;
+      cursor: pointer;
+      height: 1.5rem;
+      color: var(--button);
+   }
+   .schedulers .name_display .name.selected,
+   .schedulers .name_display .name:hover {
+      background: var(--contrastColor);
+      color: #fff;
+      text-shadow: -1px -1px 1px rgba(0,0,0,0.15);
+   }
+   .schedulers .name_display .name + .name{
+      border-top: solid 1px #fff;
+   }
+   
+   .schedulers .scheduler_list {
+      display: flex;
+      width: 50%;
+   }
+   .schedulers .scheduling_permissions_form  .controls {
+      padding: 2rem 0 0 0;
+      justify-content: center;      
    }
 	
 	

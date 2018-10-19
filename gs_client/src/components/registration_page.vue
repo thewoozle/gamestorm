@@ -542,12 +542,14 @@
 								member.first_name 	? firstName = member.first_name : firstName = '';
 								member.last_name 	? lastName 	= member.last_name 	: lastName = '';
 								member.email 		? email 	= member.email 		: email = '';
+                        var fullname = firstName.toLowerCase() + ' '+ lastName.toLowerCase();
 								
 								return 	fullName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
 									badgeName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 ||  
 								//	badgeNumber.indexOf(vm.searchQuery ) !== -1 || 
 									firstName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
 									lastName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1  || 
+                           fullname.indexOf(vm.searchQuery.toLowerCase()) !== -1 ||
 									email.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1;
 							});
 						} else {
