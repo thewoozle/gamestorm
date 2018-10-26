@@ -12,10 +12,16 @@
                </div>
                
                <div class="report_wrapper">
+               <div class="buttons">
+                  <button type="button" class="button" @click="showReport = 'regReport'" :title="conventionInfo.short_name+' Reg. Report'">Registration Report</button>
+                  <button type="button" class="button" @click="showReport = 'volunteers'" :title="conventionInfo.short_name+' members that checked VOLUNTEER INTEREST'">Volunteers</button>
+               </div>
+               
                   <div class="control_bar">					
                      <button class="control_button fal fa-cog" type="button" @click.prevent="showRegReportSettings? showRegReportSettings = false : showRegReportSettings = true" title="Show Reg. settings"  ></button>
                      <button class="control_button fal fa-file-alt"   type="button" @click="showRegReport? showRegReport = false : showRegReport=true" title="Show registration report" ></button>
                   </div>
+                  
                   
                   <div class="reg_lists">
             <pre>
@@ -30,11 +36,19 @@
                <div v-for="state in memberFilter('state')" >{{state.name}} - {{state.num}}</div>
             </div>
             
+               <p>----------------------------------------------------------------------------------------------</p>
+               <p>REG  REPORT</p>
             
 						<span class="text">Number of Registered Members</span>
-						<span class="value" v-text="regReport.registeredMembers || '-'"></span>                  
+						<span class="value" v-text="regReport.registeredMembers || '-'"></span><br />                  
                {{regReport}}
-               <p style="color: white" v-for="(item, key) in regReport">{{key}} - {{item}}</p>
+               <p style="color: white" v-for="(item, key) in regReports.regReport">{{key}} - {{item}}</p>
+               
+               <p>----------------------------------------------------------------------------------------------</p>
+               <p>VOLUNTEERS REPORT</p>
+               <p style="color: white" v-for="person in regReports.volunteers">{{person.first_name+' '+person.last_name}} - {{person.email}}</p>
+               
+               
                   </div>
                </div>
                
@@ -47,7 +61,7 @@
 	
 	<script>
 		import {apiDomain} from '../config';
-		import { mapGetters} from 'vuex';
+		import { mapState,mapGetters} from 'vuex';
 		export default{
 			name: 'reg_reports_page',
 			
@@ -56,6 +70,7 @@
 				return {
                showRegReport        : false,
                showRegReportSettings: false,   
+               showReport           : 'regReport',
 				}
 			},
 			
@@ -72,15 +87,19 @@
          
 			
 			computed: {
+         ...mapState({
+               conventionInfo	   : 'conventionInfo',
+					regReport         : 'regReport',
+               regReports        : 'regReports',
+               memberTypes		   : 'memberTypes',
+               departments		   : 'departments',
+               staffPositions	   : 'staffPositions',	
+            
+         }),   
 			...mapGetters({
-               conventionInfo	: 'conventionInfo',
-               user		   	: 'user',
-               conventions		: 'conventions',
-               members			: 'members',
-               memberTypes		: 'memberTypes',
-               departments		: 'departments',
-               staffPositions	: 'staffPositions',				
-					regReport      : 'regReport',
+               user		   	   : 'user',
+               conventions		   : 'conventions',
+               members			   : 'members',
             }),
             
 			},

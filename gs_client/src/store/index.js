@@ -44,6 +44,7 @@
 		paymentMethods : {},
 		members	      : [],
 		regReport      : {},
+      regReports     : {},
 		articles       : {},
 		staffPositions : {},
 		venues         : {},
@@ -286,7 +287,8 @@
 		// GET REGISTRATION REPORT
 		get_reg_report({commit}) {
 			Axios.get(apiDomain+'_get_reg_report').then((response) => {
-				commit('set_reg_report',{ regReport: response.data.regReport });
+				commit('set_reg_report',{ regReport: response.data.regReport });   
+            commit('set_reg_reports', {regReports: response.data});
 			},(err) => {
 				console.log(err.statusText);
 			});
@@ -490,20 +492,22 @@
       },
       
       update_location({commit}, location) {
-         var   vm = this,
-               _formData = new FormData();
-          
-         Object.entries(location).forEach((item)=>{
-            _formData.append(item[0], item[1]);	
-         });
-         
-         Axios.post(apiDomain+'_update_location', _formData).then((response)=>{
+         console.log('LOCATION: '+location.length);
+         if(location) {
+            var   vm = this,
+                  _formData = new FormData();
+             
+            Object.entries(location).forEach((item)=>{
+               _formData.append(item[0], item[1]);	
+            });
             
-            //commit('set_location', location);          
-         }, (err) => {
-				  console.log('error: '+err.statusText);
-			              
-         }); 
+            Axios.post(apiDomain+'_update_location', _formData).then((response)=>{
+               
+               //commit('set_location', location);          
+            }, (err) => {
+                 console.log('error: '+err.statusText);
+            }); 
+         }
       },
       
       
@@ -654,6 +658,11 @@
 		set_reg_report: (state, { regReport }) => {
 			state.regReport = regReport;
 		},
+      
+      // SET OTHER REG REPORTS
+      set_reg_reports: (state,  {regReports}) => {
+         state.regReports = regReports
+      },
 		
 		
 		// SET MEMBER 

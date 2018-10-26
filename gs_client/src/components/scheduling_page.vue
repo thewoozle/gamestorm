@@ -173,7 +173,7 @@
                               </div>
                               
                               <div class="controls">
-                                 <button type="button" class="button" v-text="editLocation.id? 'Update Location' : 'Add Location'" @click.prevent="() =>{set_location_form_data(); $store.dispatch('update_location',editLocation).then(()=>{})}"></button> 
+                                 <button type="button" class="button" v-text="editLocation.id? 'Update Location' : 'Add Location'" @click.prevent="() =>{set_location_form_data(); }"></button> 
                               </div>
                            </form>
                         </div>   
@@ -280,7 +280,9 @@
                            <div class="">
                               <button type="button" class="" >Auto Schedule</button>
                               
-                              <div class="">{{scheduleLocationList}}</div>
+                              <div class="">
+                                 <button type="button" class="button" v-for="location in scheduleLocationList">{{location.location_tag}} - {{location.location_type}}</button>
+                              </div>   
                            </div>
                            
                         </div>
@@ -302,14 +304,14 @@
                            <div class="event_list">
                               <span class="title element_title" >Unapproved</span>
                               <div class="event" v-for="event in conEvents" v-if="event.event_status == '0'" :class="'event_0'">
-                                 <span class="element tag" v-text="event.con_event_tag.replace(/_/g, ' ')"></span>
+                                 <span class="element tag" v-text="event.con_event_tag"></span>
                                  <div class="element times">
                                     <span class="element start_time" v-text="day_time(event.event_start_time)"></span>
                                     <span class="element duration" v-text="event_duration(event.event_start_time, event.event_end_time)"></span>
                                  </div>   
                                  <div class="element meta">
                                     <span class="element type" v-text="event.type"></span>
-                                    <span class="element track" v-text="event.track.replace(/_/g, ' ')"></span>
+                                    <span class="element track" v-text="event.track"></span>
                                  </div>
                                  <span class="element name" v-text="event.event_name"></span>
                                  
@@ -333,14 +335,14 @@
                               
                               <span class="title element_title" >Approved, unscheduled</span>
                               <div class="event" v-for="event in conEvents" v-if="event.event_status >= 20 && event.event_status < 30" :class="'event_20'">
-                                  <span class="element tag" v-text="event.con_event_tag.replace(/_/g, ' ')"></span>
+                                  <span class="element tag" v-text="event.con_event_tag"></span>
                                  <div class="element times">
                                     <span class="element start_time" v-text="day_time(event.event_start_time)"></span>
                                     <span class="element duration" v-text="event_duration(event.event_start_time, event.event_end_time)"></span>
                                  </div>   
                                  <div class="element meta">
                                     <span class="element type" v-text="event.type"></span>
-                                    <span class="element track" v-text="event.track.replace(/_/g, ' ')"></span>
+                                    <span class="element track" v-text="event.track"></span>
                                  </div>
                                  <span class="element name" v-text="event.event_name"></span>
                                  
@@ -486,7 +488,7 @@
                submissionSystem     : {},
 					selectVenueLocs      : 0,
                copyConLocations     : 0,
-               scheduleLocationList : '',
+               scheduleLocationList : [],
                editScheduler        : {},
                schedulerSearch      : '',
                showLocationControls : false,
@@ -697,6 +699,7 @@
                vm.editLocation.selectedCon = vm.selectedCon;
                vm.editLocation.venue = vm.currentCon.venue;
                vm.get_timeblocks();
+               vm.$store.dispatch('update_location',vm.editLocation).then(()=>{})
             },
             
             
@@ -863,9 +866,13 @@
                vm.conEvents.forEach((event) => {
                   if(event.con_event_id == conEventId) {
                         console.log('track: '+event.event_track);
+                        vm.conLocations.forEach((location) => {
+                          if(location.scheduling_area == event.event_track) {
+               vm.scheduleLocationList.push(location);
+                          }
+                        });
                   }
                });
-               vm.scheduleLocationList = "<p>list of locations for this track</p>";
             },
             
             submit_scheduler() {
@@ -1540,7 +1547,12 @@
    
    .schedulers .scheduler_list {
       display: flex;
+      flex-wrap: wrap;
       width: 50%;
+   }
+   .schedulers .scheduler_list .scheduler {
+      display: flex;
+      width: 100%;
    }
    .schedulers .scheduling_permissions_form  .controls {
       padding: 2rem 0 0 0;
