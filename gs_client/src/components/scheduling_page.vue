@@ -3,7 +3,7 @@
 		<div id="scheduling_page">
 		
 		
-		<span class="section_title">Scheduling Hub</span>
+		<span class="section_title">{{currentCon.short_name? currentCon.short_name : ''  }} Scheduling Hub</span>
 		
 		
 		<div class="sections">
@@ -21,13 +21,14 @@
 			
 			
 			<section class="section scheduling_panel">
-				<div class="tab_box" >
+				<div class="tab_box" :class="expandScheduleBox? 'expanded' : ''" >
 					<div class="tabs">
 						<button type="button" class="tab_button" :class="schedulingTab == 'alerts'? 'active' : '' " @click="schedulingTab='alerts'">Alerts</button>
 						<button type="button"  class="tab_button" :class="schedulingTab == 'locations'? 'active' : '' "  @click="schedulingTab='locations'">Locations</button>
 						<button type="button"  class="tab_button" :class="schedulingTab == 'events'? 'active' : '' "  @click="schedulingTab='events'">Events</button>
 						<button type="button"  class="tab_button" :class="schedulingTab == 'schedule'? 'active' : '' "  @click="schedulingTab='schedule'">Schedule</button>
 						<button type="button"  class="tab_button" :class="schedulingTab == 'schedulers'? 'active' : '' "  @click="schedulingTab='schedulers'">Schedulers</button>
+                  <button type="button" class="control_button fal" :class="expandScheduleBox? 'fa-minus-square' : 'fa-expand-arrows-alt'" @click="expandScheduleBox? expandScheduleBox = false : expandScheduleBox = true"></button>
 					</div>
 					<div class="boxes">
 						<div class="box alerts"  :class="schedulingTab == 'alerts'? 'active' : '' " >
@@ -265,7 +266,7 @@
                      
                      <div class="schedule_grid">
                         <div class="control_bar">
-                           <button type="button" title="Show schedule settings" class="control_button fal fa-cog" @click="showScheduleControls? showScheduleControls = false : showScheduleControls = true"></button>
+                           <button type="button" title="Show schedule settings" class="control_button fal fa-cog" @click="() =>{showScheduleControls? showScheduleControls = false : showScheduleControls = true;  handle_slideouts('showScheduleEventEdit');}"></button>
                           
                         </div>
                         
@@ -275,18 +276,48 @@
                            </div>
                            
                         </div>
+                        
+                        
                         <div class="slide_in event_schedule" :class="showEventSchedule? 'show' : ''">
                            <button type="button" class="close_button fal fa-times" @click="showEventSchedule? showEventSchedule = false : showEventSchedule = true"></button>
-                           <div class="">
-                              <button type="button" class="" >Auto Schedule</button>
-                              
-                              <div class="">
+                           <div class="location_list">
+                           
+                              <div class="names">
+                                 <div class="name" v-for="location in scheduleLocationList">{{location.location_tag.replace(/_/g, ' ')}}</div>
+                              </div>
+                              <div class="time_blocks">
+                                 <div class="time_block" v-for="time in scheduleLocationTimes">
+                                    <span class="time" v-for="location in scheduleLocationList">{{time}}</span>
+                                 </div>
+                              </div>
+                           </div>
+                           
+                        </div>
+                        
+                        
+                        
+                        <div class="slide_in schedule_event_edit" :class="showScheduleEventEdit? 'show' : ''">
+                           <button type="button" class="close_button fal fa-times" @click="showScheduleEventEdit? showScheduleEventEdit = false : showScheduleEventEdit = true"></button>
+                           <div class="edit_form">
+                           
+                           {{scheduleEditEvent}}
+                           
+                           
+                           </div>
+                           
+                        </div>
+                        
+                        <!--
+                        <div class="slide_in event_schedule" :class="showEventSchedule? 'show' : ''">
+                           <button type="button" class="close_button fal fa-times" @click="showEventSchedule? showEventSchedule = false : showEventSchedule = true; showEventControls = false;"></button>
+                           <div class="schedule_list">
+                              <div class="buttons">
                                  <button type="button" class="button" v-for="location in scheduleLocationList">{{location.location_tag}} - {{location.location_type}}</button>
                               </div>   
                            </div>
                            
                         </div>
-                        
+                        -->
                      
                         <schedule_grid :_selected_con = "selectedCon"   />
                      
@@ -316,7 +347,7 @@
                                  <span class="element name" v-text="event.event_name"></span>
                                  
                                  <div class="event_controls">
-                                    <button type="button" class="event_control fal fa-edit" @click.prevent="edit_event(event.con_event_id)"></button>
+                                    <button type="button" class="event_control fal fa-edit" @click.prevent="() => { showScheduleEventEdit? showScheduleEventEdit = false : handle_slideouts('showScheduleEventEdit'); scheduleEditEvent =event; showScheduleControls = false;}"></button>
                                     <button  type="button" 
                                              class="event_control fal" 
                                              :class="event.event_status == '0'? 'fa-thumbs-up' : 'fa-thumbs-down'" 
@@ -333,8 +364,8 @@
                               </div>
                               
                               
-                              <span class="title element_title" >Approved, unscheduled</span>
-                              <div class="event" v-for="event in conEvents" v-if="event.event_status >= 20 && event.event_status < 30" :class="'event_20'">
+                              <span class="title element_title" >Approved, Unscheduled</span>
+                              <div class="event" v-for="event in conEvents" v-if="event.event_status >= 20 && event.event_status <= 30" :class="'event_20'">
                                   <span class="element tag" v-text="event.con_event_tag"></span>
                                  <div class="element times">
                                     <span class="element start_time" v-text="day_time(event.event_start_time)"></span>
@@ -347,8 +378,8 @@
                                  <span class="element name" v-text="event.event_name"></span>
                                  
                                  <div class="event_controls">
-                                    <button type="button" class="event_control fal fa-edit" @click.prevent="edit_event(event.con_event_id)"></button>
-                                     <button  type="button" 
+                                    <button type="button" class="event_control fal fa-edit" @click.prevent="() => { showScheduleEventEdit? showScheduleEventEdit = false : handle_slideouts('showScheduleEventEdit'); scheduleEditEvent =event; showScheduleControls = false;}"></button>
+                                    <button  type="button" 
                                              class="event_control fal" 
                                              :class="event.event_status == '0'? 'fa-thumbs-up' : 'fa-thumbs-down'" 
                                              @click.prevent="handle_event_status(event.con_event_id) "
@@ -489,9 +520,13 @@
 					selectVenueLocs      : 0,
                copyConLocations     : 0,
                scheduleLocationList : [],
+               scheduleLocationTimes : {},
                editScheduler        : {},
                schedulerSearch      : '',
+               expandScheduleBox    : false,
                showLocationControls : false,
+               showScheduleEventEdit: false,
+               scheduleEditEvent    : null,
                showEventControls    : false,
                eventSort		      : 'event_tag',
                showEventsList       : 'con',
@@ -663,6 +698,14 @@
 			
 			methods: {
             
+            handle_slideouts(slideout) {
+               var vm = this;
+               
+               slideout == 'showEventSchedule'? vm.showEventSchedule = true : vm.showEventSchedule = false;
+               slideout == 'showScheduleControls'? vm.showScheduleControls = true : vm.showScheduleControls = false; 
+               slideout == 'showScheduleEventEdit'? vm.showScheduleEventEdit = true : vm.showScheduleEventEdit = false; 
+            },
+            
             
 				get_scheduling_data() {
 				//GET STORE DATA
@@ -683,6 +726,7 @@
                // vm.get_timeblocks();
                // vm.get_event_signups();
 				},
+            
             
             // DETERMINE LOCATION PARENT
             location_parent(id) {
@@ -822,13 +866,7 @@
                vm.$forceUpdate();
             },
             
-            
-            // EDIT SCHEDULE EVENT
-            edit_event(conEventId) {
-               console.log(conEventId);
-            },
-            
-            
+                                 
             //UPDATE SCHEDULER
             update_scheduler() {
                var vm = this;
@@ -860,17 +898,27 @@
                // each event has a tag for track 
                // user has area permissions and can only update events in their area (by track)
                
+               
+               
+               
+               
                var vm = this;
-               vm.showEventSchedule? vm.showEventSchedule = false : vm.showEventSchedule = true;
+               vm.scheduleLocationList = [];
+               vm.scheduleLocationTimes = {};
+               
+               vm.showEventSchedule? vm.showEventSchedule = false : vm.handle_slideouts('showEventSchedule');
                
                vm.conEvents.forEach((event) => {
                   if(event.con_event_id == conEventId) {
-                        console.log('track: '+event.event_track);
-                        vm.conLocations.forEach((location) => {
-                          if(location.scheduling_area == event.event_track) {
-               vm.scheduleLocationList.push(location);
-                          }
-                        });
+                     vm.conLocations.forEach((location) => {
+                        if(location.scheduling_area == event.event_track) {
+                           console.log('track: '+event.event_track+' / ' +location.scheduling_area);
+                           vm.scheduleLocationList.push(location);
+                           vm.scheduleLocationTimes.startTime = event.event_start_time;
+                           vm.scheduleLocationTimes.endTime = event.event_end_time
+                        }
+                     });
+                     vm.$forceUpdate();
                   }
                });
             },
@@ -971,18 +1019,39 @@
 		padding: 2rem;
 		width: 100%;
 	}
+	.scheduling_panel .tab_box.expanded {
+      position: fixed;
+         top: 0;
+         left: 0;
+         z-index: 1001;
+      height: 100%;   
+      padding: .5rem;
+      margin-bottom: 0;
+      background: rgba(34,34,34,0.9);
+      overflow: auto;
+   }
+   
+	.scheduling_panel .tab_box.expanded .boxes {
+      height: calc(100% - 4rem);
+   }
 	.scheduling_panel .tab_box .tabs {
 		display: flex;
 		width: 100%;
-		padding: 0 2rem;
+      position: relative;
 	}
+	.scheduling_panel .tab_box .tabs .control_button {
+      position: absolute;
+         top: 0;
+         right: 0;
+      width: 2.5em;
+      height: 2.5rem;      
+   }
 	.scheduling_panel .tab_box .tab_button {
 		display: flex;
 		justify-content: center;
 		cursor: pointer;
-		margin: 0 .5rem;
 		border-radius: .15rem;
-		width: 20%;
+      min-width: 15%;
 		font-size: 1.25rem;
 		height: 2rem;
 		background: rgba(0,118,163,.4);		
@@ -994,6 +1063,9 @@
 		justify-content: center;
 		align-items: center;
 	}
+	.scheduling_panel .tab_box .tab_button + .tab_button {
+      margin-left: 1rem;
+   }
 	.scheduling_panel .tab_box .tab_button:hover {
 		background: rgba(0,118,163,.1);
 	}
@@ -1039,7 +1111,7 @@
          justify-content: space-around;
       width: 100%;
       background: var(--altBackground2);
-      padding: 2rem 3rem;
+      padding: 1rem 3rem;
    }
 	.scheduling_panel .tab_box .box_header .title {
       display: flex;
@@ -1070,8 +1142,8 @@
          justify-content: center;
          align-items: flex-start;
       width: 45%;
-      margin: 1rem 0;
-      max-height: 50rem;
+      margin: 1rem 0 0 0;
+      height: calc(100% - 6rem);
       overflow: hidden;
    }
    .scheduling_panel .tab_box .box_loading {
@@ -1133,8 +1205,10 @@
       position: relative;
       display: flex;
          flex-wrap: wrap;
-         flex-direction: column;
       width: 55%;
+      height: calc(100% - 6rem);
+      overflow: hidden;
+      overflow-Y: auto;
       padding: 1rem 3rem 1rem 0;
    }
    
@@ -1472,8 +1546,12 @@
       position: absolute;
          top: 0;
          right: -22rem;
+      display: flex;   
       width: 22rem;
       transition: right .4s;
+      background: var(--borderColor);
+      border: solid 1px var(--borderColor3);
+      border-radius: var(--borderRadius);
    }
    .schedule_grid .slide_in.show {
       right: 0;
@@ -1558,6 +1636,38 @@
       padding: 2rem 0 0 0;
       justify-content: center;      
    }
+   
+   .scheduleEditEvent .edit_form {
+      
+   }
+   .schedule_grid .location_list {
+      display: flex;
+      justify-content: space-between;
+   }
+   .schedule_grid .location_list .names{
+      display: flex;
+         flex-wrap: wrap;
+      width: 5rem;
+   }
+   .schedule_grid .location_list .name {
+      display: flex;
+         justify-contnet: flex-end;
+      width: 100%;
+      text-align: right;
+      
+   }
+   .schedule_grid .location_list .time_blocks{
+      display: flex;
+         flex-wrap: wrap;
+      width: calc(100% - 5rem);
+      
+   }
+   .schedule_grid .location_list .time_block{
+      display: flex;
+      width: 100%;
+   }
+   
+   
 	
 	
 	

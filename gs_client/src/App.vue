@@ -17,13 +17,7 @@
 			<router-view class="main_view"/>
 			
 			<page_footer v-if="pageType == 'public' " />
-		<div class="data_view dev_notes" :class="showDevNotes? 'show' : ''">
-         <button type="button" class="control_button fal fa-times" v-if="showDevNotes" @click="showDevNotes? showDevNotes = false : showDevNotes = true " ></button>
-         <button type="button" class="title" @click="showDevNotes? showDevNotes = false : showDevNotes = true">DEV NOTES</button>
-         <pre class="todo_list">{{devNotes.todo}}</pre>
-         <pre class="notes">{{devNotes.dev_notes}}</pre>
-      
-      </div>
+		
 		</main>			
 		
 	  </div>
@@ -412,6 +406,19 @@
 			margin-top: 0;
 		}
 		
+   .fake_slider {
+      position: absolute;
+         z-index: 100;
+      display: inline-block;
+      overflow: auto;
+   }
+   .fake_slider .content {
+      display: inline-block;
+      width: 0;
+      height: 0;
+   }
+   
+   
 		.data_view {
 			display: flex;
 			flex-direction: column;	

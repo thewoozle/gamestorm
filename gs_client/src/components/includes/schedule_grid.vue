@@ -1,25 +1,28 @@
 
    <template>
-   
-                        
-                        
-                        <div class="grid_wrapper"  >                        
-                           <div class="box_loading" v-if="!conEvents">No Events Found</div>
-                           <div class="box_loading" v-else-if="conEvents && conEvents.length < 1">Loading...</div>
-                                                        
-                           <div class="grid" v-else>
-                              <span class="title list_title">Schedule Grid</span>
-                              <div class="times">
-                                 <span class="time" v-for="timeblock in get_timeblocks()" v-text="tag_time(timeblock)"></span>
-                              </div>
-                              
-                              <div class="locations" v-html="create_locations()">
-                              
-                              </div>
-                           
-                           </div>
-                        
-                        </div>
+      <div class="grid_wrapper"  >
+         <span class="fake_slider grid_slider" @scroll="grid_scroll"><span class="content" ref="grid_scroll" :style="{'width': grid_width()+'px'}" ></span></span>                        
+         <div class="box_loading" v-if="!conEvents">No Events Found</div>
+         <div class="box_loading" v-else-if="conEvents && conEvents.length < 1">Loading...</div>
+            
+         
+         <div class="grid" v-else ref="grid">
+            <span class="title list_title">Schedule Grid</span>
+            <div class="times">
+               <div class="time_wrapper" v-for="timeblock in get_timeblocks()" >
+                  <span class="time"v-text="tag_time(timeblock)"></span>
+                  <span class="day" v-text="tag_day(timeblock)"></span>
+               </div>
+            </div>
+            
+            <div class="locations" v-html="create_locations()"> </div>
+            
+            <span class="fake_slider location_slider"><span class="content"></span></span>
+            
+           
+         
+         </div>
+      </div>
    
    </template>
    
@@ -35,6 +38,7 @@
             return{
 					selectedCon		      : null,
                timeblocks           : [],  
+               gridSCroll           : 0,
             }
          },
          
@@ -68,18 +72,20 @@
          
          methods: {
             
+            grid_width() {
+               if(this.$refs.grid) {
+                  return this.$refs.grid.clientWidth;
+               }
+            },
             
-            /*
-                                 <div class="location_list" >
-                                 
-                                    <span class="location" v-for="location in conLocations" v-bind:title="location.name">{{location.location_tag}}</span>
-                                 </div>
-                           
-                                 <div class="timeblock_list" v-for="location in conLocations">
-                                    <span class="time_block" v-for="timeblock in get_timeblocks()" >{{display_event(timeblock, location.location_tag) || '-'}}</span>
-                                 </div>
-            */                     
-                                 
+            grid_scroll() {
+               var vm = this;
+               
+               console.log(vm.$refs);
+               vm.gridSCroll = 0;
+               
+            },
+            
             create_locations() {
                var   vm          = this,
                      locations   = '<div>',
@@ -182,7 +188,6 @@
       display: flex;
       flex-wrap: wrap;
       position: relative;
-      width: 100%;
    }
    .schedule_grid .grid_wrapper .grid .title {
       position: absolute;
@@ -208,18 +213,36 @@
       display: flex;
       min-width: 100%;
       height: 3rem;
-      padding-left: 5rem;
+      padding: 0 0 0 5rem;
    }
+   .schedule_grid .times .time_wrapper {
+      display: flex;
+      position: relative;
+         align-items: flex-end;
+      width: 4rem;
+      height: 100%;
+   }
+   
    .schedule_grid .times .time {
       display: flex;
-      width: 4rem;
-      justify-content: flex-end;
-      flex-wrap: nowrap;
+         justify-content: flex-end;
+         flex-wrap: nowrap;
       white-space: nowrap;
-      height: 2rem;
-      line-height: 2rem;
-      padding: .5rem; 
+      height: 1rem;
+      width: 100%;
+      padding: 0 .5rem; 
+      line-height: 1rem;
+      font-size: .9rem;
       color: var(--button2);
+   }
+   .schedule_grid .times .day {
+      position: absolute;
+         top: 1rem; 
+         left: 0;
+      width: 500%;
+      padding: 0 0 0 1rem;
+      color: #d5d5d5;
+      text-transform: uppercase;
    }
 	
    .schedule_grid .locations {
@@ -260,6 +283,15 @@
       display: flex;
       width: 4rem;
       color: red;
+   }
+   
+   .fake_slider.grid_slider {
+         top: 3rem;
+         height: 1rem;
+      left: 0;
+      width: 100%;
+   }
+   .fake_slider.grid_slider .content {
    }
    
    

@@ -40,6 +40,9 @@
          tag_time(date) {
             return moment(date).format('hh:mm a');
          },
+         tag_day(date) {
+            return moment(date).format('ddd');
+         },
          
          day_time(date) {
             return moment(date).format('ddd hh:mm a');            
