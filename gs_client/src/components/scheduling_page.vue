@@ -280,16 +280,27 @@
                         
                         <div class="slide_in event_schedule" :class="showEventSchedule? 'show' : ''">
                            <button type="button" class="close_button fal fa-times" @click="showEventSchedule? showEventSchedule = false : showEventSchedule = true"></button>
-                           <div class="location_list">
                            
-                              <div class="names">
-                                 <div class="name" v-for="location in scheduleLocationList">{{location.location_tag.replace(/_/g, ' ')}}</div>
+                           <div class="location_list">
+                              <span class="track_name">Locations for {{scheduleLocationList.trackName}} track</span>
+                           
+                              <div class="timeblocks">
+                                 <div class="time_wrapper" v-for="timeblock in scheduleLocationList.timeblocks" >
+                                    <span class="time"v-text="tag_time(timeblock)"></span>
+                                    <span class="day" v-text="tag_day(timeblock)"></span>
+                                 </div>   
                               </div>
-                              <div class="time_blocks">
-                                 <div class="time_block" v-for="time in scheduleLocationTimes">
-                                    <span class="time" v-for="location in scheduleLocationList">{{time}}</span>
+                              
+                              <div class="schedule_blocks">
+                                 <div class="names">
+                                    <div class="name" v-for="location in scheduleLocationList.trackList">{{location.location_tag.replace(/_/g, ' ')}}</div>
                                  </div>
-                              </div>
+                                 <div class="time_blocks">
+                                    <div class="time_block" v-for="time in scheduleLocationTimes">
+                                       <span class="time" v-for="time in scheduleLocationList.timeblocks"></span>
+                                    </div>
+                                 </div>
+                              </div>   
                            </div>
                            
                         </div>
@@ -742,7 +753,7 @@
                var vm = this;
                vm.editLocation.selectedCon = vm.selectedCon;
                vm.editLocation.venue = vm.currentCon.venue;
-               vm.get_timeblocks();
+               //vm.get_timeblocks();
                vm.$store.dispatch('update_location',vm.editLocation).then(()=>{})
             },
             
@@ -757,6 +768,41 @@
                });
                return sublocations;      
             },
+            
+            
+            // get_event_timeblocks() {
+               
+               // //{{scheduleLocationList.startTime}} to {{scheduleLocationList.endTime}}
+               
+               
+               // var   vm    = this,
+                     // timeblocks;
+               
+               // if(vm.timeblocks.length < 1) {
+                  // var   times = [],
+                        // day   = '',
+                        // con   = {};
+                  // if(vm.conventions.length > 0) {
+                     // vm.conventions.forEach((convention) => {
+                        // convention.tag_name == vm.selectedCon? con = convention : '';
+                     // });
+                     
+                     // for(var timeBlock = moment(con.start_date_time); moment(timeBlock).diff(con.end_date_time, 'hours') <=0; timeBlock.add(30, 'minutes') ) { 
+                        // //var _day = moment(timeBlock).format('ddd');
+                        // if(parseInt(timeBlock.format('HH')) >= 9 || timeBlock.format('HH') == '00') { 
+                           // times.push(moment(timeBlock));
+                        // }
+                     // }
+                  // } 
+                  // timeblocks = times;
+               // } else {
+                  // timeblocks = vm.timeblocks;
+               // }
+               
+               // return timeblocks;   
+            // },
+            
+            
             
             set_presenter_player(uuid) {
                var   vm    = this,
@@ -806,27 +852,6 @@
             
             
             
-            get_timeblocks() {               
-               var   vm    = this,
-                     times = [],
-                     day   = '',
-                     con   = {};
-               
-               if(vm.conventions.length > 0) {
-                  vm.conventions.forEach((convention) => {
-                     convention.tag_name == vm.selectedCon? con = convention : '' ;         
-                  });
-                  
-                  for(var timeBlock = moment(con.start_date_time); moment(timeBlock).diff(con.end_date_time, 'hours') <=0; timeBlock.add(30, 'minutes') ) { 
-                     //var _day = moment(timeBlock).format('ddd');                  
-                     if(parseInt(timeBlock.format('HH')) >= 9 || timeBlock.format('HH') == '00') { 
-                        times.push(moment(timeBlock));
-                     }
-                  }
-               } 
-               vm.timeblocks = times; 
-            },
-				
 				
 				check_user() {
 					var vm = this;
@@ -902,25 +927,49 @@
                
                
                
-               var vm = this;
+               var   vm       = this,
+                     trackName= '',
+                     trackList= [], 
+                     times    = [];
                vm.scheduleLocationList = [];
                vm.scheduleLocationTimes = {};
                
-               vm.showEventSchedule? vm.showEventSchedule = false : vm.handle_slideouts('showEventSchedule');
+               //vm.showEventSchedule? vm.showEventSchedule = false : vm.handle_slideouts('showEventSchedule');
+               vm.handle_slideouts('showEventSchedule');
                
                vm.conEvents.forEach((event) => {
                   if(event.con_event_id == conEventId) {
+                          
+                           var startTime = moment(event.event_start_time).subtract(60, 'minutes');
+                           var endTime = moment(event.event_start_time).add(60, 'minutes');
+                           console.log(startTime+' - ' + endTime);
+                           for(var timeBlock = startTime; moment(timeBlock).diff(endTime, 'hours') <=0; timeBlock.add(30, 'minutes') ) { 
+                              //var _day = moment(timeBlock).format('ddd');  
+                              times.push(moment(timeBlock));
+                           }
+                           
+                           trackName = event.track_name; 
+                           
+                           
                      vm.conLocations.forEach((location) => {
                         if(location.scheduling_area == event.event_track) {
-                           console.log('track: '+event.event_track+' / ' +location.scheduling_area);
-                           vm.scheduleLocationList.push(location);
-                           vm.scheduleLocationTimes.startTime = event.event_start_time;
-                           vm.scheduleLocationTimes.endTime = event.event_end_time
+                           // times = [];
+                           // trackList= [];
+                           trackList.push(location);
+                           
+                              //console.log(times);
+                           
+                           //      console.log(times);
+                     
+                           
                         }
                      });
-                     vm.$forceUpdate();
+                           //vm.$forceUpdate();
                   }
                });
+                           Vue.set(vm.scheduleLocationList, 'trackList', trackList);
+                           Vue.set(vm.scheduleLocationList, 'trackName', trackName);
+                           Vue.set(vm.scheduleLocationList, 'timeblocks', times);
             },
             
             submit_scheduler() {
@@ -1545,9 +1594,9 @@
    .schedule_grid .slide_in {
       position: absolute;
          top: 0;
-         right: -22rem;
+         right: -100%;
       display: flex;   
-      width: 22rem;
+      width: 100%;
       transition: right .4s;
       background: var(--borderColor);
       border: solid 1px var(--borderColor3);
@@ -1555,7 +1604,7 @@
    }
    .schedule_grid .slide_in.show {
       right: 0;
-      z-index: 10;
+      z-index: 50;
    }
    .schedulers .scheduling_permissions_form {
       display: flex;
@@ -1642,7 +1691,15 @@
    }
    .schedule_grid .location_list {
       display: flex;
-      justify-content: space-between;
+         flex-wrap: wrap;
+         justify-content: space-between;
+   }
+   
+   
+   .schedule_grid .location_list .schedule_blocks {
+      display: flex;
+      width: 100%;
+      
    }
    .schedule_grid .location_list .names{
       display: flex;
@@ -1662,9 +1719,24 @@
       width: calc(100% - 5rem);
       
    }
-   .schedule_grid .location_list .time_block{
+   .schedule_grid .location_list .time_block {
       display: flex;
       width: 100%;
+   }
+   .schedule_grid .location_list .track_name {
+      display: flex;
+      width: 100%;
+      justify-content: center;
+      text-align: center;
+   }
+   .schedule_grid .location_list .timeblocks {
+      display: flex;
+      justify-content: flex-start;
+   }
+   .schedule_grid .location_list .time_blocks .time{
+      display: flex;
+      width: 5rem;
+      border: soid white 1px;
    }
    
    

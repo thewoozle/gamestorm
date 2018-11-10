@@ -408,7 +408,8 @@
 		
    .fake_slider {
       position: absolute;
-         z-index: 100;
+         z-index: 25
+         ;
       display: inline-block;
       overflow: auto;
    }
