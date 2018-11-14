@@ -283,22 +283,28 @@
                            
                            <div class="location_list">
                               <span class="track_name">Locations for {{scheduleLocationList.trackName}} track</span>
-                           
-                              <div class="timeblocks">
-                                 <div class="time_wrapper" v-for="timeblock in scheduleLocationList.timeblocks" >
-                                    <span class="time"v-text="tag_time(timeblock)"></span>
-                                    <span class="day" v-text="tag_day(timeblock)"></span>
-                                 </div>   
-                              </div>
-                              
+                                                         
                               <div class="schedule_blocks">
                                  <div class="names">
                                     <div class="name" v-for="location in scheduleLocationList.trackList">{{location.location_tag.replace(/_/g, ' ')}}</div>
                                  </div>
                                  <div class="time_blocks">
-                                    <div class="time_block" v-for="time in scheduleLocationTimes">
-                                       <span class="time" v-for="time in scheduleLocationList.timeblocks"></span>
-                                    </div>
+                                    <header class="header">
+                                       <div class="time_wrapper" v-for="timeblock in scheduleLocationList.timeblocks" >
+                                          <span class="time"v-text="tag_time(timeblock)"></span>
+                                          <span class="day" v-text="tag_day(timeblock)"></span>
+                                       </div>   
+                                    </header>
+                                    
+                                    
+                                    <div class="times">
+                                       <div class="location_blocks" v-for="location in scheduleLocationList.trackList">
+                                       
+                                          <div class="time_block" v-for="time in scheduleLocationList.timeblocks">
+                                             <span class="time" >-</span>
+                                          </div>
+                                       </div>
+                                    </div>   
                                  </div>
                               </div>   
                            </div>
@@ -368,7 +374,7 @@
                                     <button  type="button" 
                                              class="event_control fal "
                                              :class="event.con_location? 'fa-minus-circle' : 'fa-list-alt'"
-                                             @click="handle_event_location(event.con_event_id)"
+                                             @click.prevent="handle_event_location(event.con_event_id)"
                                     ></button>                                 
                                  </div>
                                  
@@ -939,11 +945,10 @@
                
                vm.conEvents.forEach((event) => {
                   if(event.con_event_id == conEventId) {
-                          
                            var startTime = moment(event.event_start_time).subtract(60, 'minutes');
-                           var endTime = moment(event.event_start_time).add(60, 'minutes');
-                           console.log(startTime+' - ' + endTime);
-                           for(var timeBlock = startTime; moment(timeBlock).diff(endTime, 'hours') <=0; timeBlock.add(30, 'minutes') ) { 
+                           var endTime = moment(event.event_end_time).add(60, 'minutes');
+                           
+                           for(var timeBlock = moment(startTime); moment(timeBlock).diff(endTime, 'hours') <=0; timeBlock.add(30, 'minutes') ) { 
                               //var _day = moment(timeBlock).format('ddd');  
                               times.push(moment(timeBlock));
                            }
@@ -1699,7 +1704,7 @@
    .schedule_grid .location_list .schedule_blocks {
       display: flex;
       width: 100%;
-      
+      margin-top: 1rem;
    }
    .schedule_grid .location_list .names{
       display: flex;
@@ -1731,12 +1736,45 @@
    }
    .schedule_grid .location_list .timeblocks {
       display: flex;
-      justify-content: flex-start;
+         justify-content: flex-start;
+      padding-left: 5rem;
+   }
+   .schedule_grid .location_list .time_blocks .location_block {
+      display: flex;
+         flex-wrap: nowrap;      
+   }
+   .schedule_grid .location_list .time_blocks .time_block {
+      display: flex;
+      width: 5rem;
+   }
+   .schedule_grid .location_list .time_blocks .times,
+   .schedule_grid .location_list .time_blocks .header {
+      display: flex;
+      width: 100%;
+      padding: 0;
    }
    .schedule_grid .location_list .time_blocks .time{
       display: flex;
-      width: 5rem;
-      border: soid white 1px;
+      border: solid white 1px;
+   }
+   
+   .schedule_blocks .time_blocks {
+      flex-wrap: nowrap;
+      height: 2rem;
+   }
+   .schedule_blocks .time_blocks .time_wrapper {
+      display: flex;
+      width: 4.5rem;
+      height: 100%;
+      position: relative;
+   }
+   .schedule_blocks .time_blocks .time_wrapper .day {
+      position: absolute;
+         top: -1em;
+         left: 0;
+      font-size: .75rem;
+      color: rgba(0,0,0,0.5
+      );   
    }
    
    

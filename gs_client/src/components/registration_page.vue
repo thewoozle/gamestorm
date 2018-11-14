@@ -8,7 +8,7 @@
 			
 				<section class="section reg_panel" :class="regPanel == 'regForm'? 'show' : ''">
 					<div class="control_bar">					
-						<button class="control_button fal fa-cog" type="button" @click.prevent="showRegSettings? showRegSettings = false : showRegSettings = true" title="Show Reg. settings"  ></button>
+						<button class="control_button fal fa-cog" type="button" @click.prevent="handle_slideouts('showRegSettings')" title="Show Reg. settings"  ></button>
 						<button class="control_button fal fa-redo-alt"   type="button" @click="member={}" title="Clear reg. form" ></button>
 						<button class="control_button fal fa-repeat-1-alt"  v-if="member.uuid" type="button" @click.prevent="showBadgeNumber? showBadgeNumber = false : showBadgeNumber = true" title="Update badge number" ></button>
 						<button class="control_button fal fa-usd-circle"  v-if="member.uuid" type="button"@click="showTransactions? showTransactions = false : showTransactions = true" title="Show transaction history" ></button>
@@ -17,7 +17,7 @@
 					
 					<!-- REG SETTINGS SLIDE-IN -->
 					<div class="slide_in reg_settings" :class="showRegSettings? 'show' : ''">
-						<button class="close_button fal fa-times" type="button" @click.prevent="showRegSettings? showRegSettings = false : showRegSettings = true" ></button>
+						<button class="close_button fal fa-times" type="button" @click.prevent="showRegSettings = false"></button>
 					
 						<div class="control_wrapper select_wrapper">
 							<label class="label" for="convention">Convention</label>
@@ -46,8 +46,26 @@
 								<span class="grad_bar"></span>
 							</button>
 						</div>
+                  
+						<div class="control_wrapper ">
+							<button type="button" class="toggle_button" :class="showGuestGms? 'active' : ''" @click.prevent="handle_slideouts('showGuestGms')">
+								<span class="text_wrapper">
+									<span class="text">Guest Gm email blast</span> 
+								</span>	
+							</button>
+						</div>
 						
 					</div>					
+               
+               
+					<!-- GUEST GM LIST SLIDE-IN -->
+					<div class="slide_in transaction_history" :class="showGuestGms? 'show' : ''">
+						<button class="close_button fal fa-times" type="button" @click.prevent="showGuestGms? showGuestGms = false : showGuestGms = true" ></button>
+               
+               GUEST GMS LIST<br />
+               select list of guest gms with slider and search, with list below
+               
+               </div>
 					
 					
 					<!-- TRANSACTION HISTORY SLIDE-IN -->
@@ -438,11 +456,12 @@
 			
 			data() {
 				return {
-					userPass		: false,
-					regPanel		: 'regForm', 
+					userPass		   : false,
+					regPanel		   : 'regForm', 
 					formMessage		: null,
-					showRegSettings	: false,
-					showBadgeNumber	: false,
+					showBadgeNumber: false,
+					showRegSettings: false,
+               showGuestGms   : false,
 					showTransactions: false,
 					member			: {},
 				//conNum : 0,
@@ -628,6 +647,15 @@
 					}
 				},
 				
+            
+            // close slideouts
+            handle_slideouts(slideout) {
+               var vm = this;
+               slideout == 'showRegSettings'? vm.showRegSettings = true : vm.showRegSettings = false;
+               slideout == 'showGuestGms'? vm.showGuestGms = true : vm.showGuestGms = false;
+               slideout == 'showTransactions'? vm.showTransactions = true : vm.showTransactions = false;
+            },
+            
 				
 				// SUBMIT MEMBER FOR REGISTRATION
 				submit_member(e) {
