@@ -1,0 +1,22 @@
+   PHP MYADMIN query for members roles at gs_20`
+
+   SELECT * FROM `gs_20` g
+   INNER JOIN `users` u ON g.con_uuid = u.uuid
+   WHERE g.con_position > 0
+   ORDER BY u.last_name
+   
+   sql query for staff gms for gs_20
+   SELECT `first_name`,`last_name`, `short_name`, p.`position` FROM `gs_20` g
+   INNER JOIN `users` u ON g.con_uuid = u.uuid
+   INNER JOIN `convention_staff`s ON g.con_uuid = s.uuid
+   INNER JOIN `staff_positions` p ON g.con_position = p.id
+   INNER JOIN `departments` d on g.con_department = d.id
+   WHERE g.con_department = 17
+   ORDER BY u.last_name
+
+
+   GUEST GMS: 
+
+   SELECT * FROM `gs_21_membership` g
+   INNER JOIN `users` u ON g.con_uuid = u.uuid
+   WHERE g.con_status = 14

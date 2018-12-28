@@ -15,6 +15,7 @@
 						<button class="control_button fal fa-user-times"  v-if="member.uuid" type="button" @click="remove_member(member.uuid)"title="Deactivate member entry" ></button>	
 					</div>
 					
+               
 					<!-- REG SETTINGS SLIDE-IN -->
 					<div class="slide_in reg_settings" :class="showRegSettings? 'show' : ''">
 						<button class="close_button fal fa-times" type="button" @click.prevent="showRegSettings = false"></button>

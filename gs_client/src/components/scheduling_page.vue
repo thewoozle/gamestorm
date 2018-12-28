@@ -297,9 +297,21 @@
                                     </div>
                                     
                                     <div class="location_block" v-for="location in scheduleLocationList.trackList">
-                                          <div class="time_wrapper" v-for="time in scheduleLocationList.timeblocks">
-                                             <span class="time" >{{location_has_event(location, time)}}</span>
-                                          </div>
+                                       --{{location.availability}}--
+                                       
+                                       
+                                    
+                                    
+                                       <div class="time_wrapper" v-for="time in scheduleLocationList.timeblocks">
+                                          <button v-if="location_has_event(location, time) == 'button'" 
+                                             type="button" 
+                                             class="schedule_event_button" 
+                                             :style="{'width' : (scheduleLocationList.event.event_duration)*.15+ 'rem'}"
+                                          >Schedule {{scheduleLocationList.event.con_event_tag.replace(/_/g, ' ')}}
+                                          </button>
+                                    
+                                          <span class="time"  >{{location_has_event(location, time)}}</span>
+                                       </div>
                                     </div>
                                     
                                     
@@ -534,7 +546,7 @@
                submissionSystem     : {},
 					selectVenueLocs      : 0,
                copyConLocations     : 0,
-               scheduleLocationList : [],
+               scheduleLocationList : {},
                scheduleLocationTimes : {},
                editScheduler        : {},
                schedulerSearch      : '',
@@ -886,7 +898,6 @@
             
             // HANDLE EVENT SCHEDULE 
             handle_event_location(conEventId) {
-               console.log('handle event location for '+ conEventId);
                // in slideout, create list of locations in event track with clear time between start and stop 
                // create override to show locations in area 
                // create 'auto-schedule' button for first empty 'table' in area. 
@@ -901,14 +912,17 @@
                      trackName= '',
                      trackList= [], 
                      times    = [];
-               vm.scheduleLocationList = [];
                vm.scheduleLocationTimes = {};
                
                //vm.showEventSchedule? vm.showEventSchedule = false : vm.handle_slideouts('showEventSchedule');
                vm.handle_slideouts('showEventSchedule');
+               let event = vm.conEvents.find(o => o.con_event_id == conEventId);
+               console.log(event);
                
-               vm.conEvents.forEach((event) => {
-                  if(event.con_event_id == conEventId) {
+               
+               // vm.conEvents.forEach((event) => {
+                  // if(event.con_event_id == conEventId) {
+               console.log('handle event location for '+ conEventId);
                      var startTime = moment(event.event_start_time).subtract(60, 'minutes');
                      var endTime = moment(event.event_end_time).add(60, 'minutes');
                      Vue.set(vm.scheduleLocationList, 'event', event);
@@ -923,39 +937,69 @@
                            
                      vm.conLocations.forEach((location) => {
                         if(location.scheduling_area == event.event_track) {
-                           trackList.push(location); 
+                           //let location = vm.conLocations.find(l => l.scheduling_area == event.event_track);
+                              trackList.concat(location);
+                           //trackList.push(location); 
                         }
                      });
-                           //vm.$forceUpdate();
-                  }
-               });
+                              console.log(trackList);
+                  // }
+               // });
                Vue.set(vm.scheduleLocationList, 'trackList', trackList);
                Vue.set(vm.scheduleLocationList, 'trackName', trackName);
                Vue.set(vm.scheduleLocationList, 'timeblocks', times);
+                           vm.$forceUpdate();
             },
+            
             
             submit_scheduler() {
                console.log('this');
             },
             
+            
             // LOCATION HAS EVENT 
             location_has_event(location, time) {
                // find event by location and time. 
                var   vm = this,
-                     locationInfo = ' - ';
+                     availability = false,
+                     locationInfo = '';
                vm.conEvents.forEach((event) => {
                   if(event.event_location == location.location_id ) {
-                     locationInfo = location.location_id;
+                     locationInfo = event.con_event_tag;
                   }
                   
                });
                
                // create object of timeblocks, for location. if all timeblocks are empty, flag to create button
+               //scheduleLocationList.trackList
                
-               if(moment(time).format('HH:mm') == moment(vm.scheduleLocationList.event.event_end_time).format('HH:mm')) {
-               console.log(moment(time).format('HH:mm')+' - ' + moment(vm.scheduleLocationList.event.event_end_time).format('HH:mm'));
-                  locationInfo = 'X';
-               }
+               
+               
+               
+               // find location in scheduleLocationList.trackList and set availability to be true or false
+               vm.scheduleLocationList.trackList.forEach((track) => {
+                  if(location.id == track.id) {
+                     
+                     if(moment(time).isSameOrAfter(moment(vm.scheduleLocationList.event.event_start_time)) && moment(time).isBefore(moment(vm.scheduleLocationList.event.event_end_time))){
+                        locationInfo = 'clear';
+                        availability = true;
+                     }
+                     if(moment(time).isSame(moment(vm.scheduleLocationList.event.event_start_time)) ){
+                        locationInfo = 'button';
+                     }
+               
+                     Vue.set(track, 'availability', availability);
+                  }
+                  
+                  
+                  
+                  
+               });
+               
+               
+               
+               
+               
                return locationInfo;
             },
             
@@ -1688,7 +1732,7 @@
       height: 2rem;
    }
    .schedule_blocks .location_block .time_wrapper {
-      display: flex;
+      display: flex;      
       width: 4.5rem;
       height: 100%;
       position: relative;
@@ -1700,6 +1744,15 @@
       font-size: .75rem;
       color: rgba(0,0,0,0.5
       );   
+   }
+   
+   
+   .schedule_blocks .time_blocks .schedule_event_button {
+      position: absolute;
+         top: 0;
+         left: 0;
+         z-index: 10;
+         
    }
    
    

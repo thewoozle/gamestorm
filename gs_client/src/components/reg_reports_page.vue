@@ -48,6 +48,10 @@
                <p>VOLUNTEERS REPORT</p>
                <p style="color: white" v-for="person in regReports.volunteers">{{person.first_name+' '+person.last_name}} - {{person.email}}</p>
                
+               <p>----------------------------------------------------------------------------------------------</p>
+               <p>GUEST GMs REPORT</p>
+               <p style="color: white" v-for="person in regReports.guestgms">{{person.first_name+' '+person.last_name}} - {{person.email}}</p>
+               
                
                   </div>
                </div>

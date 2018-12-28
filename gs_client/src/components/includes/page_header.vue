@@ -37,16 +37,16 @@
 					
 					
 					<div class="control_element " v-else>
-						<button class="button" :class="{'active':showLoginDropdown}" type="button" @click.prevent="showLoginDropdown? showLoginDropdown = false : showLoginDropdown = true">Sign In</button>
+						<button class="button" :class="{'active':showLoginDropdown}" type="button" @click.prevent="{showLoginDropdown? showLoginDropdown = false : showLoginDropdown = true; }" title="Sign-in to an existing account or create a new user-account">Sign In</button>
 						
-						<div class="login_dropdown" :class="{'show': showLoginDropdown}">
+						<div class="login_dropdown" :class="[{'show': showLoginDropdown}, {'register' : dropdownSection == 'register'}]">
                      <div class="form_message"  ref="login_message">{{formMessage}}</div>	
 						
 							<div class="buttons">
 								<button type="button" class="button"  :class="{'active':dropdownSection == 'login'}" @click.prevent="dropdownSection = 'login'">Sign in</button>
 								<button type="button" class="button"  :class="{'active':dropdownSection == 'help'}" @click.prevent="dropdownSection == 'help'? dropdownSection = 'login' : dropdownSection ='help'">Sign-in Help</button>
 								<button type="button" class="button"  :class="{'active':dropdownSection == 'register'}" @click.prevent="dropdownSection == 'register'? dropdownSection = 'login' : dropdownSection ='register' ">Register</button>
-								<button type="button" class="close_button fal fa-times" @click="showLoginDropdown = false"></button>
+								<button type="button" class="close_button fal fa-times" @click="{showLoginDropdown = false; dropdownSection = null;}"></button>
 							</div>
 							
 							
@@ -89,7 +89,42 @@
 							
 				
 							<div class="dropdown_section register_section" :class="{'show': dropdownSection == 'register'}">
-								REGISTER FORM
+                     
+                     
+                     
+								REGISTER FORM<br />
+                        [attended con disclaimer] <br />
+                        [ show form, check email against memberships]
+                        
+                        <div class="section_content register ">	
+                           <span class="section_title">Create a new Account</span>
+                           <p>Create a GameStorm login and profile to access Convention material and register for the GameStorm Convention and Events.</p>
+                           <p>All information will be confidential and used only in relation to having website access and for convention membership. </p>
+                           
+                           <div class="form_wrapper">
+                              
+                              <div class="rows" >
+                                 <div class="form_row">
+                                    <label for="first_name">First Name</label>
+                                    <div class="input_wrapper">
+                                       <input class="input text_box" type="text" name="first_name" id="first_name"   v-model="newUser.firstName" required @keyup="submitErrors.first_name = null"/>
+                                    </div>
+                                    <span class="input_message" v-bind:class="submitErrors.first_name? 'show' : ''" v-text="submitErrors.first_name"></span> 					
+                                 </div>
+                                 <div class="form_row">
+                                    <label for="last_name">Last Name</label>
+                                    <div class="input_wrapper">
+                                       <input class="input text_box" type="text" name="last_name" id="last_name"   v-model="newUser.lastName" required @keyup="submitErrors.last_name = null"/>
+                                    </div>
+                                    <span class="input_message" v-bind:class="submitErrors.last_name? 'show' : ''" v-text="submitErrors.last_name"></span> 					
+                                 </div>
+                                 
+                                 
+                              </div>
+                           </div>
+
+                        </div>
+                        
 							</div>
 							
 			
@@ -164,6 +199,7 @@
 					formMessage			: '',
 					loginUsers			: {},
 					showLoginLoading	: false,
+               newUser           : {},
 				}
 			},
 			
@@ -296,7 +332,13 @@
 						*/
 						
 				},
-				
+            
+            /* ---------------------------------------------------------------
+                     CREATE USER
+               ---------------------------------------------------------------   */
+				create_user(e) {
+               console.log(e.target);
+            }
 				
 			}
 			
