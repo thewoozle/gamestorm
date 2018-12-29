@@ -46,7 +46,7 @@
 								<button type="button" class="button"  :class="{'active':dropdownSection == 'login'}" @click.prevent="dropdownSection = 'login'">Sign in</button>
 								<button type="button" class="button"  :class="{'active':dropdownSection == 'help'}" @click.prevent="dropdownSection == 'help'? dropdownSection = 'login' : dropdownSection ='help'">Sign-in Help</button>
 								<button type="button" class="button"  :class="{'active':dropdownSection == 'register'}" @click.prevent="dropdownSection == 'register'? dropdownSection = 'login' : dropdownSection ='register' ">Register</button>
-								<button type="button" class="close_button fal fa-times" @click="{showLoginDropdown = false; dropdownSection = null;}"></button>
+								<button type="button" class="close_button fal fa-times" @click="{showLoginDropdown = false; dropdownSection = 'login';}"></button>
 							</div>
 							
 							
@@ -90,20 +90,23 @@
 				
 							<div class="dropdown_section register_section" :class="{'show': dropdownSection == 'register'}">
                      
-                     
-                     
-								REGISTER FORM<br />
-                        [attended con disclaimer] <br />
-                        [ show form, check email against memberships]
-                        
                         <div class="section_content register ">	
                            <span class="section_title">Create a new Account</span>
-                           <p>Create a GameStorm login and profile to access Convention material and register for the GameStorm Convention and Events.</p>
-                           <p>All information will be confidential and used only in relation to having website access and for convention membership. </p>
+                           <p>A User Account is required to purchase a convention membership or schedule convention events. </p>
+                           <p>If you have attended a GameStorm convention, you may already have a User Account, using the email address that you provided at Registration. </p>
                            
                            <div class="form_wrapper">
                               
                               <div class="rows" >
+                                 <div class="form_row">
+                                    <label for="last_name">Email</label>
+                                    <div class="input_wrapper">
+                                       <input class="input text_box" type="text" name="email" id="email"   v-model="newUser.email" required @keyup="{check_email(); submitErrors.email = null}"/>
+                                    </div>
+                                    <span class="input_message" v-bind:class="submitErrors.email? 'show' : ''" v-text="submitErrors.email"></span> 
+                                    <span class="input_message" v-bind:class="submitErrors.email? 'show' : ''" v-text="submitErrors.email"></span> 					
+                                 </div>
+                                 
                                  <div class="form_row">
                                     <label for="first_name">First Name</label>
                                     <div class="input_wrapper">
@@ -111,6 +114,7 @@
                                     </div>
                                     <span class="input_message" v-bind:class="submitErrors.first_name? 'show' : ''" v-text="submitErrors.first_name"></span> 					
                                  </div>
+                                 
                                  <div class="form_row">
                                     <label for="last_name">Last Name</label>
                                     <div class="input_wrapper">
@@ -120,6 +124,87 @@
                                  </div>
                                  
                                  
+                                 <div class="form_row">
+                                    <label for="last_name">Address</label>
+                                    <div class="input_wrapper">
+                                       <input class="input text_box" type="text" name="address" id="address"   v-model="newUser.address" required @keyup="submitErrors.address = null"/>
+                                    </div>
+                                    <span class="input_message" v-bind:class="submitErrors.address? 'show' : ''" v-text="submitErrors.address"></span> 					
+                                 </div>
+                                 
+                                 
+                                 <div class="form_row">
+                                    <label for="last_name">Address 2</label>
+                                    <div class="input_wrapper">
+                                       <input class="input text_box" type="text" name="address2" id="address2"   v-model="newUser.address2" required @keyup="submitErrors.address2 = null"/>
+                                    </div>
+                                    <span class="input_message" v-bind:class="submitErrors.address2? 'show' : ''" v-text="submitErrors.address2"></span> 					
+                                 </div>
+                                 
+                                 
+                                 <div class="form_row">
+                                    <label for="last_name">City</label>
+                                    <div class="input_wrapper">
+                                       <input class="input text_box" type="text" name="city" id="city"   v-model="newUser.city" required @keyup="submitErrors.city = null"/>
+                                    </div>
+                                    <span class="input_message" v-bind:class="submitErrors.city? 'show' : ''" v-text="submitErrors.city"></span> 					
+                                 </div>
+                                 
+                                 
+                                 <div class="form_row">
+                                    <div class="form_element">
+                                       <div class="input_wrapper">
+                                          <select class="select" name="state" id="state" v-model="newUser.state || ''" @click="submitErrors.state = null" >
+                                             <option value="" style="display: none" >State...</option>
+                                             <option :value="state.state" v-for="state in statesList" >{{state.name}}</option>	
+                                          </select>
+                                          <label>State or Territory</label>
+                                          <span class="form_error" v-if="submitErrors.state" v-text="submitErrors.state? 'State or Territory is required' : ''"></span>
+                                       </div>   
+                                    </div>      
+                                    <div class="form_element">
+                                       <div class="input_wrapper" title="leave blank if over 18 at time of next convention">
+                                          <input class="input text_box" type="date" name="birth_date" id="birth_date"  @keyup="submitErrors.birthDate = null" />
+                                       </div>				
+                                       <label for="country">Birthdate</label>
+                                       <span class="input_message" v-bind:class="submitErrors.birthDate? 'show' : ''" v-text="submitErrors.birthDate"></span>
+                                    </div>
+                  
+                                 </div>	
+											
+                                 
+                                 <div class="form_row">
+                                    <label for="last_name">Postal Code</label>
+                                    <div class="input_wrapper">
+                                       <input class="input text_box" type="text" name="zip" id="zip"   v-model="newUser.zip" required @keyup="submitErrors.zip = null"/>
+                                    </div>
+                                    <span class="input_message" v-bind:class="submitErrors.zip? 'show' : ''" v-text="submitErrors.zip"></span> 	
+                                    
+                                 </div>
+                                 
+                                 <div class="form_row">
+                                    <label for="new_password" title="minimum 6 characters, no spaces or quotes">Password 
+                                       <button type="button" class="password_show fal" v-bind:class="showPassword ? 'fa-eye' : 'fa-eye-slash'" @click="showPassword ? showPassword = false : showPassword = true"></button>
+                                    </label>
+                                    <div class="input_wrappers">
+                                       <div class="input_wrapper">
+                                          <input id="new_password" v-bind:type="showPassword? 'text' : 'password'" class="input text_box new_password" name="new_password"  v-model="newPassword" required placeholder="Password" @keyup="validate_new_password(); submitErrors.email = null"/>
+                                          <i class="pass_icon" v-bind:class="validatePassword == true? 'fal fa-check-square' : 'fas fa-ban fail'" v-if="newPassword"></i>
+                                       </div>	
+                                       
+                                       <div class="input_wrapper">
+                                          <input id="compare_password" v-bind:type="showPassword? 'text' : 'password'" class="input text_box verify_password" name="compare_password" required v-model="confPassword" placeholder="Verify Password" @keyup="validate_new_password()"/>
+                                          <i class="pass_icon" v-bind:class="newPassword == confPassword? 'fal fa-check-square' : 'fas fa-ban fail'" v-if="newPassword"></i>
+                                       </div>
+                                       <span class="input_message" v-bind:class="submitErrors.password? 'show' : ''" v-text="submitErrors.password"></span> 
+                                    </div>	
+                                 </div>
+                                 
+                                 <div class="form_row controls">
+                                    <button type="submit" class="button">Submit</button>			
+                                 </div>
+                                 
+                                 <p>All information will be confidential and used only in relation to having website access and for convention membership. </p>
                               </div>
                            </div>
 
@@ -196,10 +281,14 @@
                uuid              : '',
 					formData		   	: {},
 					submitErrors		: {},
+               newPassword       : '',
+               confPassword      : '',
 					formMessage			: '',
 					loginUsers			: {},
 					showLoginLoading	: false,
                newUser           : {},
+               validatePassword  : false,
+               showPassword      : false,
 				}
 			},
 			
@@ -218,7 +307,8 @@
 				...mapGetters({
 					conventionInfo	: 'conventionInfo',
 					user			   : 'user',
-					pageContent		: 'pageContent'
+					pageContent		: 'pageContent',
+					statesList		: 'statesList',
 				}),
 				
 				pageName() {
@@ -254,9 +344,22 @@
 						if (vm.$route.name != 'mainpage') {
 							vm.$router.replace({name: 'mainpage'});
 						}
-					}
-					
+					}					
 				},	
+            
+            /* -----------------------------------------------------------
+                        CHECK EMAIL
+               ----------------------------------------------------------- */
+            check_email() {
+               var vm = this;
+               vm.newUser.email = vm.newUser.email.replace(/ /g, '');
+               vm.$store.dispatch('check_email', vm.newUser.email).then((response) => {
+                  console.log(response);
+               }, (err) => {
+                     vm.submitErrors = err;
+                  vm.showLoginLoading = false;
+               });
+            },
 				
 				
 				/*	----------------------------------------------------------- 
@@ -338,8 +441,21 @@
                ---------------------------------------------------------------   */
 				create_user(e) {
                console.log(e.target);
-            }
-				
+            },
+            
+            /* ---------------------------------------------------------------
+                     VALIDATE NEW PASSWORD
+               ---------------------------------------------------------------   */
+				validate_new_password() {
+               var vm = this;
+               console.log(vm.newPassword);
+               vm.newPassword = vm.newPassword.replace(/ |"|'|`/g, '');
+               vm.confPassword = vm.confPassword.replace(/ |"|'|`/g, '');
+               vm.newPassword.length >= 6? vm.validatePassword = true : vm.validatePassword = false;
+               
+               
+               
+            },
 			}
 			
 		}
@@ -565,7 +681,7 @@
 		font-size: 1rem;
 		margin: .2rem 0;
 	}
-	
+   
 	
 	
 	#page_header .user_controls .login_dropdown {
@@ -629,7 +745,7 @@
 		min-width: 30rem;
 		opacity: 0;
 		padding: .25rem 1rem;
-		transition: opacity .3s, z-index .3s
+		transition: opacity .3s, z-index .3s, min-width .3s;
 	}
 	#page_header .user_controls .dropdown_section.show {
 		position: relative;
@@ -637,6 +753,19 @@
 		z-index: 10;
 		pointer-events: auto;
 	}
+	#page_header .user_controls .login_dropdown.show.register {
+      max-height: calc(100vh - 10%);
+   }
+   
+   #page_header .user_controls .login_dropdown.register .dropdown_section {
+      min-width: 40rem;
+   }
+   #page_header .user_controls .login_dropdown .section_title {
+      padding: 0;
+      text-align: center;
+      justify-content: center;
+   }
+	
 	#page_header .user_controls .dropdown_section form .controls {
 		display: flex;
 		justify-content: flex-end;
@@ -649,7 +778,7 @@
 	}
 	
 	
-	#page_header .user_controls .dropdown_section.help_section p {
+	#page_header .user_controls .dropdown_section p {
 		font-weight: 300;
 	}
 	#page_header .user_controls .dropdown_section.login_section {

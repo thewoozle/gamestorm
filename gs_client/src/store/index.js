@@ -40,6 +40,7 @@
       userInfo       : {},
 		regSettings    : {},
 		memberTypes    : {},
+      checkEmail     : false,
 		departments    : {},
 		paymentMethods : {},
 		members	      : [],
@@ -334,6 +335,18 @@
 			});
 		},
       
+      // CHECK EMAIL
+      check_email({commit},email) {
+         if(email.indexOf('@') >-1) {
+         console.log(email.indexOf('@'));
+            Axios.get(apiDomain+'_check_email', {params: {email : email}}
+            ).then((response) => {
+               console.log(response.data);
+               commit('set_check_email', response.data);
+            });
+         }
+      },
+      
       update_schedulers({commit}, scheduler) {         
          var vm = this,
             _formData = new FormData();
@@ -609,6 +622,10 @@
          Vue.set(state, 'userInfo', userInfo);
       },
       
+      // SET CHECK EMAIL
+      set_check_email: (state, emailInfo) => {
+         console.log(emailInfo.checkEmail);
+      },
 		
 		// SET MEMBERS (chunks of 20%)
 		set_members: (state, { members, action }) => {

@@ -192,15 +192,13 @@
 									<div class="form_row">								
 										
 										<div class="input_wrapper">
-											<select class="select" name="state" id="state" v-model="member.state" @click="formErrors['state'] = null" >
+											<select class="select" name="state" id="state" v-model="member.state || ''" @click="formErrors['state'] = null" >
 												<option value="" style="display: none" >State...</option>										
 												<option :value="state.state" v-for="state in statesList" >{{state.name}}</option>	
 											</select>
 											<label>State or Territory</label>
 												<span class="form_error" v-if="formErrors.state" v-text="formErrors.state? 'State or Territory is required' : ''"></span>
-										</div>	
-											
-										
+										</div>								
 										
 										<div class="input_wrapper">
 											<input  class="text_box" type="text" name="zip" v-model="member.zip"   v-on:keydown.once="formErrors['zip'] = null" />
