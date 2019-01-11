@@ -4,8 +4,9 @@
      
          <span id="loading" :class="showSpinner? 'show' : ''"><span class="spinner" ></span></span>
          <div class="reset_password" v-if="urlParams.c">
-            <form class="" @submit.prevent="reset_password">
-            <span class="warning" v-if="!$route.query.c"> Warning, unknown user. Please request a new password reset link</span>
+            <form class="" @submit.prevent="reset_password" v-if="$store.dispatch('validate_reset', {reset_code: urlParams.c})">
+               <span class="warning" v-if="!$route.query.c"> Warning, unknown user. Please request a new password reset link</span>
+               <button type="button" class="button close_button" @click="()=>{urlParams = {};}" >Close</button>
                
                <div class="form_row">
                   <label for="new_password" title="minimum 6 characters, no spaces or quotes">Password 
@@ -29,8 +30,14 @@
                <div class="form_row controls">
                   <button type="submit" class="button">Submit</button>			
                </div>
+               
+               <p class="reset_message" v-if="resetMessage" v-text="resetMessage"></p>
             
             </form>
+            
+            <div class="reused_reset" v-else >
+            RESET CODE ALREADY USED
+            </div>
             
          </div>
       
@@ -48,27 +55,7 @@
                
                
                
-               
-            <!-- TEMPORARY EVENTS PLACEHOLDER-->    
-            <div class="events_placeholder">
-               <span class="title">GameStorm21 Events</span>
-               <section class="section event_submission">
-                  <span class="section_title">Event Submission</span>
-						<span class="subtitle" v-text="'(Submission Deadline: '+ month_day_year(currentCon.event_submissions_close)+')'"></span>
-                  
-                  <event_submission_form v-if="user.uuid" />
-                  <div class="login_message" v-else >
-                     <p>Please Sign-in to  submit events</p>
-                  </div>
-                  
-                  
-               </section>
-               
-               <section class="section event_display">
-               
-               </section>
-            
-            </div>   
+              
             
             
             
@@ -76,11 +63,36 @@
             
             
             <!-- REMOVE HIDDEN CLASS-->
-            <main class="main_content hidden" ref="main_content" @scroll="handle_page_scroll">
-
-               <router-view class="main_view"/>
+            <main class="main_content " ref="main_content" @scroll="handle_page_scroll">
                
-               <page_footer v-if="pageType == 'public' " />
+               
+               <div class="events_placeholder" v-if="pageName == 'mainpage'" >
+                  <span class="section_title">GameStorm21 Events</span>
+                  <section class="section event_submission">
+                     <span class="title">Event Submission Form</span>
+                     <span class="subtitle" v-text="'(Submission Deadline: '+ month_day_year(currentCon.event_submissions_close)+')'"></span>
+                     
+                     <event_submission_form v-if="user.uuid" />
+                     <div class="login_message" v-else >
+                        <p>Please Sign-in to  submit events</p>
+                     </div>
+                     
+                     
+                  </section>
+                  
+                  <section class="section event_display">
+                  
+                  </section>
+               
+               </div>   
+               
+               
+               <div v-else>
+                  <router-view class="main_view"/>
+                  
+                  <page_footer v-if="pageType == 'public' " />
+               </div>
+
             </main>			
             </div>
          </div>   
@@ -123,6 +135,7 @@
             validatePassword: false,
             urlParams   : {},
             showSpinner : true,
+            resetMessage: null,
 			}
 		},  
 		  
@@ -227,16 +240,24 @@
             if (vm.urlParams.c ) {  
                if(vm.confPassword == vm.newPassword) {
                   userInfo.newPassword = vm.newPassword;
-                  userInfo.uuid = vm.$route.query.c
+                  userInfo.uuid = vm.$route.query.c;
                   
                   vm.$store.dispatch('update_password', userInfo).then((response) => {
-                     
+                        vm.resetMessage = 'Password Reset';
+                        setTimeout(function() {
+                           vm.loginMessage = null;
+                           vm.urlParams = {};
+                           vm.$router.go({name: 'mainpage'});
+                           },2000);
+                           
                   }, (err) => {
                      console.log(err);
                   });
                } 
             }               
          },
+         
+         
 			
 			
 			handle_page_load() {
@@ -245,9 +266,8 @@
 					vm.pageClasses = this.$store.state.pageStatus;	
 					vm.$store.dispatch('get_con_events').then(() => {
                vm.showSpinner = false;	
-                  console.log("THIS");
                });  
-				});					
+				});
 			},
 			
 			set_page_type(name) {
@@ -2052,6 +2072,7 @@
          background:   var(--altColor); 
       }
 		#app .reset_password form {
+         position:relative;
          display: flex;
          flex-wrap: wrap;
          width: 100%;
@@ -2083,6 +2104,30 @@
          color: var(--warningColor);
          font-style: italic;
       }
+		#app .reset_password .close_button {
+         position: absolute;
+            top: -4rem;
+            right: 0;
+         font-size: 1.25rem; 
+         width: auto;
+         padding: 0 1rem;
+         color: #fff;
+      }
+		#app .reset_password .close_button:hover {
+         color: var(--warningColor);
+      }
+		#app .reset_password .reset_message {
+         position: absolute;
+         bottom: .5rem;
+         left: 0;
+         width: 100%;
+         display: flex;
+         justify-content: center;
+         color: var(--passColor);
+         font-size: 1.5rem;
+         font-style: italic;
+      }
+      
       
       
 		/*  ---------------------------------------------------------------------------------
@@ -2109,10 +2154,22 @@
       .events_placeholder .section_title {
          display: flex;
          width: 100%;
+         justify-content: center;
       }
-      .events_placeholder .subtitle {
+      
+      .events_placeholder .section .title {
+         font-size: 1.5rem;
+         font-weight: 300;
+         width: 100%;
+         display: flex;
+         justify-content: center;
+      }
+      .events_placeholder .section .subtitle {
          display: flex;
          width: 100%;
+         justify-content: center;
+         font-size:.9rem;
+         font-weight: normal;
       }
          
       .events_placeholder .event_submission{

@@ -5,7 +5,7 @@
          <form class="event_submission_form"  @submit.prevent="submit_event">	                        
             <input type="hidden" v-model="editEvent.event_id" />
             <input type="hidden" v-model="editEvent.uuid" />
-            
+            <input type="hidden" v-model="editEvent.selected_con" />
             <div class="event_meta">
                <input class="input text_box"  type="text" name="event_tag" v-model="editEvent.event_tag" />
             </div>
@@ -204,6 +204,7 @@
                </div>
                
                <div class="controls">
+                  <span class="presenter" v-text="'Event presenter: '+ user.first_name+' '+user.last_name"></span>
                   <button type="submit" class="button">Submit</button>
                </div>
                
@@ -242,9 +243,11 @@
          computed: {
             ...mapGetters({
                currentCon  : 'currentCon',
+					conventionInfo	: 'conventionInfo',
                eventTracks : 'eventTracks',
                eventTypes  : 'eventTypes',
                ageGroups   : 'ageGroups',
+               user        : 'user',
             }),
          },
          
@@ -258,11 +261,14 @@
             vm.editEvent.age_category  = ''; 
             vm.editEvent.experience_level= '';
             vm.editEvent.table_requested= '';
+            vm.editEvent.uuid = vm.user.uuid;
          },
          methods: {
             submit_event(e) {
                var vm = this;
-               console.log(vm.editEvent);
+               vm.$store.dispatch('submit_event', vm.editEvent).then((response) => {
+                  
+               });            
             },
             
             clear_event_form() {
@@ -331,6 +337,19 @@
       }
       .form_element.system_element {
          width: 70%;
+      }
+      .events_placeholder .controls {
+         position: relative;
+      }
+      .events_placeholder .presenter {
+         position: absolute;
+            top: 0;
+            left: 0;
+         margin: 1rem;
+         font-weight: 100;
+         font-size: 1rem;
+         color: #c5c5c5;
+            
       }
       
 	

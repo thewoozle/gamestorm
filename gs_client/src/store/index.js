@@ -205,9 +205,13 @@
             console.log(response);
          }, (err) => {
             console.log(err);
-         });
-            
-            
+         });            
+      },
+      
+      // VALIDATE RESET 
+      validate_reset({commit}, reset_code) {
+         console.log('validate reset code returns true');
+         return true;
       },
       
       
@@ -419,7 +423,7 @@
       
       // GET SCHEDULING PERMISSIONS 
       get_scheduling_permissions({commit}) {
-         var cvm = this;
+         var vm = this;
          
          Axios.get(apiDomain+'_get_scheduling_permissions').then((response) => {
             console.log(response.data);
