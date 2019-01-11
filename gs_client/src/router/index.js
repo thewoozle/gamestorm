@@ -2,6 +2,7 @@
 	import Vue from 'vue'
 	import Router from 'vue-router'
 	import main_page from '@/components/main_page'
+   import reset_password from '@/components/reset_password'
 	import gamestorm_page from '@/components/gamestorm_page'
 	import convention_page from '@/components/convention_page'
    import account_page from '@/components/account_page'
@@ -12,7 +13,7 @@
 	import registration_page from '@/components/registration_page'
 	import reg_reports_page from '@/components/reg_reports_page'
 	import scheduling_page from '@/components/scheduling_page'
-
+   
 	Vue.use(Router)
 
 	export default   new Router({
@@ -42,6 +43,13 @@
          path     : '/account',
          name     : 'accountpage',
          component: account_page   
+      },
+      
+      // FORGOT PASSWORD 
+      {
+         path     : '/reset_password',
+         name     : 'resetpassword',
+         component: reset_password
       },
       
 

@@ -40,7 +40,7 @@
       userInfo       : {},
 		regSettings    : {},
 		memberTypes    : {},
-      checkEmail     : false,
+      checkEmail     : null,
 		departments    : {},
 		paymentMethods : {},
 		members	      : [],
@@ -78,8 +78,25 @@
 		},
 		
 		
-		
-      
+		// SUBMIT NEW USER
+      submit_new_user({commit}, userInfo) {      
+         return new Promise((resolve, reject) => {   
+            var   vm = this,
+                  _formData = new FormData();
+                   
+            for(var key in userInfo) {
+               _formData.append(key, userInfo[key]);
+            }
+            Axios.post(apiDomain+'_submit_new_user', _formData, {headers : 
+               {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+            }).then((response) => {
+                  resolve(response.data);
+                  
+            },(err) => {
+                  reject(err.response.data.errors);
+            }); 
+         });   
+      },
 		
 		// UPDATE CURRENTCON
 		update_currentCon({commit}, {convention}) {
@@ -165,8 +182,32 @@
                console.log(err.statusText);
                console.log(err.response.data.errors);
             });
+         });         
+      },
+      
+      // RESET PASSWORD
+      reset_password({commit}, email) {
+         Axios.post(apiDomain+'_password_reset_request',  {email : email }, {
+            headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+         }).then((response) => {
+            console.log(response);
+         }, (err) => {
+            console.log(err);
          });
          
+      },
+      
+      // UPDATE PASSWORD
+      update_password({commit}, userInfo) {
+         Axios.post(apiDomain+'_update_password', {userInfo: userInfo}, {
+            headers : {'Content-Type' : 'application/x-www-form-urlencoded;  charset=UTF-8' }
+         }).then((response) => {
+            console.log(response);
+         }, (err) => {
+            console.log(err);
+         });
+            
+            
       },
       
       
@@ -624,7 +665,8 @@
       
       // SET CHECK EMAIL
       set_check_email: (state, emailInfo) => {
-         console.log(emailInfo.checkEmail);
+         console.log(emailInfo.users.length+' / ' + emailInfo.users);
+         Vue.set(state,'checkEmail', emailInfo.users.length);         
       },
 		
 		// SET MEMBERS (chunks of 20%)
@@ -738,6 +780,7 @@
 		currentCon		: state => state.currentCon,
 		user			   : state => state.user,
       userInfo       : state => state.userInfo,
+      checkEmail     : state => state.checkEmail,
 		
 		// reg getters
 		regReport 		: state => state.regReport,

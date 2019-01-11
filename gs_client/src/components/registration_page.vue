@@ -192,7 +192,7 @@
 									<div class="form_row">								
 										
 										<div class="input_wrapper">
-											<select class="select" name="state" id="state" v-model="member.state || ''" @click="formErrors['state'] = null" >
+											<select class="select" name="state" id="state" v-model="member.state" @click="formErrors['state'] = null" >
 												<option value="" style="display: none" >State...</option>										
 												<option :value="state.state" v-for="state in statesList" >{{state.name}}</option>	
 											</select>
@@ -584,6 +584,7 @@
 				vm.check_user();
 				
 				this.get_store_data();
+            vm.member.state = '';
 				
 			},
 			
@@ -627,6 +628,7 @@
 					//e.preventDefault();
 					vm.member = [];
 					vm.searchQuery = '';
+               vm.member.state = '';
 				},
 				
 				// SEARCH QUERY
@@ -683,6 +685,7 @@
 						}
 					});
 					
+               vm.member.state = '';
 					vm.$forceUpdate();					
 				}
 			}			

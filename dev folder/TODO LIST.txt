@@ -1,0 +1,8 @@
+
+   01/04
+      fix signin-help and change my password
+      fix login
+      
+      registration: deactivate member still shows in member list
+   
+   

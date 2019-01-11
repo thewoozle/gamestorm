@@ -1,25 +1,89 @@
 	<template>
-	  <div class="page_wrapper" ref="app" id="app" :class="[pageName, pageType, pageClasses.pageReady,pageClasses.showMenu,pageClasses.showSlideout,pageClasses.fixFooter]">
-		<span id="loading"><span class="spinner"></span></span>
-		
-		<main_menu class="main_menu" v-if="pageType == 'public' "/>
-		<header class="page_header">
-		
-		<button class="signin_button" id="sign-in_button" @click.prevent="showSignIn? showSignIn = false: showSignIn=true">Sign In @{{showSignIn}}</button>
-			
-			<admin_page_header v-if="pageType == 'admin' " />		
-			<reg_page_header v-else-if="pageType == 'registration'" />		
-			<page_header v-else />
-		</header>
-		
-		<main class="main_content" ref="main_content" @scroll="handle_page_scroll">
+      
+      <div class="page_wrapper" ref="app" id="app" :class="[pageName, pageType, pageClasses.pageReady,pageClasses.showMenu,pageClasses.showSlideout,pageClasses.fixFooter]">
+     
+         <span id="loading" :class="showSpinner? 'show' : ''"><span class="spinner" ></span></span>
+         <div class="reset_password" v-if="urlParams.c">
+            <form class="" @submit.prevent="reset_password">
+            <span class="warning" v-if="!$route.query.c"> Warning, unknown user. Please request a new password reset link</span>
+               
+               <div class="form_row">
+                  <label for="new_password" title="minimum 6 characters, no spaces or quotes">Password 
+                     <button type="button" class="password_show fal" v-bind:class="showPassword ? 'fa-eye' : 'fa-eye-slash'" @click="showPassword ? showPassword = false : showPassword = true"></button>
+                  </label>
+                  <div class="input_wrappers">
+                     <div class="input_wrapper">
+                        <input id="new_password" v-bind:type="showPassword? 'text' : 'password'" class="input text_box new_password" name="new_password"  v-model="newPassword" required placeholder="Password" @keyup="validate_new_password(); submitErrors.email = null"/>
+                        <i class="pass_icon" v-bind:class="validatePassword == true? 'fal fa-check-square' : 'fas fa-ban fail'" v-if="newPassword"></i>
+                     </div>	
+                     
+                     <div class="input_wrapper">
+                        <input id="compare_password" v-bind:type="showPassword? 'text' : 'password'" class="input text_box verify_password" name="compare_password" required v-model="confPassword" placeholder="Verify Password" @keyup="validate_new_password()"/>
+                        <i class="pass_icon" v-bind:class="newPassword == confPassword? 'fal fa-check-square' : 'fas fa-ban fail'" v-if="newPassword"></i>
+                     </div>
+                     <span class="input_message" v-bind:class="submitErrors.password? 'show' : ''" v-text="submitErrors.password"></span> 
+                  </div>	
+               </div>
+               
+               
+               <div class="form_row controls">
+                  <button type="submit" class="button">Submit</button>			
+               </div>
+            
+            </form>
+            
+         </div>
+      
+         <div class="main_page" v-else>         
+            <!-- REMOVE HIDDEN CLASS-->
+            <main_menu class="main_menu hidden"  v-if="pageType == 'public' "/>
+               <header class="page_header">
+               
+                  <button class="signin_button" id="sign-in_button" @click.prevent="showSignIn? showSignIn = false: showSignIn=true">Sign In @{{showSignIn}}</button>
+                  
+               <admin_page_header v-if="pageType == 'admin' " />		
+               <reg_page_header v-else-if="pageType == 'registration'" />		
+               <page_header v-else />
+               </header>
+               
+               
+               
+               
+            <!-- TEMPORARY EVENTS PLACEHOLDER-->    
+            <div class="events_placeholder">
+               <span class="title">GameStorm21 Events</span>
+               <section class="section event_submission">
+                  <span class="section_title">Event Submission</span>
+						<span class="subtitle" v-text="'(Submission Deadline: '+ month_day_year(currentCon.event_submissions_close)+')'"></span>
+                  
+                  <event_submission_form v-if="user.uuid" />
+                  <div class="login_message" v-else >
+                     <p>Please Sign-in to  submit events</p>
+                  </div>
+                  
+                  
+               </section>
+               
+               <section class="section event_display">
+               
+               </section>
+            
+            </div>   
+            
+            
+            
+            
+            
+            
+            <!-- REMOVE HIDDEN CLASS-->
+            <main class="main_content hidden" ref="main_content" @scroll="handle_page_scroll">
 
-			<router-view class="main_view"/>
-			
-			<page_footer v-if="pageType == 'public' " />
-		
-		</main>			
-		
+               <router-view class="main_view"/>
+               
+               <page_footer v-if="pageType == 'public' " />
+            </main>			
+            </div>
+         </div>   
 	  </div>
 	</template>
 
@@ -38,6 +102,8 @@
 		import page_footer from '@/components/includes/page_footer'	
 		import {apiDomain} from './config'
       import {mapState, mapGetters} from 'vuex'
+      
+      import event_submission_form from '@/components/includes/event_submission_form'
 		
 		Vue.use(Router)
 		export default {
@@ -50,6 +116,13 @@
 				pageType	   : '',
 				showSignIn  : false,
             showDevNotes: false,
+            showPassword: false,
+            newPassword : '',
+            confPassword: '',
+            submitErrors: [],
+            validatePassword: false,
+            urlParams   : {},
+            showSpinner : true,
 			}
 		},  
 		  
@@ -59,17 +132,23 @@
 			'reg_page_header'	: reg_page_header,
 			'main_menu' 		: main_menu,
 			'page_footer'		: page_footer,
+         
+         'event_submission_form': event_submission_form,
 		},
 		  
 			
 		  created() {
-			this.get_store_data();
-			
+            var vm = this,
+               _urlParams;
+            _urlParams = new URL(window.location.href).searchParams.has('c');
+            _urlParams? vm.urlParams.c = new URL(window.location.href).searchParams.get('c') : vm.urlParams = {}; 
+				vm.handle_page_load();           
 		  },
 		  
 		  computed: {
            ...mapState({
               devNotes  : 'devNotes',
+              currentCon: 'currentCon',
            }),
            ...mapGetters({
               user      : 'user',
@@ -101,9 +180,9 @@
 				vm.$store.dispatch('get_site_data').then(() => {
 					vm.handle_page_load(); 
 					vm.set_page_type(this.$route.name);
-				});			
+				});	          	
 			},  
-			  
+         
 			  
 			// HANDLE PAGE SCROLL
 			handle_page_scroll(e) {
@@ -130,15 +209,45 @@
 				}
 				
 			},
+         
+         
+         /* ---------------------------------------------------------------
+                  VALIDATE NEW PASSWORD
+            ---------------------------------------------------------------   */
+         validate_new_password() {
+            var vm = this;
+            vm.newPassword = vm.newPassword.replace(/ |"|'|`/g, '');
+            vm.confPassword = vm.confPassword.replace(/ |"|'|`/g, '');
+            vm.newPassword.length >= 6? vm.validatePassword = true : vm.validatePassword = false;            
+         },
+         
+         reset_password() {
+            var   vm = this,
+                  userInfo = {};
+            if (vm.urlParams.c ) {  
+               if(vm.confPassword == vm.newPassword) {
+                  userInfo.newPassword = vm.newPassword;
+                  userInfo.uuid = vm.$route.query.c
+                  
+                  vm.$store.dispatch('update_password', userInfo).then((response) => {
+                     
+                  }, (err) => {
+                     console.log(err);
+                  });
+               } 
+            }               
+         },
 			
 			
 			handle_page_load() {
 				var vm = this;				
 				vm.$store.dispatch('update_page_status', {pageReady: 'ready'}).then(() => {
 					vm.pageClasses = this.$store.state.pageStatus;	
-					vm.$store.dispatch('get_con_events').then(() => {});
-				});
-					
+					vm.$store.dispatch('get_con_events').then(() => {
+               vm.showSpinner = false;	
+                  console.log("THIS");
+               });  
+				});					
 			},
 			
 			set_page_type(name) {
@@ -406,18 +515,21 @@
 			margin-top: 0;
 		}
 		
-   .fake_slider {
-      position: absolute;
-         z-index: 25
-         ;
-      display: inline-block;
-      overflow: auto;
-   }
-   .fake_slider .content {
-      display: inline-block;
-      width: 0;
-      height: 0;
-   }
+      .fake_slider {
+         position: absolute;
+            z-index: 25
+            ;
+         display: inline-block;
+         overflow: auto;
+      }
+      .fake_slider .content {
+         display: inline-block;
+         width: 0;
+         height: 0;
+      }
+      .hidden {
+         display: none!important;         
+      }
    
    
 		.data_view {
@@ -959,138 +1071,6 @@
 		
 		
 		
-			
-		/*	------	TIME PICKER	------	*/
-		/*
-		.time_picker {
-			position: relative;
-			z-index: 10;
-			display: flex;
-			justify-content: space-between;
-			width: 14rem;		
-			padding: .25rem;
-			align-items: flex-start;
-			background: #fff;
-			
-		}
-		.time_picker .days {
-			display: flex;
-			flex-wrap: wrap;
-			padding: 0 .25rem 0 0;
-			width: 6rem;
-		}
-		.time_picker .days .day {
-			display: flex;
-			width: 100%;
-			text-transform: uppercase;
-			justify-content: center;
-			border-radius: .1rem;
-			cursor: pointer;
-			background: var(--textColor3);
-			color: var(--textColor);
-			text-shadow: -1px -1px 1px rgba(0,0,0,0.1);
-		}
-		.time_picker .days .day + .day{
-			margin-top: .15rem;
-		}
-		.time_picker .days .day.active,
-		.time_picker .days .day:hover {
-			background: var(--passColor);
-		}
-		.time_picker .times {
-			position: relative;
-			display: flex;
-			flex-wrap: wrap;
-			height: 7rem;
-			width: 8rem;
-		}
-		.time_picker .times_wrapper {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			border-left: solid 1px var(--borderColor);
-			max-height: 100%;
-			overflow: hidden;
-			overflow-Y: auto;
-			background: #fff;
-			transition: max-height .4s, border .4s;
-		}
-		.time_picker:focus .times_wrapper,
-		.time_picker:hover .times_wrapper {
-			max-height: 75vh;
-			border: solid 1px var(--borderColor);
-		}
-		.time_picker .time_wrapper{
-			flex-wrap: wrap;
-			overflow: hidden;
-			position: relative;
-			top: 0;
-			transition: top .4s;
-		}
-		.time_picker .times_wrapper .day_wrapper {
-			display: flex;
-			flex-wrap: wrap;	
-		}
-		
-		.time_picker .times .time_title {
-			display: flex;
-			width: 100%;
-			justify-content: center;
-			font-weight: bold;
-			text-transform: uppercase;
-			color: var(--textColor);
-			background: var(--titleColor);
-		}
-		.time_picker .times .time_title + .time {
-			border-top: solid 1px var(--borderColor);		
-		}
-		.time_picker .times .time + .time_title {
-			margin-top: .65rem;
-			border-top: solid 2px var(--titleColor);
-		}
-		.time_picker .times .time {
-			position: relative;
-			z-index: 10;
-			display: flex;
-			cursor: pointer;
-			position: relative;
-			color: var(--button);
-			width: 100%;
-			border-bottom: solid 1px var(--borderColor);
-			justify-content: flex-end;
-			padding: 0 2rem .1rem .75rem;
-		}	
-		.time_picker .times .time.between_time:before {
-			content: '';
-			position: absolute;
-				top: 0;
-				z-index: -1;
-				left: 5%;
-			height: 100%;	
-			width: 90%;
-		}
-		.time_picker .times .time.between_time:before,
-		.time_picker .times .time.start_time,
-		.time_picker .times .time.end_time {
-			background: rgba(12,72,95,.5);
-		}
-		.time_picker .times .time.between_time,
-		.time_picker .times .time.start_time,
-		.time_picker .times .time.end_time {
-			color: #fff;
-			text-shadow: -1px -1px 1px rgba(0,0,0,0.1);		
-		}
-		
-		.time_picker .times .time.active,
-		.time_picker .times .time:hover {
-			background: var(--#eee);
-		}
-		.time_picker .times .time + .time {
-			padding-top: .1rem;
-		}
-		*/
-		
 		/*	------	LINKS & BUTTONS	------	*/
 		.link {
 			font-size: inherit;
@@ -1317,26 +1297,29 @@
 				top: 50%;
 			width: 8rem;
 			height: 8rem;
-			opacity: 1;
-			z-index: 1001;
+			opacity: 0;
+			z-index: -1;
 			transform:translate(-4rem, -4rem) scale(1);
 			transition:	opacity .8s, height .8s, width .8s, transform .8s, z-index .8s;						
 		}
-		#app.ready #loading {
+		#loading.show {
 			transform:translate(-4rem, -8rem) scale(.25);
-			opacity: 0;
-			z-index: -1;
+			opacity: 1;
+			z-index: 1001;
 		}
 		#loading .spinner {
-			display: block;
+			display: none;
 			width: 100%;
 			height: 100%;	
 			border-radius: 50%;
 			border: 1px solid transparent;
-			border-top-color: #2180BA;
-			-webkit-animation: spin 2s linear infinite;
-			animation: spin 2s linear infinite;		
+			border-top-color: #2180BA;	
 		}
+		#loading.show .spinner {
+			display: block;
+			-webkit-animation: spin 2s linear infinite;
+			animation: spin 2s linear infinite;	
+      }
 		#app.ready #loading .spinner {
 			-webkit-animation: none;
 			animation: none;
@@ -1514,6 +1497,12 @@
 			line-height: 2em;
 			padding: .25rem 0;
 		}
+      .form_row .footnote {
+         display: flex;
+         width: 100%;
+         font-weight: 100;
+         color: var(--highlightColor);
+      }
 		.form_element {
          position: relative;
 			display: flex;
@@ -1724,6 +1713,7 @@
 		.textarea {
 			min-height: 3rem;
 			border-radius: .2em;
+			border: solid 1px #777;
 		}
 		.checkbox_wrapper {
 			flex-wrap: nowrap;
@@ -1759,7 +1749,7 @@
 			font-weight: 300;
 			visibility: visible;
 		}
-		.checkbox.checked:after {
+		.checkbox:checked:after {
 			content: '\f00c';		
 		}
 		.select option {
@@ -2048,6 +2038,96 @@
 			transform: scale(.7);
 			width: 100%;
 		}
+      
+      
+		#app .reset_password {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         position: fixed;
+            top: 0;
+            left: 0;
+         height: 100vh;
+         width: 100vw;
+         background:   var(--altColor); 
+      }
+		#app .reset_password form {
+         display: flex;
+         flex-wrap: wrap;
+         width: 100%;
+         max-width: 35rem;
+         margin-bottom: 20%;
+         padding: 2rem 1rem;
+         background: #fff;
+         border: solid 1px var(--borderColor);
+         border-radius: .35rem;
+      }
+		#app .reset_password input {
+         color: var(--textColor4);
+      }
+		#app .reset_password .pass_icon {
+         left: 90%;
+      }
+		#app .reset_password .controls .button {
+         color: #fff;
+      }
+		#app .reset_password .controls .button:hover {
+         color: var(--button);
+         text-shadow: none;
+      }
+		#app .reset_password .warning {
+         display: flex;
+         width: 100%;
+         justify-content: center;
+         text-align: center;
+         color: var(--warningColor);
+         font-style: italic;
+      }
+      
+      
+		/*  ---------------------------------------------------------------------------------
+								EVENTS PLACEHOLDER
+			---------------------------------------------------------------------------------  	*/	
+      
+      .events_placeholder {
+         position: fixed;
+            top: 6.5rem;
+            left: 0;
+            z-index: 49;
+         display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+         overflow: hidden;
+         overflow-Y: auto;
+         padding: 1rem 2rem;
+         align-items: flex-start;
+         height: calc(100vh - 6.5rem);
+         width: 100vw;
+         background: var(--backgroundColor);
+      }
+      
+      .events_placeholder .section_title {
+         display: flex;
+         width: 100%;
+      }
+      .events_placeholder .subtitle {
+         display: flex;
+         width: 100%;
+      }
+         
+      .events_placeholder .event_submission{
+         display: flex;
+            flex-wrap: wrap;
+         width: 100%;
+         max-width: 50rem;
+      }
+         
+      .events_placeholder .event_display{
+         display: flex;
+         width: 0;
+      }
+      .events_placeholder {
+      }
 		
 	
 		/*  ---------------------------------------------------------------------------------

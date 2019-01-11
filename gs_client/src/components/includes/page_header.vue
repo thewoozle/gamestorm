@@ -40,7 +40,7 @@
 						<button class="button" :class="{'active':showLoginDropdown}" type="button" @click.prevent="{showLoginDropdown? showLoginDropdown = false : showLoginDropdown = true; }" title="Sign-in to an existing account or create a new user-account">Sign In</button>
 						
 						<div class="login_dropdown" :class="[{'show': showLoginDropdown}, {'register' : dropdownSection == 'register'}]">
-                     <div class="form_message"  ref="login_message">{{formMessage}}</div>	
+                     <div class="form_message" :class="loginMessage? 'show' : ''" v-text="loginMessage"></div>	
 						
 							<div class="buttons">
 								<button type="button" class="button"  :class="{'active':dropdownSection == 'login'}" @click.prevent="dropdownSection = 'login'">Sign in</button>
@@ -97,20 +97,37 @@
                            
                            <div class="form_wrapper">
                               
-                              <div class="rows" >
-                                 <div class="form_row">
+                              <form @submit.prevent="submit_new_user" class="rows" >
+                                 <div class="form_row email_check_row">
                                     <label for="last_name">Email</label>
                                     <div class="input_wrapper">
                                        <input class="input text_box" type="text" name="email" id="email"   v-model="newUser.email" required @keyup="{check_email(); submitErrors.email = null}"/>
                                     </div>
-                                    <span class="input_message" v-bind:class="submitErrors.email? 'show' : ''" v-text="submitErrors.email"></span> 
-                                    <span class="input_message" v-bind:class="submitErrors.email? 'show' : ''" v-text="submitErrors.email"></span> 					
+                                    <div v-if="checkEmail == 0" class="email_check">
+                                       <span class="icon fal fa-thumbs-up" title="This email address is not in use" ></span> 
+                                    </div>
+                                    
+                                    <div v-else-if="checkEmail == 1" class="email_check">
+                                       <span class="icon fas fa-exclamation" title="This email address has a user account associated with it. You can use the SIGN-IN HELP link to set or reset your password, or
+                                          if you are adding an additional user to your email address, you can continue to create a new user account" >
+                                       </span> 
+                                       <span class="message">This email address has a user account associated with it. You can use the SIGN-IN HELP link to set or reset your password, or
+                                          if you are adding an additional user to your email address, you can continue to create a new user account.
+                                       </span>
+                                    </div>
+                                    
+                                    <div v-else-if="checkEmail > 1" class="email_check">
+                                       <span class="icon fas fa-user-plus" :title="'This email address has '+checkEmail +' user accounts associated with it. You can use the SIGN-IN HELP link to set or reset the accounts password(s) or continue creating a new user account. '" >
+                                       </span> 
+                                       <span class="message">This email address has {{checkEmail}} user account{{checkEmail >1? 's' : ''}} associated with it. You can use the SIGN-IN HELP link to set or reset the accounts password(s) or continue creating a new user account. 
+                                       </span>
+                                    </div>
                                  </div>
                                  
                                  <div class="form_row">
                                     <label for="first_name">First Name</label>
                                     <div class="input_wrapper">
-                                       <input class="input text_box" type="text" name="first_name" id="first_name"   v-model="newUser.firstName" required @keyup="submitErrors.first_name = null"/>
+                                       <input class="input text_box" type="text" name="first_name" id="first_name"   v-model="newUser.first_name" required @keyup="submitErrors.first_name = null"/>
                                     </div>
                                     <span class="input_message" v-bind:class="submitErrors.first_name? 'show' : ''" v-text="submitErrors.first_name"></span> 					
                                  </div>
@@ -118,7 +135,7 @@
                                  <div class="form_row">
                                     <label for="last_name">Last Name</label>
                                     <div class="input_wrapper">
-                                       <input class="input text_box" type="text" name="last_name" id="last_name"   v-model="newUser.lastName" required @keyup="submitErrors.last_name = null"/>
+                                       <input class="input text_box" type="text" name="last_name" id="last_name"   v-model="newUser.last_name" required @keyup="submitErrors.last_name = null"/>
                                     </div>
                                     <span class="input_message" v-bind:class="submitErrors.last_name? 'show' : ''" v-text="submitErrors.last_name"></span> 					
                                  </div>
@@ -136,7 +153,7 @@
                                  <div class="form_row">
                                     <label for="last_name">Address 2</label>
                                     <div class="input_wrapper">
-                                       <input class="input text_box" type="text" name="address2" id="address2"   v-model="newUser.address2" required @keyup="submitErrors.address2 = null"/>
+                                       <input class="input text_box" type="text" name="address2" id="address2"   v-model="newUser.address2" @keyup="submitErrors.address2 = null"/>
                                     </div>
                                     <span class="input_message" v-bind:class="submitErrors.address2? 'show' : ''" v-text="submitErrors.address2"></span> 					
                                  </div>
@@ -154,7 +171,7 @@
                                  <div class="form_row">
                                     <div class="form_element">
                                        <div class="input_wrapper">
-                                          <select class="select" name="state" id="state" v-model="newUser.state || ''" @click="submitErrors.state = null" >
+                                          <select class="select" name="state" id="state" v-model="newUser.state" @click="submitErrors.state = 'null'" @set="newUser.state == null? newUser.state = '' : ''">
                                              <option value="" style="display: none" >State...</option>
                                              <option :value="state.state" v-for="state in statesList" >{{state.name}}</option>	
                                           </select>
@@ -164,22 +181,30 @@
                                     </div>      
                                     <div class="form_element">
                                        <div class="input_wrapper" title="leave blank if over 18 at time of next convention">
-                                          <input class="input text_box" type="date" name="birth_date" id="birth_date"  @keyup="submitErrors.birthDate = null" />
+                                       <datetime type="date" v-model="newUser.birth_date"   ></datetime>
+                                       
                                        </div>				
                                        <label for="country">Birthdate</label>
                                        <span class="input_message" v-bind:class="submitErrors.birthDate? 'show' : ''" v-text="submitErrors.birthDate"></span>
                                     </div>
-                  
                                  </div>	
 											
                                  
                                  <div class="form_row">
-                                    <label for="last_name">Postal Code</label>
-                                    <div class="input_wrapper">
-                                       <input class="input text_box" type="text" name="zip" id="zip"   v-model="newUser.zip" required @keyup="submitErrors.zip = null"/>
-                                    </div>
-                                    <span class="input_message" v-bind:class="submitErrors.zip? 'show' : ''" v-text="submitErrors.zip"></span> 	
+                                    <div class="form_element">
+                                       <label for="last_name">Postal Code</label>
+                                       <div class="input_wrapper">
+                                          <input class="input text_box" type="text" name="zip" id="zip"   v-model="newUser.zip" required @keyup="submitErrors.zip = null"/>
+                                       </div>
+                                       <span class="input_message" v-bind:class="submitErrors.zip? 'show' : ''" v-text="submitErrors.zip"></span> 	
                                     
+                                    </div>      
+                                    <div class="form_element">
+                                       <label for="last_name">Phone</label>
+                                       <div class="input_wrapper">
+                                          <input class="input text_box" type="text" name="phone" id="phone"   v-model="newUser.phone" />
+                                       </div>                                    
+                                    </div>
                                  </div>
                                  
                                  <div class="form_row">
@@ -205,7 +230,7 @@
                                  </div>
                                  
                                  <p>All information will be confidential and used only in relation to having website access and for convention membership. </p>
-                              </div>
+                              </form>
                            </div>
 
                         </div>
@@ -214,25 +239,27 @@
 							
 			
 							<div class="dropdown_section help_section" :class="{'show': dropdownSection == 'help'}">
-								
-								<p>If you have forgotten your password or need to request a password reset, enter the email address that you've used for your GameStorm account 
-									and we will email a password reset link to you. That link will allow you to enter a new password and login. 
-								</p>	
+								<span class="section_title">Reset Password</span>
 								
 								<form method="post" action="" @submit.prevent="request_password_reset">							
 									<div class="form_row">
 										<div class="form_element">
 											<label for="email">Email</label>
 											<div class="input_wrapper">
-												<input type="text" class="input text_box" v-model="email" name="email" />
+												<input type="text" class="input text_box" v-model="reset_email" name="email" />
 												<span class="input_message" v-if="submitErrors.email">{{submitErrors.email}}</span>
 											</div>
 										</div>
-									
-										<div class="form_element">
-											<button type="submit" class="button">Submit  Request</button>
-										</div>
-									</div>	
+									</div>
+                           <div class="controls">
+										<button type="submit" class="button">Reset</button>	
+                              
+                              <button type="button" Class="info_button far fa-info-circle"></button>
+                              <p class="info_body">If you have forgotten your password or need to request a password reset, enter the email address that you've used for your GameStorm account 
+                                 and we will email a password reset link to you. That link will allow you to enter a new password and login. 
+                              </p>	
+                                 
+									</div>
 								</form> 
 								
 							</div>
@@ -243,8 +270,13 @@
 					
 				</div>		
 				
-			<div class="site_title editable" ref="site_title" data-name="site_title"v-if="pageContent.site_title"  v-html="pageContent.site_title.content"></div>
+            
+            
+         <!-- UNHIDE TO SEE TITLE -->   
+			<div class="site_title editable hidden"  ref="site_title" data-name="site_title"v-if="pageContent.site_title"  v-html="pageContent.site_title.content"></div>
 			
+         
+         
 			</div>
 			
 	</template>
@@ -258,14 +290,18 @@
 		import { mapGetters } from 'vuex'
 		import moment from 'moment'
 		import {apiDomain} from '@/config'
+		import { Datetime } from 'vue-datetime'
+		import 'vue-datetime/dist/vue-datetime.css'
+		import Router from 'vue-router'
 		
 		import Storage from 'vue-ls'
 		import options from '@/ls_options'
+				
 		
-		
-		
+		Vue.use(Router)
 		Vue.use(Storage, options);	
 		Vue.use(VueAxios, Axios);
+		Vue.use(Datetime);
 	
 		export default{
 			name: 'page_header',
@@ -284,11 +320,13 @@
                newPassword       : '',
                confPassword      : '',
 					formMessage			: '',
+               loginMessage      : null,
 					loginUsers			: {},
 					showLoginLoading	: false,
                newUser           : {},
                validatePassword  : false,
                showPassword      : false,
+               reset_email       :'',
 				}
 			},
 			
@@ -302,12 +340,18 @@
 					
 			filters: {	
 			},
+         
+			components: {
+				datetime: Datetime,
+			},
+         
 			 
 			computed: {
 				...mapGetters({
 					conventionInfo	: 'conventionInfo',
 					user			   : 'user',
 					pageContent		: 'pageContent',
+               checkEmail     : 'checkEmail',
 					statesList		: 'statesList',
 				}),
 				
@@ -318,8 +362,10 @@
 			},
 		  
 			created() {
-				this.check_logged_in();
-				
+            var vm = this;
+				vm.check_logged_in();
+            vm.newUser = {};
+				vm.newUser.state = '';
 			},
 			
 			
@@ -338,7 +384,8 @@
 					-----------------------------------------------------------	*/
 				check_logged_in() {
 					var vm = this;
-					if (Vue.ls.get('user')) {
+					if (Vue.ls.get('user') && Vue.ls.get('user').length > 0) {
+               console.log(Vue.ls.get('user').length);
 						vm.$store.dispatch('update_user', Vue.ls.get('user') );						
 					} else {
 						if (vm.$route.name != 'mainpage') {
@@ -353,8 +400,7 @@
             check_email() {
                var vm = this;
                vm.newUser.email = vm.newUser.email.replace(/ /g, '');
-               vm.$store.dispatch('check_email', vm.newUser.email).then((response) => {
-                  console.log(response);
+               vm.$store.dispatch('check_email', vm.newUser.email).then(() => {
                }, (err) => {
                      vm.submitErrors = err;
                   vm.showLoginLoading = false;
@@ -382,11 +428,10 @@
                      if (response.response.message) {
                         
                         // show response message for two seconds
-                        vm.formMessage = response.response.message;							
-                        vm.$refs.login_message.classList.add('show');
+                        vm.loginMessage = response.response.message;		
                         console.log('fix login message');
                            setTimeout(function() {
-                           vm.$refs.login_message.classList.remove('show');
+                           vm.loginMessage = null;
                            },2000);
                      } 
                      if (response.users) {
@@ -410,29 +455,55 @@
                Vue.ls.remove('user');
 					vm.$router.go({name: 'mainpage'});
 				},
-				
+            
+            /* -----------------------------------------------------------
+                        SUBMIT NEW USER
+               ----------------------------------------------------------- */
+				submit_new_user(e) {
+               var vm = this;
+               vm.newUser.password = vm.newPassword;
+               vm.$store.dispatch('submit_new_user', vm.newUser).then((response) => {
+                  if(response == 'success') {
+                     
+                     
+                     
+                        // show response message for two seconds
+                        vm.loginMessage = response;		
+                        console.log('fix login message');
+                           setTimeout(function() {
+                           vm.loginMessage = null;
+                           },3000);
+                           
+                           
+                     vm.dropdownSection = 'login';
+                     vm.newUser = {};
+                     vm.newUser.state = '';
+                  } else {
+                     
+                        // show response message for two seconds
+                        vm.loginMessage = response;		
+                        console.log('fix login message');
+                           setTimeout(function() {
+                           vm.loginMessage = null;
+                           },3000);
+                  }
+               }, (err) => {
+                  vm.submitErrors = err;
+               });
+               
+            },
 				/*	----------------------------------------------------------- 
 								REQUEST PASSWORD RESET	
 					-----------------------------------------------------------	*/
 				request_password_reset(e) {
 					// send email for validation and get return status
-					var 	vm = this,
-							form = $(e.target);
+					var 	vm = this;
 							
-							
-							/*
-						$.ajax({
-							url: 'password_reset_request',
-							type: 'POST',
-							data: form.serialize()
-						}).done(function(response){
-							console.log(response);
-							vm.responseMessage = response;
-						}).fail(function(err){
-							console.log(err.status+' - '+err.statusText);
-						});		
-						
-						*/
+					vm.$store.dispatch('reset_password', vm.reset_email).then((response) => {
+                  console.log(response);
+               }, (err) => {
+                  vm.subitErrors = err;
+               });	
 						
 				},
             
@@ -747,12 +818,60 @@
 		padding: .25rem 1rem;
 		transition: opacity .3s, z-index .3s, min-width .3s;
 	}
+   
 	#page_header .user_controls .dropdown_section.show {
 		position: relative;
 		opacity: 1;
 		z-index: 10;
 		pointer-events: auto;
 	}
+   
+   
+	#page_header .user_controls .dropdown_section.help_section label {
+      width: auto;
+      padding: 0 1rem;
+   }
+	#page_header .user_controls .dropdown_section.help_section .controls {
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      justify-content: center;
+   }
+	#page_header .user_controls .dropdown_section.help_section form {
+      width: 100%;
+   }
+	#page_header .user_controls .dropdown_section.help_section .info_button {
+      position: absolute;
+         top: 0;
+         right: 0;
+         z-index: 10;
+      cursor: pointer;
+      font-size: 1.65rem;
+      background: none;
+      color: var(--passColor);
+      transition: color .4s;
+   }
+	#page_header .user_controls .dropdown_section.help_section .info_button:hover {
+      color: var(--button2);      
+   }
+	#page_header .user_controls .dropdown_section.help_section  .info_body {
+      position: absolute;
+         top: 0;
+         left: 100%;
+      width: 100%;
+      padding: 0 1rem;
+      background: none;
+      border-radius: .25rem;
+      opacity: .25;
+      transition: left .4s, opacity .4s, background .4s;
+   }
+	#page_header .user_controls .dropdown_section.help_section .info_button:hover~.info_body {
+      left: 0;
+      opacity: 1;
+      background: rgba(80,0,0,.65);
+   }
+   
+   
 	#page_header .user_controls .login_dropdown.show.register {
       max-height: calc(100vh - 10%);
    }
@@ -761,11 +880,65 @@
       min-width: 40rem;
    }
    #page_header .user_controls .login_dropdown .section_title {
-      padding: 0;
+      padding: .5rem 0;
+      font-family: dosis;
+      font-size: 1.65rem;
+      font-weight: 300;
       text-align: center;
       justify-content: center;
    }
 	
+	#page_header .user_controls .dropdown_section .email_check_row {
+      overflow: hidden;
+      padding-bottom: 2rem;
+   }
+	#page_header .user_controls .dropdown_section .input_message {
+      color: var(--highlightColor);
+   }
+	#page_header .user_controls .dropdown_section .email_check {
+      position:relative;
+      display: flex;
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: 2rem;
+   }
+	#page_header .user_controls .dropdown_section .email_check .icon {
+      position: absolute;
+         top: calc(50% - 2rem);
+         right: 1rem;
+         z-index: 10;
+      display: flex;
+         justify-content: center;
+         align-items: center;
+      width: 2rem;
+      height: 2rem;
+      font-size: 1.25rem;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.15);
+      background: rgba(0,0,0,0.15);
+      color: var(--passColor);
+   }
+	#page_header .user_controls .dropdown_section .email_check .icon.fa-user-plus,
+	#page_header .user_controls .dropdown_section .email_check .icon.fa-exclamation {
+      color: var(--warningColor);
+      cursor: pointer;
+   }
+	#page_header .user_controls .dropdown_section .email_check .message {
+      position: absolute;
+         top: 0;
+         right: -30rem;
+      width: 30rem;
+      font-size: .85rem;
+      background: #4f0202;
+      color: var(--highlightColor);
+      padding: .15rem .5rem;
+      display: flex;      
+      transition: right .5s;
+   }
+	#page_header .user_controls .dropdown_section .email_check_row .email_check .icon:hover ~ .message {
+      right: 3rem;
+   }
 	#page_header .user_controls .dropdown_section form .controls {
 		display: flex;
 		justify-content: flex-end;

@@ -15,6 +15,8 @@
 	Vue.use(Vuex)	
 	//new Vue(Vue.util.extend({ router }, App)).$mount('#app');
 	Vue.config.productionTip = false;
+   
+   
 	
 	Vue.mixin({
 		created: function() {},
@@ -29,6 +31,9 @@
 				return moment(date).format('MMM, Do YYYY');
 			},
 			
+         iso_date(date) {
+            return moment(date).format('YYYY-M-d'); 
+         },
 			day_date(date) {
 				return moment(date).format('MMM Do');
 			},
