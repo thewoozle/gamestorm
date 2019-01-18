@@ -1,8 +1,14 @@
 
-   01/04
-      fix signin-help and change my password
-      fix login
+   01/11
+   
+      event_submission_form needs current con tag
       
       registration: deactivate member still shows in member list
+      
+      New Account-
+         send email conf. 
+      
+      account - 
+         multiple email addresses login
    
    

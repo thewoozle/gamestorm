@@ -66,26 +66,29 @@
             <main class="main_content " ref="main_content" @scroll="handle_page_scroll">
                
                
+               
+               <!-- EVENTS PLACEHOLDER -->
                <div class="events_placeholder" v-if="pageName == 'mainpage'" >
                   <span class="section_title">GameStorm21 Events</span>
-                  <section class="section event_submission">
-                     <span class="title">Event Submission Form</span>
-                     <span class="subtitle" v-text="'(Submission Deadline: '+ month_day_year(currentCon.event_submissions_close)+')'"></span>
+                  <div class="sections" v-if="user.uuid">
+                     <section class="section event_submission" >
+                        <span class="title">Event Submission Form</span>
+                        <span class="subtitle" v-text="'( Submission Deadline: '+ month_day_year(currentCon.event_submissions_close)+' )'"></span>
+                        
+                        <event_submission_form  />
+                        
+                     </section>
                      
-                     <event_submission_form v-if="user.uuid" />
-                     <div class="login_message" v-else >
-                        <p>Please Sign-in to  submit events</p>
-                     </div>
-                     
-                     
-                  </section>
+                     <section class="section event_display">
+                        <user_events_list v-if="userEvents.length > 0" />
+                     </section>
+                  </div>
                   
-                  <section class="section event_display">
+                  <div class="login_message" v-else >
+                     <p>Please Sign-in to  submit events</p>
+                  </div>
                   
-                  </section>
-               
                </div>   
-               
                
                <div v-else>
                   <router-view class="main_view"/>
@@ -93,8 +96,8 @@
                   <page_footer v-if="pageType == 'public' " />
                </div>
 
-            </main>			
-            </div>
+            </main>
+            
          </div>   
 	  </div>
 	</template>
@@ -116,6 +119,7 @@
       import {mapState, mapGetters} from 'vuex'
       
       import event_submission_form from '@/components/includes/event_submission_form'
+      import user_events_list from '@/components/includes/user_events_list'
 		
 		Vue.use(Router)
 		export default {
@@ -147,6 +151,7 @@
 			'page_footer'		: page_footer,
          
          'event_submission_form': event_submission_form,
+         'user_events_list'   : user_events_list,
 		},
 		  
 			
@@ -160,8 +165,9 @@
 		  
 		  computed: {
            ...mapState({
-              devNotes  : 'devNotes',
-              currentCon: 'currentCon',
+               devNotes  : 'devNotes',
+               currentCon: 'currentCon',
+               userEvents  : 'userEvents',
            }),
            ...mapGetters({
               user      : 'user',
@@ -176,7 +182,10 @@
 					this.set_page_type(name);
 				},
             user:function(newval, oldval) {
-               if(!newval.uuid) {this.$router.go({name: 'mainpage'});}
+               var vm = this;
+               if(!newval.uuid) {
+                  vm.$route.name == 'mainpage'? '' : vm.$router.push({name: 'mainpage'});
+               }
             },
             
 		  },
@@ -247,7 +256,7 @@
                         setTimeout(function() {
                            vm.loginMessage = null;
                            vm.urlParams = {};
-                           vm.$router.go({name: 'mainpage'});
+                           vm.$route.name == 'mainpage'? '' : vm.$router.push({name: 'mainpage'});
                            },2000);
                            
                   }, (err) => {
@@ -261,7 +270,9 @@
 			
 			
 			handle_page_load() {
-				var vm = this;				
+				var vm = this;
+            vm.$store.dispatch('check_user').then(()=>{});
+            
 				vm.$store.dispatch('update_page_status', {pageReady: 'ready'}).then(() => {
 					vm.pageClasses = this.$store.state.pageStatus;	
 					vm.$store.dispatch('get_con_events').then(() => {
@@ -1736,41 +1747,37 @@
 			border: solid 1px #777;
 		}
 		.checkbox_wrapper {
-			flex-wrap: nowrap;
+         position: relative;
+         display: flex;
+            align-items: center;
+            justify-content: center;
+         font-size: 2rem;
+			cursor: pointer;
+			height: 1em;
+			width: 1em;
+			border-radius: .25rem;	
 		}
+		.checkbox_wrapper:before {
+         position: absolute;
+            top: 0;
+            left: 0;
+			font-size: 1.1em;
+			background: var(--button);
+         color: #7d7d7d;
+      }
 		.checkbox_wrapper label{
 			margin-left: 1rem;
 		}
-		.checkbox {
+		.checkbox_wrapper .checkbox {
 			display: flex;
-			height: 2rem;
-			width: 2rem;;
-			position: relative;
-			visibility: hidden;
-		}
-		.checkbox:after {
 			position: absolute;
-				top: 0;
-				left: 0;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			font-size: 1.5rem;
-			cursor: pointer;
-			line-height: 2rem;
-			height: inherit;
-			width: inherit;
-			font-family: 'Font Awesome 5 Pro';
-			color: #d7d7d7;
-			background: var(--button);
-			border-radius: .25rem;		
-			border: solid 1px var(--borderColor2);
-			content: '';
-			font-weight: 300;
-			visibility: visible;
-		}
-		.checkbox:checked:after {
-			content: '\f00c';		
+            top: 0;
+            left: 0;         
+            z-index: 10;
+         width: 100%;
+         height: 100%;
+         opacity: 0;
+         cursor: pointer;
 		}
 		.select option {
 			color: var(--button);
@@ -1922,7 +1929,6 @@
 		}
 		form .expanding_row.show {
 			line-height: 1rem;
-			padding: .25rem 0;
 			max-height: 5rem;
 		}
 		
@@ -2146,11 +2152,24 @@
          overflow-Y: auto;
          padding: 1rem 2rem;
          align-items: flex-start;
-         height: calc(100vh - 6.5rem);
+         max-height: calc(100vh - 6.5rem);
          width: 100vw;
          background: var(--backgroundColor);
       }
       
+      .events_placeholder .login_message {
+         display: flex;
+         justify-content: center;
+         margin-top:3rem;
+         width: 100%;
+      }
+      
+      .events_placeholder .sections {
+         display: flex;
+            justify-content: space-between;
+         width: 100%;
+         
+      }
       .events_placeholder .section_title {
          display: flex;
          width: 100%;
@@ -2170,20 +2189,27 @@
          justify-content: center;
          font-size:.9rem;
          font-weight: normal;
+         margin-top: .5rem;
       }
          
-      .events_placeholder .event_submission{
+      .events_placeholder .submission_intro {
          display: flex;
-            flex-wrap: wrap;
-         width: 100%;
-         max-width: 50rem;
+         padding: .5rem .5rem .5rem 2rem;
+      }
+      .events_placeholder .event_submission {
+         display: flex;
+            flex-direction: column;
+         padding: 0 1rem 0 2rem;
+         width: 65%; 
       }
          
       .events_placeholder .event_display{
          display: flex;
-         width: 0;
+         width: 30%;
       }
       .events_placeholder {
+         
+         
       }
 		
 	

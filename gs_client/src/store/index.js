@@ -58,6 +58,7 @@
       conLocations   : {},
       memberList     : {},
       timeblocks     : [],
+      userEvents     : {},
 	}
 	
 	const actions = {
@@ -110,8 +111,14 @@
 		
 		
 		// UPDATE USER (login, logout)
-		update_user({commit}, user) {
-			commit('set_user', {user});
+		update_user({commit}, user) {         
+         if(user) {
+            window.sessionStorage.user = JSON.stringify(user);
+            commit('set_user', {user});
+         } else {
+            window.sessionStorage.user = '';
+            commit('set_user');
+         }
 		},
       
       
@@ -155,24 +162,24 @@
             }).then((response) => {
                    
                if (response.data.user) {
-
-                        var user = response.data.user;
+                        var user = response.data.user,
+                            uuid = response.data.user.uuid;
                         
-                        commit('set_user', {user});
-                        Vue.ls.set('user', response.data.user, (60*60*1000) *2); // one hour
-                        // Vue.ls.set('user', response.data.user, (10*1000)); // one minute
+                        commit('set_user', user);
+                        if(window.sessionStorage) {  
+                           sessionStorage.user = JSON.stringify(user); 
                         
-                        // start one-hour-and-two-minutes timer then log-out 
-                        setTimeout(function() {
-                           console.log('LOG OUT timer expired');
-                          // vm.logout();					
-                           
-                           
-                     Vue.ls.remove('user');
-                     commit('set_user', {});
-               
-                  //},(10*1000));
-                  }, (60*60*1000) *2);
+                        // start one-hour-and-two-minutes timer then log-out                        
+                           setTimeout(function() {
+                              console.log('LOG OUT timer expired');
+                              
+                              sessionStorage.user = '';
+                              commit('set_user', {});
+                              commit('set_user_events', '');
+                           //},(10*1000));
+                           }, (60*60*1000) *2);
+                        }
+                        
                }
                
                resolve(response.data);         
@@ -208,10 +215,28 @@
          });            
       },
       
+      // GET USERS EVENTS 
+      get_users_events({commit}, uuid) {
+         Axios.post(apiDomain+'_get_users_events', {uuid: uuid}, {
+            headers : {'Content-Type' : 'application/x-www-form-urlencoded;  charset=UTF-8' }
+         }).then((response) => {
+            commit('set_user_events', response.data.userEvents);
+         }, (err) => {
+            console.log(err);
+         });
+      },
+      
       // VALIDATE RESET 
       validate_reset({commit}, reset_code) {
          console.log('validate reset code returns true');
          return true;
+      },
+      
+      // CHECK USER (is logged in)
+      check_user({commit}) {
+         if(sessionStorage.user) {
+            commit('set_user', JSON.parse(sessionStorage.user));
+         }
       },
       
       
@@ -351,17 +376,25 @@
             _formData = new FormData();
 			_formData.append('con', selectedCon);			
          
-         if(localStorage) {
-            if(localStorage.allEvents) {
-               commit('set_scheduling_data', {
-                  allEvents      : JSON.parse(localStorage.allEvents),
-               });
-            }            
-         }
+         // if(localStorage) {
+            // if(localStorage.schedulingData) {
+               // commit('set_scheduling_data', {
+               // venues         : JSON.parse(localStorage.schedulingData.venues, 
+               // conLocations   : response.data.conLocations, 
+               // allEvents      : response.data.allEvents,
+               // eventTypes     : response.data.eventTypes,
+               // eventTracks    : response.data.eventTracks,
+               // ageGroups      : response.data.ageGroups,
+               // memberList     : response.data.memberList,
+               // permissions    : response.data.permissions,
+               // areas          : response.data.areas
+               // });
+            // }            
+         // }
       
 			Axios.post(apiDomain+'_get_scheduling_data', _formData).then((response) => {
             if(localStorage) {
-               localStorage.setItem('allEvents', JSON.stringify(response.data.allEvents));  
+               localStorage.setItem('schedulingData', JSON.stringify(response.data));  
             }
 				commit('set_scheduling_data', {
               // conEvents      : response.data.conEvents, 
@@ -505,6 +538,7 @@
 		},
       
       
+      
       // SUBMIT EVENT 
       submit_event({commit}, event) {
          var vm = this;
@@ -513,10 +547,10 @@
             Axios.post(apiDomain+'_submit_event', event, {headers : 
             {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}}).then((response) => {		
                if(response.data.errors.length > 0) {
-                  reject(response.data);                  
+                  reject(response.data.errors);                  
                } else {
                   commit('set_con_event', response.data.event);
-                  resolve(response.data);            
+                  resolve(response.data.message);            
                }
             }, (err) => {
                console.log(err.statusText);
@@ -652,20 +686,25 @@
 		},		
 		
 		// SET USER 
-		set_user: (state,{ user}) => {
+		set_user: (state,user) => {
          if(user) {
-            state.user = user;
+            Vue.set(state, 'user', user);
          } else {
-            state.user = {};
+            Vue.set(state, 'user', {});
          }
 		},
       
       
-      //SET USER INFO   
-      set_userInfo: (state, {userInfo}) => {
+      //SET USER    
+      set_userInfo: (state, userInfo) => {
          console.log(userInfo);
          Vue.set(state, 'userInfo', userInfo);
       },
+      //SET USER INFO   
+      // set_userInfo: (state, userInfo) => {
+         // console.log(userInfo);
+         // Vue.set(state, 'userInfo', userInfo);
+      // },
       
       // SET CHECK EMAIL
       set_check_email: (state, emailInfo) => {
@@ -771,6 +810,11 @@
       set_schedulers: (state, permissions) => {
         Vue.set(state, 'schedulingPermissions', permissions);
       },
+      
+      // SET USER  EVENTS 
+      set_user_events: (state, userEvents) => {
+         Vue.set(state, 'userEvents', userEvents);
+      },
 	}
 	
 	const getters = {
@@ -807,6 +851,7 @@
       memberList     : state => state.memberList,
       schedulingPermissions: state => state.schedulingPermissions,
       conLocations   : state => state.conLocations,
+      userEvents     : state => state.userEvents,
 	}
 	
 	export default new Vuex.Store ({

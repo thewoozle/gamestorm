@@ -11,7 +11,7 @@
             </div>
             
             <div class="form_buttons"> 
-               <button type="button" class="form_button fa fa-refresh" @click.prevent="clear_event_form"></button>
+               <button type="button" class="form_button fal fa-redo-alt" @click.prevent="clear_event_form"></button>
             </div>	
             
             <div class="submission_intro ">
@@ -24,7 +24,7 @@
                <div class="form_row">
                   <label class="label" title="This can be a unique name of the event, or the generic name of the a game" >Event Name</label>
                   <div class="input_wrapper">
-                     <input class="input text_box" type="text" v-model="editEvent.event_name" @keyup="submitErrors.event_name = null"/> 
+                     <input class="input text_box" type="text" v-model="editEvent.event_name" @keyup="submitErrors.event_name = null" required /> 
                   </div>	
                   <span class="input_message" v-if="submitErrors.event_name" v-text="submitErrors.event_name[0]"></span> 
                </div>
@@ -32,7 +32,7 @@
                <div class="form_row">
                   <label class="label">Event Track</label>
                   <div class="input_wrapper">
-                     <select class="input select" v-model="editEvent.event_track"  @change="submitErrors.event_track = null"  >
+                     <select class="input select" v-model="editEvent.event_track"  @change="submitErrors.event_track = null" required >
                         <option value="" style="display: none">select event track</option>
                         
                         <option :value="track.id" v-for="track in eventTracks" v-text="track.track_name"></option>
@@ -46,8 +46,10 @@
                <div class="form_row " >
                   <div class="form_element designer_element">
                      <label class="label">GM is Designer</label>
-                     <div class="checkbox_wrapper input_wrapper">
-                        <input class="checkbox " type="checkbox" v-model="editEvent.gm_designer"  value="1" placeholder="GM is Designer" /> 
+                     <div class="input_wrapper" >
+                        <span class="checkbox_wrapper fal" :class="editEvent.gm_designer? 'fa-check-square' : 'fa-square'">
+                           <input class="checkbox " type="checkbox" v-model="editEvent.gm_designer"  value="1" placeholder="GM is Designer" />
+                        </span>
                      </div>
                      <span class="input_message" v-if="submitErrors.gm_designer" v-text="submitErrors.gm_designer[0]"></span> 
                   </div>
@@ -66,13 +68,13 @@
                   <div class="form_element">
                      <label class="label">Event Day / Time </label>
                      <div class="input_wrapper">
-                        <datetime type="datetime" v-model="editEvent.event_start_time"  min-datetime="2019-03-01" max-datetime="2019-03-03"></datetime> 
+                        <datetime type="datetime" v-model="editEvent.event_start_time"  min-datetime="2019-03-01" max-datetime="2019-03-03"  ></datetime> 
                      </div>
                   </div>   
                   <div class="form_element">
                      <label class="label">Event Duration</label>
                      <div class="input_wrapper">
-                        <select class="select" v-model="editEvent.duration">
+                        <select class="select" v-model="editEvent.event_duration" required>
                            <option value="" style="display: none;">Duration</option>
                            <option value=".5">30 minutes</option>
                            <option value="1">1 Hour</option>
@@ -89,10 +91,12 @@
                            <option value="16">16 hours</option>
                            <option value="20">20 hours</option>
                            <option value="24">24 hours</option>
+                           <option value="99">Special (as noted)</option>
                         </select>
                      </div>
                   </div>
-                  <span class="footnote"> Event duration may not be greater than 24 hours. If you need more time, use 'notes' below</span> 
+                  <span class="footnote">If you need the event duration greater than 24 hours. use 'notes' below</span> 
+                  <span class="input_message" v-if="submitErrors.event_duration">Please include a duration for the event</span>
                </div>
                
                
@@ -100,17 +104,18 @@
                   <div class="form_element">
                      <label class="label">Number of Players<br/>(besides presenter)</label>
                      <div class="input_wrapper">
-                        <input class="text_box num_players_box" type="number" min="1" max="100" v-model="editEvent.seats"  placeholder="1"   />
+                        <input class="text_box num_players_box" type="number" min="2" max="100" v-model="editEvent.seats"  placeholder="2"  required />
                      </div>	
                   </div>
                   <div class="form_element " >
                      <label class="label">GM is player</label>
-                     <div class="checkbox_wrapper" >
-                        <div class="input_wrapper">
-                           <input class="checkbox" type="checkbox" v-model="editEvent.gm_player" value="1" placeholder="will you be playing the game" /> 
-                        </div>
-                        <span class="input_message" v-if="submitErrors.event_duration">Event duration may not be greater than 24 hours</span>
+                     
+                     <div class="input_wrapper" >
+                        <span class="checkbox_wrapper fal" :class="editEvent.gm_player? 'fa-check-square' : 'fa-square'">
+                           <input class="checkbox " type="checkbox" v-model="editEvent.gm_player"  value="1" placeholder="GM is Player" />
+                        </span>
                      </div>
+                                          
                   </div>
                </div>
 
@@ -119,7 +124,7 @@
                   <div class="form_element">
                      <label class="label">Event Type</label>
                      <div class="input_wrapper">
-                        <select class="select" name="event_type" v-model="editEvent.event_type"  >												
+                        <select class="select" name="event_type" v-model="editEvent.event_type" required >												
                            <option value="" style="display: none">select event type</option>                        
                            <option :value="type.id" v-for="type in eventTypes" v-text="type.type_name"></option>                        
                         </select>
@@ -130,7 +135,7 @@
                   <div class="form_element">
                      <label class="label">Table Shape</label>
                      <div class="input_wrapper">
-                        <select class="select" name="table_requested" v-model="editEvent.table_requested" >
+                        <select class="select" name="table_requested" v-model="editEvent.table_requested" required  >
                            <option value="" style="display: none">select table shape</option>
                            <option value="none" >None</option>
                            <option value="noPref" >No Preference</option>
@@ -149,7 +154,7 @@
                   <div class="form_element">
                      <label class="label">Experience Level</label>
                      <div class="input_wrapper">
-                        <select class="select" name="experience_level"  v-model="editEvent.experience_level" >
+                        <select class="select" name="experience_level"  v-model="editEvent.experience_level" required  >
                            <option value="" style="display: none">select experience level</option>
                            <option value="none" >No Experience</option>
                            <option value="beginner" >Beginner</option>
@@ -163,7 +168,7 @@
                   <div class="form_element">  
                      <label class="label">Age Group</label>
                      <div class="input_wrapper">
-                        <select class="select" name="age_category" v-model="editEvent.age_category" >
+                        <select class="select" name="age_category" v-model="editEvent.age_category" required  >
                            <option value="" style="display: none">select age group</option>                           
                            <option :value="age.id" v-for="age in ageGroups" v-text="age.age_text"></option>
                         </select>		
@@ -183,8 +188,8 @@
 													
                <div class="form_row">
                   <label class="label">Short Description</label>
-                  <div class="input_wrapper">
-                     <textarea class="textarea"  placeholder="400 char max."  v-model="editEvent.short_description" maxlength = "400"  /></textarea> 
+                  <div class="input_wrapper"  required >
+                     <textarea class="textarea"  placeholder="400 char max."  v-model="editEvent.short_description" maxlength = "400" required  /></textarea> 
                   </div>
                   <span class="input_message" v-if="submitErrors.short_description" v-text="submitErrors.short_description[0]" ></span> 
                </div>
@@ -263,11 +268,18 @@
             vm.editEvent.table_requested= '';
             vm.editEvent.uuid = vm.user.uuid;
          },
+         
+         
          methods: {
             submit_event(e) {
                var vm = this;
                vm.$store.dispatch('submit_event', vm.editEvent).then((response) => {
-                  
+                  if(response.errors) {
+                     vm.submitErrors = response.errors;
+                  } else {
+                     vm.submitErrors = {};
+                     vm.clear_event_form();
+                  }
                });            
             },
             
@@ -313,6 +325,9 @@
 	<style>
       .events_placeholder .event_submission_form {
          margin-bottom: 2rem;
+      }
+      .events_placeholder .rows {
+         margin-top: 1.5rem;
       }
       .events_placeholder .title {
          display: flex;

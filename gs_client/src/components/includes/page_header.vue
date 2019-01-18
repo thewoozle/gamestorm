@@ -28,7 +28,7 @@
 							
 							<div class="column">							
 								<router-link v-if="user.permissions && user.permissions.admin > 0" :to="'/admin'" class="button" >Admin</router-link>								
-								<button type="button" class="button" @click="logout">Sign Out</button>
+								<button type="button" class="button" @click.prevent="logout">Sign Out</button>
 							</div>
 						</div>						
 					</div>
@@ -325,7 +325,7 @@
 					showLoginLoading	: false,
                newUser           : {},
                validatePassword  : false,
-               showPassword      : false,
+               showPassword      : 'password',
                reset_email       :'',
 				}
 			},
@@ -424,6 +424,7 @@
 					
 					vm.$store.dispatch('submit_login', loginInfo).then((response) => {
                   
+                  vm.$store.dispatch('get_users_events', response.user.uuid);
                      vm.showLoginLoading = false;
                      if (response.response.message) {
                         
@@ -442,7 +443,10 @@
                      vm.submitErrors = err;
                   vm.showLoginLoading = false;
                });
-					
+					vm.$route.name == 'mainpage'? '' : vm.$router.push({name: 'mainpage'});
+               vm.showLoginDropdown = false;
+               vm.email = null;
+               vm.password = null;
 				},
 				
 				
@@ -451,9 +455,9 @@
 					-----------------------------------------------------------	*/
 				logout(e) {
 					var vm = this;
-					vm.$store.dispatch('update_user', {});	
-               Vue.ls.remove('user');
-					vm.$router.go({name: 'mainpage'});
+					vm.$store.dispatch('update_user' ).then(()=>{
+                  vm.$route.name == 'mainpage'? '' : vm.$router.push({name: 'mainpage'});
+               });
 				},
             
             /* -----------------------------------------------------------
