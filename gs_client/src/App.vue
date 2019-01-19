@@ -80,7 +80,8 @@
                      </section>
                      
                      <section class="section event_display">
-                        <user_events_list v-if="userEvents.length > 0" />
+                        <user_events_list v-if="userEvents" />
+                        <span class="loading" v-else >Loading...</span>
                      </section>
                   </div>
                   
@@ -160,7 +161,8 @@
                _urlParams;
             _urlParams = new URL(window.location.href).searchParams.has('c');
             _urlParams? vm.urlParams.c = new URL(window.location.href).searchParams.get('c') : vm.urlParams = {}; 
-				vm.handle_page_load();           
+            vm.$store.dispatch('get_site_data').then(()=>{});
+				vm.handle_page_load();  
 		  },
 		  
 		  computed: {
@@ -2204,12 +2206,18 @@
       }
          
       .events_placeholder .event_display{
+         position: relative;
          display: flex;
          width: 30%;
       }
-      .events_placeholder {
-         
-         
+      .events_placeholder .event_display .loading {
+         position: absolute;
+         left: 0;
+         top: 2rem;
+         color: #999;
+         font-weight: 100;
+         width: 100%;
+         text-align: center;
       }
 		
 	

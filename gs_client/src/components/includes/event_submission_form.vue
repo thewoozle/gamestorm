@@ -32,10 +32,10 @@
                <div class="form_row">
                   <label class="label">Event Track</label>
                   <div class="input_wrapper">
-                     <select class="input select" v-model="editEvent.event_track"  @change="submitErrors.event_track = null" required >
+                     <select class="input select" v-model="editEvent.event_track"  @change="() => {submitErrors.event_track = null; event_has_system();}" required >
                         <option value="" style="display: none">select event track</option>
                         
-                        <option :value="track.id" v-for="track in eventTracks" v-text="track.track_name"></option>
+                        <option :value="track.id" v-for="track in eventTracks" v-if="track.public == 1" v-text="track.track_name"></option>
                         
                      </select>
                   </div>	
@@ -48,12 +48,12 @@
                      <label class="label">GM is Designer</label>
                      <div class="input_wrapper" >
                         <span class="checkbox_wrapper fal" :class="editEvent.gm_designer? 'fa-check-square' : 'fa-square'">
-                           <input class="checkbox " type="checkbox" v-model="editEvent.gm_designer"  value="1" placeholder="GM is Designer" />
+                           <input class="checkbox " type="checkbox" v-model="editEvent.gm_designer"  :value="1" placeholder="GM is Designer" />
                         </span>
                      </div>
                      <span class="input_message" v-if="submitErrors.gm_designer" v-text="submitErrors.gm_designer[0]"></span> 
                   </div>
-                  <div class="form_element system_element expanding_row" :class="editEvent.gm_designer == 1? 'show' : ''">
+                  <div class="form_element system_element expanding_row" :class="eventHasSystem? 'show' : ''">
                      <label class="label">Game System</label>
                      <div class="input_wrapper">
                         <input class="input text_box" type="text"  v-model="editEvent.event_system"  name="event_system" /> 	
@@ -102,9 +102,9 @@
                
                <div class="form_row players">
                   <div class="form_element">
-                     <label class="label">Number of Players<br/>(besides presenter)</label>
+                     <label class="label">Number of Players<br/>(besides GM)</label>
                      <div class="input_wrapper">
-                        <input class="text_box num_players_box" type="number" min="2" max="100" v-model="editEvent.seats"  placeholder="2"  required />
+                        <input class="text_box num_players_box" type="number" min="2" max="100" v-model="editEvent.seats"  placeholder="0"  required />
                      </div>	
                   </div>
                   <div class="form_element " >
@@ -112,10 +112,9 @@
                      
                      <div class="input_wrapper" >
                         <span class="checkbox_wrapper fal" :class="editEvent.gm_player? 'fa-check-square' : 'fa-square'">
-                           <input class="checkbox " type="checkbox" v-model="editEvent.gm_player"  value="1" placeholder="GM is Player" />
+                           <input class="checkbox " type="checkbox" v-model="editEvent.gm_player"  :value="1" placeholder="GM is Player" />
                         </span>
                      </div>
-                                          
                   </div>
                </div>
 
@@ -233,8 +232,9 @@
          
          data() {
             return{
-               editEvent: {},
-               submitErrors: {},
+               editEvent      : {},
+               submitErrors   : {},
+               eventHasSystem : false,
             }
          },
          
@@ -273,7 +273,15 @@
          methods: {
             submit_event(e) {
                var vm = this;
+               console.log(vm.editEvent.gm_designer);
+               vm.editEvent.gm_designer? vm.editEvent.gm_designer = 1: '';
+               vm.editEvent.gm_player? vm.editEvent.gm_player = 1: '';
+               
                vm.$store.dispatch('submit_event', vm.editEvent).then((response) => {
+                  vm.$store.dispatch('get_users_events', vm.user.uuid).then((response)=>{
+                     console.log(response);
+                  });
+                  
                   if(response.errors) {
                      vm.submitErrors = response.errors;
                   } else {
@@ -281,6 +289,26 @@
                      vm.clear_event_form();
                   }
                });            
+            },
+            
+            event_has_system() {
+               var   vm = this,
+                     hasSystem = false;
+               switch(vm.editEvent.event_track) {
+                  case 10:
+                  case 14:
+                  case 17:
+                  case 18:
+                  case 19:
+                  case 20:
+                  case 21:
+                     hasSystem = true;
+                     break;
+                  default:
+                     hasSystem = false;
+               }
+               vm.eventHasSystem = hasSystem;
+               console.log(vm.editEvent.event_track);
             },
             
             clear_event_form() {
@@ -324,7 +352,11 @@
 	
 	<style>
       .events_placeholder .event_submission_form {
+         position: relative;
          margin-bottom: 2rem;
+      }
+      .events_placeholder .event_submission_form .form_buttons {
+         top: -1rem;
       }
       .events_placeholder .rows {
          margin-top: 1.5rem;

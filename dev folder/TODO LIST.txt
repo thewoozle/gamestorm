@@ -1,5 +1,4 @@
 
-   01/11
    
       event_submission_form needs current con tag
       
@@ -10,5 +9,8 @@
       
       account - 
          multiple email addresses login
+         
+      registration 
+         add membership credit for rollovers. 
    
    

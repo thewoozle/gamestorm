@@ -58,7 +58,7 @@
       conLocations   : {},
       memberList     : {},
       timeblocks     : [],
-      userEvents     : {},
+      userEvents     : null,
 	}
 	
 	const actions = {
@@ -217,9 +217,10 @@
       
       // GET USERS EVENTS 
       get_users_events({commit}, uuid) {
+         console.log('THIS');
          Axios.post(apiDomain+'_get_users_events', {uuid: uuid}, {
             headers : {'Content-Type' : 'application/x-www-form-urlencoded;  charset=UTF-8' }
-         }).then((response) => {
+         }).then((response) => {            
             commit('set_user_events', response.data.userEvents);
          }, (err) => {
             console.log(err);
@@ -725,7 +726,6 @@
                
                state.members.forEach((_member)=>{
                   if(_member.uuid == member.uuid) {
-                     console.log('update match');
                      _member = member;
                      inMembers = true;
                   } 

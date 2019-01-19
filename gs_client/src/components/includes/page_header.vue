@@ -1,12 +1,14 @@
 
 	<template>
 
-			<div  id="page_header" class="header_inner":class="pageName == 'mainpage' ? '' : 'minimized'"> 					
+			<div  id="page_header" class="header_inner":class="pageName == 'mainpage' ? '' : 'minimized'"> 	
+<!--         
 				<router-link :to="'/'" class="nav_link header_logo">
 					<span class="gs_num">{{conventionInfo.con_num}}</span>						
 				</router-link>
-				
-				
+-->			
+				<a href="https://gamestorm.org" class="nav_link header_logo"><span class="gs_num">{{conventionInfo.con_num}}</span></a>
+            
 				<div class="header_element convention_element">
 					<div class="con_info">
 						<span class="item date">{{date(conventionInfo.start_date_time)}}</span>
@@ -596,7 +598,7 @@
 	}	
 	
 	#page_header .header_logo:active {
-		transform: translateY(0);
+		/*transform: translateY(0);*/
 	}
 	#page_header .gs_num{
 		position: absolute; 
