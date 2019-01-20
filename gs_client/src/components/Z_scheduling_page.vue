@@ -31,8 +31,11 @@
                   <button type="button" class="control_button fal" :class="expandScheduleBox? 'fa-minus-square' : 'fa-expand-arrows-alt'" @click="expandScheduleBox? expandScheduleBox = false : expandScheduleBox = true"></button>
 					</div>
 					<div class="boxes">
-                  <scheduling_alerts v-if="schedulingTab == 'alerts'"/>
-                  
+						<div class="box alerts"  :class="schedulingTab == 'alerts'? 'active' : '' " >
+							ALERTS</br>
+							<p> event submissions, conflicts, scheduler area status </p>
+						</div>
+						
 						
                   
                   <!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -523,7 +526,6 @@
 		import convention_select from '@/components/includes/convention_select'
       import schedule_grid from '@/components/includes/schedule_grid'
 		import scheduling_control_panel from '@/components/includes/scheduling_control_panel'
-      import scheduling_alerts from '@/components/includes/scheduling_alerts'
 		
 		Vue.use(Router);
 		
@@ -566,8 +568,7 @@
 				'convention_select'	      : convention_select,
 				'scheduling_control_panel' : scheduling_control_panel,
             'event_form'               : event_form,
-            'schedule_grid'            : schedule_grid,
-            'scheduling_alerts'        : scheduling_alerts,
+            'schedule_grid'            : schedule_grid
 			},
 			
 			
@@ -1024,15 +1025,14 @@
 	}
 	
 	
-	.schedulingpage page_header {
+	.section.scheduling_header {
 		justify-content: space-around;
-		height: 4rem;		
+		
+		
 	}
-   .schedulingpage .main_content {
-      margin-top: 2rem;
-   }
 	.scheduling_header  .con_controls {
-		display: flex;		
+		display: flex;
+		
 	}
 	
 	.scheduling_report {

@@ -63,12 +63,56 @@
                
                
                <div class="form_row event_time_row">
-                  <input type="hidden"  v-model="editEvent.eventDay" />
-                  <input type="hidden" v-model="editEvent.event_duration" />
                   <div class="form_element">
                      <label class="label">Event Day / Time </label>
                      <div class="input_wrapper">
+                     <!--
                         <datetime type="datetime" v-model="editEvent.event_start_time"  min-datetime="2019-03-01" max-datetime="2019-03-03"  ></datetime> 
+                     -->   
+                        <select class="select" v-model="editEvent.event_start_day"   required >
+                           <option value="" style="display: none;">Day...</option>
+                           <option value="2019-03-28">Thur, Mar 28th</option>
+                           <option value="2019-03-29">Fri, Mar 29th</option>
+                           <option value="2019-03-30">Sat, Mar 30th</option>
+                           <option value="2019-03-31">Sun, Mar 31st</option>
+                        </select>
+                        
+                        <select class="select" v-model="editEvent.event_start_hour"  required >
+                           <option value="" style="display: none;">Time...</option>
+                           <option value="08:00" >8am</option>
+                           <option value="08:30" >8:30</option>
+                           <option value="09:00" >9am</option>
+                           <option value="09:30" >9:30</option>
+                           <option value="10:00" >10am</option>
+                           <option value="10:30" >10:30</option>
+                           <option value="11:00" >11am</option>
+                           <option value="11:30" >11:30</option>
+                           <option value="12:00" >12pm</option>
+                           <option value="12:30" >12:30</option>
+                           <option value="13:00" >1pm</option>
+                           <option value="13:30" >1:30</option>
+                           <option value="14:00" >2pm</option>
+                           <option value="14:30" >2:30</option>
+                           <option value="15:00" >3pm</option>
+                           <option value="16:30" >3:30</option>
+                           <option value="16:00" >4pm</option>
+                           <option value="16:30" >4:30</option>
+                           <option value="17:00" >5pm</option>
+                           <option value="17:30" >5:30</option>
+                           <option value="18:00" >6pm</option>
+                           <option value="19:30" >6:30</option>
+                           <option value="19:00" >7pm</option>
+                           <option value="19:30" >7:30</option>
+                           <option value="20:00" >8pm</option>
+                           <option value="20:30" >8:30</option>
+                           <option value="21:00" >9pm</option>
+                           <option value="21:30" >9:30</option>
+                           <option value="22:00" >10pm</option>
+                           <option value="22:30" >10:30</option>
+                           <option value="23:00" >11pm</option>
+                           <option value="23:30" >11:30</option>
+                           <option value="00:00" >12am</option>
+                        </select>
                      </div>
                   </div>   
                   <div class="form_element">
@@ -82,20 +126,21 @@
                            <option value="2">2 hours</option>
                            <option value="2.5">2&#189; hours</option>
                            <option value="3">3 hours</option>
+                           <option value="3.5">3&#189; hours</option>
                            <option value="4">4 hours</option>
+                           <option value="4.5">4&#189; hours</option>
                            <option value="5">5 hours</option>
+                           <option value="5.5">5&#189; hours</option>
                            <option value="6">6 hours</option>
+                           <option value="6.5">6&#189; hours</option>
                            <option value="8">8 hours</option>
                            <option value="10">10 hours</option>
                            <option value="12">12 hours</option>
-                           <option value="16">16 hours</option>
-                           <option value="20">20 hours</option>
-                           <option value="24">24 hours</option>
                            <option value="99">Special (as noted)</option>
                         </select>
                      </div>
                   </div>
-                  <span class="footnote">If you need the event duration greater than 24 hours. use 'notes' below</span> 
+                  <span class="footnote">If you need the event duration greater than 12 hours. use 'notes' below</span> 
                   <span class="input_message" v-if="submitErrors.event_duration">Please include a duration for the event</span>
                </div>
                
@@ -178,7 +223,7 @@
                
                
                <div class="form_row">
-                  <label class="label">Event URL</label>
+                  <label class="label">URL</label>
                   <div class="input_wrapper">
                      <input class="text_box" type="text"  v-model="editEvent.event_url"  placeholder="http://" /> 		
                   </div>
@@ -188,7 +233,7 @@
                <div class="form_row">
                   <label class="label">Short Description</label>
                   <div class="input_wrapper"  required >
-                     <textarea class="textarea"  placeholder="400 char max."  v-model="editEvent.short_description" maxlength = "400" required  /></textarea> 
+                     <textarea class="textarea"  placeholder="100 char min, 400 char max."  v-model="editEvent.short_description" maxlength = "400" required  /></textarea> 
                   </div>
                   <span class="input_message" v-if="submitErrors.short_description" v-text="submitErrors.short_description[0]" ></span> 
                </div>
@@ -265,7 +310,9 @@
             vm.editEvent.duration      = ''; 
             vm.editEvent.age_category  = ''; 
             vm.editEvent.experience_level= '';
-            vm.editEvent.table_requested= '';
+            vm.editEvent.event_start_day = '2019-03-28';
+            vm.editEvent.event_start_hour = '12:00';
+            vm.editEvent.table_requested= 'noPref';
             vm.editEvent.uuid = vm.user.uuid;
          },
          
@@ -277,18 +324,23 @@
                vm.editEvent.gm_designer? vm.editEvent.gm_designer = 1: '';
                vm.editEvent.gm_player? vm.editEvent.gm_player = 1: '';
                
+               vm.editEvent.event_start_time = vm.editEvent.event_start_day+' '+vm.editEvent.event_start_hour+':00';
+               
                vm.$store.dispatch('submit_event', vm.editEvent).then((response) => {
                   vm.$store.dispatch('get_users_events', vm.user.uuid).then((response)=>{
                      console.log(response);
-                  });
                   
-                  if(response.errors) {
-                     vm.submitErrors = response.errors;
-                  } else {
-                     vm.submitErrors = {};
-                     vm.clear_event_form();
-                  }
-               });            
+                     if(response.errors) {
+                        console.log(response.errors);
+                        vm.submitErrors = response.errors;
+                     } else {
+                        vm.submitErrors = {};
+                     }
+                  });
+               vm.clear_event_form(); 
+               }, (err) => {
+                  console.log(err);
+               });           
             },
             
             event_has_system() {
@@ -308,8 +360,8 @@
                      hasSystem = false;
                }
                vm.eventHasSystem = hasSystem;
-               console.log(vm.editEvent.event_track);
             },
+            
             
             clear_event_form() {
                var vm = this;
@@ -319,7 +371,9 @@
                vm.editEvent.event_type       = '';
                vm.editEvent.age_category     = ''; 
                vm.editEvent.experience_level = '';
-               vm.editEvent.table_requested  = '';
+               vm.editEvent.event_start_day = '2019-03-28';
+               vm.editEvent.event_start_hour = '12:00';
+               vm.editEvent.table_requested  = 'noPref';
             },
             
             
@@ -365,8 +419,19 @@
          display: flex;
          width: 100%;
       }
+      
       .event_time_row {
          flex-wrap: wrap;
+      } 
+      .event_time_row .input_wrapper {
+         display: flex;
+         flex-wrap: wrap;
+      }
+      .event_time_row .select {
+         width: 100%;
+      }
+      .event_time_row .form_element + .form_element {
+         height: 50%;
       }
       .event_time_row .footnote {
          text-align: center;

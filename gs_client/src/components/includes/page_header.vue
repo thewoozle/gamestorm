@@ -256,12 +256,11 @@
                            <div class="controls">
 										<button type="submit" class="button">Reset</button>	
                               
-                              <button type="button" Class="info_button far fa-info-circle"></button>
-                              <p class="info_body">If you have forgotten your password or need to request a password reset, enter the email address that you've used for your GameStorm account 
+                              
+									</div>
+                              <p class="forgot_info" >If you have forgotten your password or need to request a password reset, enter the email address that you've used for your GameStorm account 
                                  and we will email a password reset link to you. That link will allow you to enter a new password and login. 
                               </p>	
-                                 
-									</div>
 								</form> 
 								
 							</div>
@@ -329,6 +328,7 @@
                validatePassword  : false,
                showPassword      : 'password',
                reset_email       :'',
+               showForgotInfo    : false,         
 				}
 			},
 			
@@ -793,6 +793,7 @@
 	
 	#page_header .user_controls .login_dropdown.show {
 		max-height: 15rem;
+      max-height: calc(100vh - 10%);
 		top: 10%;
 	}
 	#page_header .user_controls .login_dropdown .buttons {
@@ -879,7 +880,6 @@
    
    
 	#page_header .user_controls .login_dropdown.show.register {
-      max-height: calc(100vh - 10%);
    }
    
    #page_header .user_controls .login_dropdown.register .dropdown_section {
@@ -1153,6 +1153,16 @@
 		font-size: 1.75rem;
 		text-align: center;
 	}
+	#page_header .forgot_info { /*
+      position: absolute;
+         bottom: 0;
+         left: 0;
+         
+      background: rgba(80,0,0,.65);
+      */
+      padding: .75rem 1.5rem;
+   }
+   
 	
 	
 	

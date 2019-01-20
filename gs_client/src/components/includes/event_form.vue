@@ -329,7 +329,7 @@
                }	else {
                      vm.selectedCon = vm.currentCon.tag_name;
                }	
-               vm.$store.dispatch('get_scheduling_data', vm.selectedCon).then(()=>{});	
+               //vm.$store.dispatch('get_scheduling_data', vm.selectedCon).then(()=>{});	
                vm.get_con_locations();              
                vm.get_con_events();
                vm.get_event_signups();

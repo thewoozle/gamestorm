@@ -374,31 +374,34 @@
    
 		get_scheduling_data({commit}, selectedCon) {         
 			var vm = this,
-            _formData = new FormData();
-			_formData.append('con', selectedCon);			
+            _formData = new FormData(),
+            schedulingData = {};
+            
+         _formData.append('con', selectedCon);
          
-         // if(localStorage) {
-            // if(localStorage.schedulingData) {
-               // commit('set_scheduling_data', {
-               // venues         : JSON.parse(localStorage.schedulingData.venues, 
-               // conLocations   : response.data.conLocations, 
-               // allEvents      : response.data.allEvents,
-               // eventTypes     : response.data.eventTypes,
-               // eventTracks    : response.data.eventTracks,
-               // ageGroups      : response.data.ageGroups,
-               // memberList     : response.data.memberList,
-               // permissions    : response.data.permissions,
-               // areas          : response.data.areas
-               // });
-            // }            
-         // }
+         if(localStorage) {
+            if(localStorage.schedulingData) {
+               schedulingData = JSON.parse(localStorage.schedulingData);
+               commit('set_scheduling_data', {
+                  venues         : schedulingData.venues, 
+                  conLocations   : schedulingData.conLocations, 
+                  allEvents      : schedulingData.allEvents,
+                  eventTypes     : schedulingData.eventTypes,
+                  eventTracks    : schedulingData.eventTracks,
+                  ageGroups      : schedulingData.ageGroups,
+                  memberList     : schedulingData.memberList,
+                  permissions    : schedulingData.permissions,
+                  areas          : schedulingData.areas,
+               });
+            }            
+         }
       
 			Axios.post(apiDomain+'_get_scheduling_data', _formData).then((response) => {
             if(localStorage) {
                localStorage.setItem('schedulingData', JSON.stringify(response.data));  
             }
 				commit('set_scheduling_data', {
-              // conEvents      : response.data.conEvents, 
+               conEvents      : response.data.conEvents, 
                venues         : response.data.venues, 
                conLocations   : response.data.conLocations, 
                allEvents      : response.data.allEvents,
@@ -546,15 +549,16 @@
             
          return new Promise((resolve, reject) => {            
             Axios.post(apiDomain+'_submit_event', event, {headers : 
-            {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}}).then((response) => {		
-               if(response.data.errors.length > 0) {
-                  reject(response.data.errors);                  
-               } else {
+            {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}}).then((response) => {
+               // if(response.data.errors) {
+                  // reject(response.data.errors);                  
+               // } else {
                   commit('set_con_event', response.data.event);
                   resolve(response.data.message);            
-               }
+               //}
             }, (err) => {
-               console.log(err.statusText);
+               // console.log(err);
+               // reject(err.response.data.errors);
             });
          });
          

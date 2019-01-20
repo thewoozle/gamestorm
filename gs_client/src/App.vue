@@ -49,7 +49,8 @@
                   <button class="signin_button" id="sign-in_button" @click.prevent="showSignIn? showSignIn = false: showSignIn=true">Sign In @{{showSignIn}}</button>
                   
                <admin_page_header v-if="pageType == 'admin' " />		
-               <reg_page_header v-else-if="pageType == 'registration'" />		
+               <reg_page_header v-else-if="pageType == 'registration'" />	
+               <scheduling_page_header v-else-if="pageType == 'scheduling'" />		
                <page_header v-else />
                </header>
                
@@ -69,7 +70,7 @@
                
                <!-- EVENTS PLACEHOLDER -->
                <div class="events_placeholder" v-if="pageName == 'mainpage'" >
-                  <span class="section_title">GameStorm21 Events</span>
+                  <span class="section_title">GameStorm 21 Events</span>
                   <div class="sections" v-if="user.uuid">
                      <section class="section event_submission" >
                         <span class="title">Event Submission Form</span>
@@ -112,6 +113,7 @@
 		import page_header from '@/components/includes/page_header'
 		import admin_page_header from '@/components/includes/admin_page_header'
 		import reg_page_header from '@/components/includes/reg_page_header'
+		import scheduling_page_header from '@/components/includes/scheduling_page_header'
 		import main_menu from '@/components/includes/main_menu'	
 		import Router from 'vue-router'
 		
@@ -147,6 +149,7 @@
 		components: {
 			'page_header' 		: page_header ,
 			'admin_page_header'	: admin_page_header,
+         'scheduling_page_header': scheduling_page_header,
 			'reg_page_header'	: reg_page_header,
 			'main_menu' 		: main_menu,
 			'page_footer'		: page_footer,
@@ -295,11 +298,12 @@
 						
 					case 'registrationpage':
                case 'regreportspage':
-               case 'scheduling_page':
 						vm.pageType = 'registration';
-						console.log(vm.pageType);
 						break;
 					
+               case 'schedulingpage':
+                  vm.pageType = 'scheduling';
+                  break;
 					default: 
 						vm.pageType = 'public';
 				}
@@ -1742,6 +1746,7 @@
 		.select {         
 			border: solid 1px #777;
 			border-radius: .2em;
+         font-size: .9rem;
       }
 		.textarea {
 			min-height: 3rem;

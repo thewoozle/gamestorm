@@ -237,16 +237,26 @@
 							<div class="member_meta">	
 							
 								<div class="checkboxes">
+                        
+                        
 									<div class="input_wrapper checkbox_wrapper">
-										<input type="checkbox" class="checkbox" :class="member.email_contact? 'checked' : ''" v-model="member.email_contact" name="email_contact"  />
+                              <span class="checkbox_wrapper fal" :class="member.email_contact? 'fa-check-square' : 'fa-square'">
+                                 <input class="checkbox " type="checkbox" v-model="member.email_contact"  :value="1"  />
+                              </span>
 										<label >Email contact</label>
-									</div>	
-									<div class="input_wrapper checkbox_wrapper">
-										<input type="checkbox" class="checkbox" :class="member.gm_interest? 'checked' : ''" v-model="member.gm_interest" name="gm_interest"/>
+									</div>
+                           
+									<div class="input_wrapper checkbox_wrapper">                             
+                              <span class="checkbox_wrapper fal" :class="member.gm_interest? 'fa-check-square' : 'fa-square'">
+                                 <input class="checkbox " type="checkbox" v-model="member.gm_interest"  :value="1"  />
+                              </span>
 										<label >Run a Game interest</label>
 									</div>	
+                           
 									<div class="input_wrapper checkbox_wrapper">
-										<input type="checkbox" class="checkbox" :class="member.volunteer_interest? 'checked' : ''" v-model="member.volunteer_interest" name="volunteer_interest"/>
+                              <span class="checkbox_wrapper fal" :class="member.volunteer_interest? 'fa-check-square' : 'fa-square'">
+                                 <input class="checkbox " type="checkbox" v-model="member.volunteer_interest"  :value="1"  />
+                              </span>
 										<label >Volunteer Interest</label>
 									</div>
 								</div>	
@@ -307,20 +317,25 @@
 												<div class="input_wrapper">
 													<input type="text" class="text_box"  name="transaction_last_4" v-model="member.cc_last_4" placeholder="CC last 4" />	
 												</div>
-												
 										</div>
 										
 										<div class="form_row transaction_row" :class="member.transaction_method == '9'? 'show' : '' ">	
 												<div class="input_wrapper">
 													<input type="text" class="text_box"  name="transfered" v-model="member.transfered" placeholder="transfered from / to" />	
-												</div>
-												
+												</div>												
 										</div>
 									</div>	
 								</div>	
 								
 							</div>
-							
+                     
+							<div class="panel membership_credit" v-bind:class="member.transaction_method == '11'? 'show' : ''">                             
+                        <span class="checkbox_wrapper fal" :class="member.membership_credit? 'fa-check-square' : 'fa-square'">
+                           <input class="checkbox " type="checkbox" v-model="member.membership_credit"  :value="1"  />
+                        </span>
+												<label>MembershipCredit</label>
+                     </div>
+                     
 							<div class="panel staff_panel staff" v-bind:class="member.con_status == '15' || member.con_status == '21'? 'show' : ''">
 								<span class="title">Staff Info</span>
 								
@@ -975,12 +990,14 @@
 			margin-top: .5rem;
 			padding: .25rem 0;
 		}
+		.reg_form .panel.membership_credit,
 		.reg_form .panel.staff_panel {
 			max-height: 0;
 			overflow: hidden;
 			padding: 0 .5rem;
 			transition: max-height .4s, padding .4s;
 		}
+		.reg_form .panel.membership_credit.show,
 		.reg_form .panel.staff_panel.show {
 			max-height: 5rem;
 			padding: .5rem;
