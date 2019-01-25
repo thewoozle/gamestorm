@@ -47,7 +47,7 @@
 							<div class="buttons">
 								<button type="button" class="button"  :class="{'active':dropdownSection == 'login'}" @click.prevent="dropdownSection = 'login'">Sign in</button>
 								<button type="button" class="button"  :class="{'active':dropdownSection == 'help'}" @click.prevent="dropdownSection == 'help'? dropdownSection = 'login' : dropdownSection ='help'">Sign-in Help</button>
-								<button type="button" class="button"  :class="{'active':dropdownSection == 'register'}" @click.prevent="dropdownSection == 'register'? dropdownSection = 'login' : dropdownSection ='register' ">Register</button>
+								<button type="button" class="button"  :class="{'active':dropdownSection == 'register'}" @click.prevent="dropdownSection == 'register'? dropdownSection = 'login' : dropdownSection ='register' ">New Account</button>
 								<button type="button" class="close_button fal fa-times" @click="{showLoginDropdown = false; dropdownSection = 'login';}"></button>
 							</div>
 							
@@ -258,7 +258,8 @@
                               
                               
 									</div>
-                              <p class="forgot_info" >If you have forgotten your password or need to request a password reset, enter the email address that you've used for your GameStorm account 
+                              <p class="forgot_info" v-if="passwordResetMessage">{{passwordResetMessage}}</p>
+                              <p class="forgot_info" v-else >If you have forgotten your password or need to request a password reset, enter the email address that you've used for your GameStorm account 
                                  and we will email a password reset link to you. That link will allow you to enter a new password and login. 
                               </p>	
 								</form> 
@@ -329,6 +330,7 @@
                showPassword      : 'password',
                reset_email       :'',
                showForgotInfo    : false,         
+               passwordResetMessage: null,
 				}
 			},
 			
@@ -426,29 +428,32 @@
 					
 					vm.$store.dispatch('submit_login', loginInfo).then((response) => {
                   
-                  vm.$store.dispatch('get_users_events', response.user.uuid);
-                     vm.showLoginLoading = false;
-                     if (response.response.message) {
-                        
+                  vm.showLoginLoading = false;
+                  if(response.user.uuid) {                     
+                     vm.$store.dispatch('get_users_events', response.user.uuid);
+                     vm.showLoginDropdown = false;
+                  } 
+                  if (response.response.message) {
                         // show response message for two seconds
-                        vm.loginMessage = response.response.message;		
-                        console.log('fix login message');
-                           setTimeout(function() {
-                           vm.loginMessage = null;
-                           },2000);
-                     } 
-                     if (response.users) {
-                        vm.loginUsers = response.users;
-                     }	
-                     
+                        vm.loginMessage = response.response.message;	
+                           
+                  } 
+                  if (response.users) {
+                     vm.loginUsers = response.users;
+                  }	
+                   
                }, (err) => {
                      vm.submitErrors = err;
                   vm.showLoginLoading = false;
                });
 					vm.$route.name == 'mainpage'? '' : vm.$router.push({name: 'mainpage'});
-               vm.showLoginDropdown = false;
                vm.email = null;
                vm.password = null;
+               setTimeout(function() {
+                  vm.loginMessage = null;
+                  vm.submitErrors= {};
+                  vm.showPassword = 'password';
+               },3000);  
 				},
 				
 				
@@ -459,6 +464,8 @@
 					var vm = this;
 					vm.$store.dispatch('update_user' ).then(()=>{
                   vm.$route.name == 'mainpage'? '' : vm.$router.push({name: 'mainpage'});
+                  vm.showPassword = 'password';
+                  vm.dropdownSection = 'login';
                });
 				},
             
@@ -470,15 +477,9 @@
                vm.newUser.password = vm.newPassword;
                vm.$store.dispatch('submit_new_user', vm.newUser).then((response) => {
                   if(response == 'success') {
-                     
-                     
-                     
+                                          
                         // show response message for two seconds
                         vm.loginMessage = response;		
-                        console.log('fix login message');
-                           setTimeout(function() {
-                           vm.loginMessage = null;
-                           },3000);
                            
                            
                      vm.dropdownSection = 'login';
@@ -487,14 +488,22 @@
                   } else {
                      
                         // show response message for two seconds
-                        vm.loginMessage = response;		
-                        console.log('fix login message');
-                           setTimeout(function() {
-                           vm.loginMessage = null;
-                           },3000);
+                        vm.loginMessage = response;
                   }
+                  
+                  setTimeout(function() {
+                     vm.loginMessage = null;
+                     vm.submitErrors= {};
+                  },3000);
+                  
                }, (err) => {
                   vm.submitErrors = err;
+                  setTimeout(function() {
+                     vm.loginMessage = null;
+                     vm.submitErrors= {};
+                     vm.dropdownSection = 'login';
+                     vm.showPassword = 'password';
+                  },3000);
                });
                
             },
@@ -506,9 +515,26 @@
 					var 	vm = this;
 							
 					vm.$store.dispatch('reset_password', vm.reset_email).then((response) => {
-                  console.log(response);
+                  vm.passwordResetMessage = response.response.message;
+                  vm.reset_email = '';
+                  
+                  setTimeout(function() {                   
+                     if(response.response.success == 'sent') {
+                        vm.passwordResetMessage = null;  
+                        vm.showLoginDropdown = false;
+                        vm.submitErrors = {};
+                     } 
+                  },4000);
+                  
+                  
+                  
                }, (err) => {
-                  vm.subitErrors = err;
+                  vm.passwordResetMessage = err.email;
+                  setTimeout(function() {
+                     vm.passwordResetMessage = null;
+                     vm.dropdownSection = 'login';
+                     vm.showPassword = 'password';
+                  },4000);
                });	
 						
 				},

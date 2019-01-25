@@ -5,24 +5,28 @@
          add membership credit for rollovers. 
          - make controller handle data 
          
-         update event controller to handle event tags in [GS]_events
-         - not saving
+         re-doing scheduling system
       
       
       TODO
 
-   
+      Navigation
+         add info and connect views
+         
       
       registration: deactivate member still shows in member list
       
+      
       New Account-
          send email conf. 
+         
       
       account - 
          multiple email addresses login
          
-      registration 
-   
+         
+         
+         
    
       scheduling
          redo control panel with big display boxes and simple pie chart
@@ -31,4 +35,10 @@
          
          get actual events being submitted
          change event-save to create proper tags
+         
+         add mass-upload from csv
    
+   
+   
+      store
+         create

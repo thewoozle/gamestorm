@@ -41,9 +41,9 @@
             
          </div>
       
-         <div class="main_page" v-else>      
-         
-            <main_menu class="main_menu "  v-if="pageType == 'public' "/>
+         <div class="main_page" v-else>         
+            <!-- REMOVE HIDDEN CLASS-->
+            <main_menu class="main_menu hidden"  v-if="pageType == 'public' "/>
                <header class="page_header">
                
                   <button class="signin_button" id="sign-in_button" @click.prevent="showSignIn? showSignIn = false: showSignIn=true">Sign In @{{showSignIn}}</button>
@@ -55,39 +55,49 @@
                </header>
                
                
+               
               
+            
+            
+            
+            
+            
+            
+            <!-- REMOVE HIDDEN CLASS-->
             <main class="main_content " ref="main_content" @scroll="handle_page_scroll">
                
                
-               <router-view class="main_view"/>
                
+               <!-- EVENTS PLACEHOLDER -->
+               <div class="events_placeholder" v-if="pageName == 'mainpage'" >
+                  <span class="section_title">GameStorm 21 Events</span>
+                  <div class="sections" v-if="user.uuid">
+                     <section class="section event_submission" >
+                        <span class="title">Event Submission Form</span>
+                        <span class="subtitle" v-text="'( Submission Deadline: '+ month_day_year(currentCon.event_submissions_close)+' )'"></span>
+                        
+                        <event_submission_form  />
+                        
+                     </section>
+                     
+                     <section class="section event_display">
+                        <user_events_list v-if="userEvents" />
+                        <span class="loading" v-else >Loading...</span>
+                     </section>
+                  </div>
+                  
+                  <div class="login_message" v-else >
+                     <p>Please Sign-in to  submit events</p>
+                  </div>
+                  
+               </div>   
                
-                     <!-- EVENTS PLACEHOLDER
-                     <div class="events_placeholder" v-if="pageName == 'mainpage'" >
-                        <span class="section_title">GameStorm 21 Events</span>
-                        <div class="sections" v-if="user.uuid">
-                           <section class="section event_submission" >
-                              <span class="title">Event Submission Form</span>
-                              <span class="subtitle" v-text="'( Submission Deadline: '+ month_day_year(currentCon.event_submissions_close)+' )'"></span>
-                              
-                              <event_submission_form  />
-                              
-                           </section>
-                           
-                           <section class="section event_display">
-                              <user_events_list v-if="userEvents" />
-                              <span class="loading" v-else >Loading...</span>
-                           </section>
-                        </div>
-                        
-                        <div class="login_message" v-else >
-                           <p>Please Sign-in to  submit events</p>
-                        </div>
-                        
-                     </div>   
-                      -->
-                
-               <page_footer v-if="pageType == 'public' " />
+               <div v-else>
+                  <router-view class="main_view"/>
+                  
+                  <page_footer v-if="pageType == 'public' " />
+               </div>
+
             </main>
             
          </div>   
@@ -122,7 +132,7 @@
 			return {
 				pageClasses	: [],
 				topdistance	: 0,
-				pageType	   : 'public',
+				pageType	   : '',
 				showSignIn  : false,
             showDevNotes: false,
             showPassword: false,
@@ -1943,11 +1953,6 @@
 			width: 100vw;
 			height: 100vh;
 		}
-      .main_page {
-         position: relative;
-         display: flex;
-         min-height: 100vh;
-      }
 		.page_wrapper.admin {
 			background: #f3fcff;
 		}
@@ -1978,7 +1983,7 @@
 		}
 		.main_content {
 			font-size: 1rem;
-			height: calc(100vh - 6rem);
+			height: calc(100% - 6rem);
 			width: 100%;
 			margin-top: 6rem;
 			padding-top: 1rem;

@@ -320,7 +320,7 @@
          methods: {
             submit_event(e) {
                var vm = this;
-               console.log(vm.editEvent.gm_designer);
+               vm.editEvent.uuid = vm.user.uuid;
                vm.editEvent.gm_designer? vm.editEvent.gm_designer = 1: '';
                vm.editEvent.gm_player? vm.editEvent.gm_player = 1: '';
                

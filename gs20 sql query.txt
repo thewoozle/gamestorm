@@ -20,3 +20,12 @@
    SELECT * FROM `gs_21_membership` g
    INNER JOIN `users` u ON g.con_uuid = u.uuid
    WHERE g.con_status = 14
+
+   
+   SELECT count(*), track_name, type_name' FROM `events` e
+   inner join `gs_21_events` g on g.con_event_id = e.event_id
+   inner Join `gs_21_participants` p on p.event_id = e.event_id
+   inner join `event_tracks` t on t.id = e.event_track
+   inner join `event_types` x on x.id = e.event_type   
+   inner Join `users` u on u.uuid = p.event_uuid
+   Where e.created_at> '2019-01-17'

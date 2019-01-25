@@ -66,6 +66,7 @@
 		// GET SITE DATA
 		get_site_data ({commit}) {
 				Axios.get(apiDomain+ '_get_site_data').then((response) => {
+				//Axios.get('https://new.gamestorm.org/public/api/_get_site_data').then((response) => {
 					commit('set_site_data', {
 						info		: response.data.convention, 
 						pageContent	: response.data.pageContent,
@@ -124,7 +125,6 @@
       
       // UPDATE USER INFO
       update_user_info({commit}, userInfo) {
-         console.log(userInfo);
          return new Promise((resolve, reject) => {
             var   vm = this,
                   _formData = new FormData();
@@ -185,23 +185,25 @@
                resolve(response.data);         
 
             },(err) => {
-               reject(err.response.data.errors );
-               console.log(err.statusText);
+               console.log(err);
                console.log(err.response.data.errors);
+               reject(err.response.data.errors );
             });
          });         
       },
       
       // RESET PASSWORD
       reset_password({commit}, email) {
-         Axios.post(apiDomain+'_password_reset_request',  {email : email }, {
-            headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
-         }).then((response) => {
-            console.log(response);
-         }, (err) => {
-            console.log(err);
-         });
          
+         return new Promise((resolve, reject) =>{
+            Axios.post(apiDomain+'_password_reset_request',  {email : email }, {
+               headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+            }).then((response) => {
+               resolve(response.data);
+            }, (err) => {
+               reject(err.response.data.errors);
+            });
+         });
       },
       
       // UPDATE PASSWORD
@@ -217,7 +219,6 @@
       
       // GET USERS EVENTS 
       get_users_events({commit}, uuid) {
-         console.log('THIS');
          Axios.post(apiDomain+'_get_users_events', {uuid: uuid}, {
             headers : {'Content-Type' : 'application/x-www-form-urlencoded;  charset=UTF-8' }
          }).then((response) => {            
@@ -531,6 +532,7 @@
          }             
          
          Axios.post(apiDomain+'_get_con_events', _formData).then((response) => {
+         //Axios.post('https://new.gamestorm.org/public/api/_get_con_events', _formData).then((response) => {
             if(localStorage) {
                localStorage.setItem('conEvents', JSON.stringify(response.data.events));
             }   

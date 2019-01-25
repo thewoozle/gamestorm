@@ -19,10 +19,10 @@
 								<router-link :to="'/'" class="nav_link">Home Page</router-link>
 								
 											
-								<router-link :to="'/account'" class="nav_link" >My Account</router-link>
+								<router-link :to="'/account'" class="nav_link" v-if="user.uuid" >My Account</router-link>
 								<router-link :to="'/my_convention'" class="nav_link" >My Convention</router-link>
 								
-								<router-link  :to="'/signin?action=register'" class="nav_link">Register</router-link>	
+								<router-link  :to="'/signin?action=register'" class="nav_link" v-if="!user.uuid">New Account</router-link>	
 								
 								<router-link :to="'/shop'" class="nav_link"  >Merch</router-link>
 								<router-link :to="'/connect'" class="nav_link"  >Connect</router-link>
@@ -50,7 +50,7 @@
 							</div>					
 						</div>				
 					</div>				
-					
+				<!--
 					<div class="nav_section">
 						<div class="nav_link_wrapper" >
 							<router-link class="nav_link nav_link_tile" :to="'/events'">
@@ -60,15 +60,15 @@
 								<span class="text_wrapper"><span class="text">Events</span></span>
 							</router-link>
 							<div class="nav_sublinks">
-							<!--
 								<router-link class="nav_link">Event List</router-link>
-								<router-link class="nav_link">Run an Event</router-link>
+								<router-link class="nav_link">Submit an Event</router-link>
 								<router-link class="nav_link">My Events</router-link>
-							-->
 							</div>					
 						</div>				
-					</div>				
-					<!--
+					</div>	
+
+            -->               
+				<!--
 					<div class="nav_section">
 						<div class="nav_link_wrapper" >
 							<router-link :to="'/info" class="nav_link nav_link_tile">
@@ -101,7 +101,7 @@
 							</div>					
 						</div>				
 					</div>
-					-->
+				-->
 				</div>
 		
 		
@@ -111,6 +111,7 @@
 	
 	
 	<script>
+		import { mapGetters } from 'vuex'
 		export default{
 			name: 'main_menu',
 			
@@ -129,10 +130,13 @@
 			},
 			
 			
-			computed: {				
-				
-			},
 			
+			computed: {
+				...mapGetters({
+					conventionInfo	: 'conventionInfo',
+					user			   : 'user',
+				}),
+			},
 			
 			mounted: function() {
 				
