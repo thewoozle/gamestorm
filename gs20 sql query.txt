@@ -22,7 +22,7 @@
    WHERE g.con_status = 14
 
    
-   SELECT count(*), track_name, type_name' FROM `events` e
+  SELECT  e.event_id, e.event_name, t.track_name, x.type_name, e.short_description, e.event_description, e.event_url, e.event_duration, e.seats, e.experience_level, e.gm_player, e.gm_designer, e.event_notes, u.first_name, u.last_name, u.email FROM `events` e
    inner join `gs_21_events` g on g.con_event_id = e.event_id
    inner Join `gs_21_participants` p on p.event_id = e.event_id
    inner join `event_tracks` t on t.id = e.event_track

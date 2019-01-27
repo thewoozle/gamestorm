@@ -343,14 +343,17 @@
 		
 		// REMOVE MEMBER
 		remove_member({dispatch,commit}, uuid) {	
-			var vm = this;
-			vm.formData = {
-				uuid	: uuid,
-			}	
-			Axios.post(apiDomain + '_remove_member', vm.formData).then((response) => {
-            dispatch('get_reg_report');
-				commit('unset_member', {uuid});
-				commit ('set_response', response.data.response);
+			
+            var vm = this,
+               formData = {
+               uuid	: uuid,
+            }	
+			Axios.post(apiDomain + '_remove_member', formData, {headers : 
+            {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}}).then((response) => {		
+               dispatch('get_reg_report');
+               commit('unset_member', {uuid});
+               commit ('set_response', response.data.response);
+               console.log(response.response.message);
 			}, (err) => {
 				  console.log(err.statusText);
 			});

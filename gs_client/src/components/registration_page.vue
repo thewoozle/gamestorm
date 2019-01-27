@@ -250,7 +250,7 @@
                               <span class="checkbox_wrapper fal" :class="member.gm_interest? 'fa-check-square' : 'fa-square'">
                                  <input class="checkbox " type="checkbox" v-model="member.gm_interest"  :value="1"  />
                               </span>
-										<label >Run a Game interest</label>
+										<label >Running  a Game interest</label>
 									</div>	
                            
 									<div class="input_wrapper checkbox_wrapper">
@@ -333,7 +333,7 @@
                         <span class="checkbox_wrapper fal" :class="member.membership_credit? 'fa-check-square' : 'fa-square'">
                            <input class="checkbox " type="checkbox" v-model="member.membership_credit"  :value="1"  />
                         </span>
-												<label>MembershipCredit</label>
+												<label>Membership Credit</label>
                      </div>
                      
 							<div class="panel staff_panel staff" v-bind:class="member.con_status == '15' || member.con_status == '21'? 'show' : ''">
@@ -945,13 +945,12 @@
 		.reg_form .member_meta .meta_input{
 			display: flex;
 			align-items: flex-start;
-			width: 40%;
+			width: 5rem;
 			margin-left: 5%;
 		}
 		.reg_form .member_meta .checkboxes  {
 			display: flex;
 			flex-wrap: wrap;
-			width: 55%;
 		}
 		
 		.reg_form .member_meta .checkboxes .checkbox_wrapper + .checkbox_wrapper {
@@ -961,6 +960,11 @@
 		.reg_form .member_meta  .input_wrapper {
 			width: 100%;
 		}
+		.reg_form .panel.membership_credit label,
+		.reg_form .member_meta  .input_wrapper label {
+         width: 6rem;
+         margin: 0;
+      }
 		.reg_form .member_meta .text_box {
 			height: 2rem;
 			text-align: center;
