@@ -340,6 +340,18 @@
             }); 
          }   
 		},
+      
+      
+      // GET MEMBER INFO
+      get_member_info({commit}, uuid) {
+         return new Promise((resolve, reject) => {   
+            Axios.get(apiDomain+'_get_member_info', {params: {uuid: uuid.uuid}}).then((response) => {
+               resolve(response.data);               
+            }, (err) => {
+               console.log(err);               
+            });
+         });
+      },
 		
 		// REMOVE MEMBER
 		remove_member({dispatch,commit}, uuid) {	
@@ -353,7 +365,7 @@
                dispatch('get_reg_report');
                commit('unset_member', {uuid});
                commit ('set_response', response.data.response);
-               console.log(response.response.message);
+               console.log(response.data.response.message);
 			}, (err) => {
 				  console.log(err.statusText);
 			});
@@ -757,9 +769,16 @@
 		// REMOVE MEMBER
 		unset_member(state, uuid) {
 			var member = state.members.find(member => member.uuid === uuid.uuid);
-			// state.members.splice(memberIndex,1);
+			var memberIndex = state.members.findIndex(member => member.uuid === uuid.uuid);
+         console.log(memberIndex);
+         
+         
+			state.members.splice(memberIndex,1);
+         
+         
+         
 			member.con_status				= null;
-			member.con_department 			= null;
+			member.con_department 		= null;
 			member.con_position 			= null;
 			member.badge_number 			= null;
 			member.membership_description	= null;

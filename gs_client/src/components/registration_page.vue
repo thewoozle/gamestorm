@@ -76,7 +76,7 @@
 						<div class="transaction_element transactions">
 							<div class="transaction" v-for="transaction in member.transactions" v-if="member.transactions">
 								
-								<span class="item date" v-text="month_day_year(transaction.updated_at)"></span>
+								<span class="item date" v-text="month_day_year(transaction.order_date)"></span>
 								<div class="details">
 									<span class="item" v-if="transaction.transaction_type" v-text="'type: '+transaction.transaction_type"></span>
 									<span class="item" v-if="transaction.transaction_record" v-text="'record: '+transaction.transaction_record"></span>
@@ -414,13 +414,7 @@
 								<button class="edit_member_button" 
 									v-bind:class="result.con_status > 0? 'attending' : ''" 
 									v-for="result in filteredMembers"   
-									@click="()=> {
-										formErrors = []; 
-										member = result; 
-										showRegSettings = false;
-										showBadgeNumber	= false;
-										showTransactions= false;
-									}" 
+									@click="()=> { get_member_info(result.uuid);}" 
 								>
 								
 									<span class="element status_info" v-if="result.con_status > 0" v-html="result.membership_description"></span>
@@ -507,6 +501,7 @@
 					departments		: 'departments',
 					paymentMethods	: 'paymentMethods',
 					staffPositions	: 'staffPositions',
+               memberInfo     : 'memberInfo',
 				}),
 				
 				match_payment_record: function() {
@@ -618,6 +613,24 @@
 					vm.$store.dispatch('get_reg_settings').then(()=>{});
 				},
 				
+            // GET MEMBER INFO 
+            get_member_info(uuid) {
+               var vm = this;
+               
+               vm.formErrors = []; 					
+					vm.showRegSettings = false;
+					vm.showBadgeNumber	= false;
+					vm.showTransactions= false;
+               vm.$store.dispatch('get_member_info', {'uuid' : uuid}).then((response)=>{
+                  if(response.message) {
+                     console.log(response.message);
+                     vm.member = {};
+                  } else {
+                     vm.member = response.member;
+                  }
+               });
+            },
+            
 				// CHECK USER PAGE PERMISSION
 				check_user() {
 					var vm = this;
