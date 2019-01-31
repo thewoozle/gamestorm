@@ -185,8 +185,6 @@
             
 		  },
 		  
-		  mounted: function()  {
-		  },
 		  
 		  
 		  methods: {
@@ -278,11 +276,10 @@
 			
 			set_page_type(name) {
 				var vm = this;
-				console.log('name:'+name);
 				switch(name) {
 					case 'adminpage':
+               case 'newspage':
 						vm.pageType = 'admin';
-						console.log(vm.pageType);
 						break;
 						
 						
@@ -297,6 +294,7 @@
 					default: 
 						vm.pageType = 'public';
 				}
+				console.log('name:'+name+' / ' + vm.pageType);
 			},
 			
 			

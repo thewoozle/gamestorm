@@ -12,7 +12,7 @@
                         <div class="info_wrapper" >
                            
                            <div class="form_row">
-                              <span class="title">Your Name</span>
+                              <span class="title">Name</span>
                               <span class="info" v-text="userInfo.first_name+' '+userInfo.last_name || '-'"></span>
                            </div>                        
                            
@@ -43,24 +43,24 @@
                               </span>	
                            </div>
                            
-                           <div class="form_row" v-if="parseInt(userInfo.admin_access) > 2">
-                              <div class="info full" >
-                              
-                                 <span class="info_element" v-if="userInfo.admin_access">
-                                    <span class="title">Admin Access</span>
-                                    <span class="role" v-text="userInfo.admin_access"></span>
+                           <div class="form_row info_row">
+                                 <span class="info_element" v-if="userInfo.membership_credit">
+                                    <span class="title">Account Credits</span>
+                                    <span class="info">Credit to attend one GameStorm Convention</span>
                                  </span>
-                                 <span class="info_element" v-if="userInfo.role_registration">
-                                    <span class="title">Registration Access</span>
-                                    <span class="role" v-text="userInfo.role_registration"></span>
-                                 </span>
-                                 <span class="info_element" v-if="userInfo.role_scheduling">
-                                    <span class="title">Scheduling Access</span>
-                                    <span class="role" v-text="userInfo.role_scheduling"></span>
-                                 </span>
-                                 
-                              </div>
                            </div>
+                           <div class="form_row info_row" >
+                                 <span class="info_element" v-if="Object.keys(user.permissions).length > 0">
+                                    <span class="title">Account Permissions</span>
+                                    <span class="info_group">
+                                       <span class="info"  v-for="(value, key) in user.permissions" v-text="">
+                                          <span class="role" v-text="key"></span>
+                                          <span class="value" v-text="value"></span>
+                                       </span>
+                                    </span>   
+                                 </span>
+                           </div>
+                           
                         </div>  
                      </div>
                         
@@ -80,6 +80,7 @@
 							<span class="section_title">Intro</span>
 							
                         <div class="content">
+                        
                            <p v-if="userInfo.con_status ">I HAVE a membership for {{currentCon.name}} {{currentCon.con_num}}</p>
                            
                            <div v-else >
@@ -95,7 +96,9 @@
                      
                   	<div class="aside_section intro" :class="accountSection == 'my_profile' ? 'show': ''">	
                         <span class="section_title">My Profile</span>
-                        <edit_profile/>
+                        
+                        <edit_profile />
+                        
                      </div>
                      
                      
@@ -134,7 +137,7 @@
 	<script>
 			import Vue from 'vue'
 			import { mapGetters } from 'vuex'
-         import edit_profile from '@/components/edit_profile'
+         import edit_profile from '@/components/includes/edit_profile'
 			
 			export default{
 				name: 'account_page',
@@ -142,6 +145,7 @@
 				data() {
 					return{
                   accountSection  : 'intro',
+                  
 					}
 				},
 				
@@ -165,12 +169,12 @@
 					var vm = this;
                vm.get_user_info();
 				},
+            
 				methods: {
 					get_user_info() {
                   var vm = this;
                   if(vm.user.uuid) {
                      vm.$store.dispatch('get_user_info', vm.user.uuid).then(()=>{
-                        console.log(vm.user.uuid);
                      });
                   } else {
                      vm.$router.push('/');
@@ -190,7 +194,7 @@
 		border-radius: var(--borderRadius);
       background: #2a2b2d;
       box-shadow: var(--blackBoxShadow);
-		padding: 3rem 0;
+		padding: 3rem 2rem 1rem 2rem;
       justify-content: space-between;
 	}
 	.section.account_section .section_content {
@@ -201,7 +205,7 @@
       display: flex;
          flex-wrap: wrap;
       position: relative;
-      width: 37%;
+      width: 45%;
       
    }
 	.section.account_section .section_content.aside {
@@ -209,21 +213,22 @@
 		display: flex;
          justify-content: flex-start;
          flex-wrap: wrap;
-		width: 60%;
+		width: 50%;
 	}
 	.section.account_section .section_content.main{
-		padding: 0 2rem;
+      
 	}
 	.section.account_section .user_info {
       display: flex;
       flex-wrap: wrap;
-      margin: 0 6rem 0 0;
+      padding: 0 2rem;
       width: 100%;
 	}
 	.section.account_section .user_info .section_title  {
 		font-size: 1.25rem;
 		text-align: center;
-      margin: 0 4rem;
+      justify-content: center;
+      margin: 0 2rem;
 		border-bottom: solid 1px var(--textColor2);
 	}
 	.section.account_section .info_wrapper {
@@ -238,20 +243,49 @@
 	}
 	.section.account_section .info_wrapper .title{
 		display: flex;
+      align-items: center;
 		width: 40%;
 		font-size: .9rem;
 		text-align: right;
-		padding-right: 1.5rem;
+      justify-content: flex-end;
+		padding-right: 1rem;
+      margin-right: 1rem;
 		line-height: 1.5rem;
+      text-transform: uppercase;
 		color: var(--textColor3);
+      border-right: solid 1px var(--borderColor);
 	}
+   
+	.section.account_section .info_wrapper .info_group,
 	.section.account_section .info_wrapper .info {
 		display: flex;
+      flex-wrap: wrap;
 		width: 60%;
-		color: var(--textColor2);
-		font-size: 1rem;
+		color: var(--textColor);
+		font-size: 1.15rem;
 		line-height: 1.5rem;		
+      font-weight: 300;
 	}
+	.section.account_section .info_wrapper .info_group .info {
+      width: 100%;
+      height: 1.5rem;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+   }
+	.section.account_section .info_wrapper .info_group .info .role {
+      display: flex;
+      font-weight: bold;   
+      height: inherit;   
+      line-height: 1.5rem;      
+   }
+	.section.account_section .info_wrapper .info_group .info .value {
+      display: flex;
+      padding: 0 1rem;
+      justify-content: flex-end;
+      height: 1em;
+      line-height: 1em;
+   }
+   
 	.section.account_section .info_wrapper .info.full {
 		width: 100%;
 	}
@@ -260,7 +294,8 @@
 	.section.account_section  .info_wrapper .badge_name,
 	.section.account_section  .info_wrapper .badge_name_2,
 	.section.account_section  .info_wrapper .city_state_zip {
-		display: block;
+		display: flex;
+      width: 100%;
 	}
 	.section.account_section .info_wrapper .info .info_element {
 		display: flex;
@@ -312,7 +347,7 @@
 	}
 	
 	.section.account_section .section_content.aside {
-		padding: 3rem 2rem 0 0;
+      
 	}
 	
 	.section.account_section .section_content.aside .aside_section {

@@ -54,8 +54,8 @@
 							
 							<div class="dropdown_section login_section" :class="{'show': dropdownSection == 'login'}">
 								<form method="post" @submit.prevent="submit_login">
-                        
-                           <div class="form_row" v-if="loginUsers.length > 0">
+                           <div class="form_row" v-if="loginUsers.length > 0 && email" >
+                              <input type="hidden" name="email" v-model="email" />
 										<label for="email">Select shared user account</label>
 										<div class="input_wrapper">
                                  <select class="select" name="uuid" v-model="uuid">
@@ -82,7 +82,9 @@
 											<input :type="showPassword" class="input text_box" v-model="password" @keydown="submitErrors.password = null" name="password" />
 											<span class="input_message" v-if="submitErrors.password">Enter your password. You may select LOGIN HELP to reset your password</span>
 										</div>
+                              <span class="input_message" v-if="submitErrors.password">Unknown Password</span>
 									</div>
+                           
 									<div class="controls">
 										<button type="submit" class="button">Submit</button>
 									</div>
@@ -114,7 +116,7 @@
                                           if you are adding an additional user to your email address, you can continue to create a new user account" >
                                        </span> 
                                        <span class="message">This email address has a user account associated with it. You can use the SIGN-IN HELP link to set or reset your password, or
-                                          if you are adding an additional user to your email address, you can continue to create a new user account.
+                                          if you are adding an additional user to your email address, you can continue to create a new user account that shares this email.
                                        </span>
                                     </div>
                                     
@@ -124,6 +126,7 @@
                                        <span class="message">This email address has {{checkEmail}} user account{{checkEmail >1? 's' : ''}} associated with it. You can use the SIGN-IN HELP link to set or reset the accounts password(s) or continue creating a new user account. 
                                        </span>
                                     </div>
+                                    <span class="input_message" v-bind:class="submitErrors.email? 'show' : ''" v-text="submitErrors.email"></span> 			
                                  </div>
                                  
                                  <div class="form_row">
@@ -131,7 +134,7 @@
                                     <div class="input_wrapper">
                                        <input class="input text_box" type="text" name="first_name" id="first_name"   v-model="newUser.first_name" required @keyup="submitErrors.first_name = null"/>
                                     </div>
-                                    <span class="input_message" v-bind:class="submitErrors.first_name? 'show' : ''" v-text="submitErrors.first_name"></span> 					
+                                    <span class="input_message" v-bind:class="submitErrors.first_name? 'show' : ''" v-text="submitErrors.first_name"></span>
                                  </div>
                                  
                                  <div class="form_row">
@@ -287,11 +290,11 @@
 	
 	<script>
 		import Vue from 'vue'
-		import Axios from 'axios'
-		import VueAxios from 'vue-axios'
-		import { mapGetters } from 'vuex'
+		// import Axios from 'axios'
+		// import VueAxios from 'vue-axios'
+		import { mapState,mapGetters } from 'vuex'
 		import moment from 'moment'
-		import {apiDomain} from '@/config'
+		//import {apiDomain} from '@/config'
 		import { Datetime } from 'vue-datetime'
 		import 'vue-datetime/dist/vue-datetime.css'
 		import Router from 'vue-router'
@@ -302,7 +305,7 @@
 		
 		Vue.use(Router)
 		Vue.use(Storage, options);	
-		Vue.use(VueAxios, Axios);
+		//Vue.use(VueAxios, Axios);
 		Vue.use(Datetime);
 	
 		export default{
@@ -331,6 +334,7 @@
                reset_email       :'',
                showForgotInfo    : false,         
                passwordResetMessage: null,
+               checkEmail        : null,
 				}
 			},
 			
@@ -351,12 +355,13 @@
          
 			 
 			computed: {
+            ...mapState({
+					statesList		: 'statesList',               
+            }),
 				...mapGetters({
 					conventionInfo	: 'conventionInfo',
 					user			   : 'user',
 					pageContent		: 'pageContent',
-               checkEmail     : 'checkEmail',
-					statesList		: 'statesList',
 				}),
 				
 				pageName() {
@@ -404,7 +409,8 @@
             check_email() {
                var vm = this;
                vm.newUser.email = vm.newUser.email.replace(/ /g, '');
-               vm.$store.dispatch('check_email', vm.newUser.email).then(() => {
+               vm.$store.dispatch('check_email', vm.newUser.email).then((response) => {
+                  vm.checkEmail = response.data.users.length;
                }, (err) => {
                      vm.submitErrors = err;
                   vm.showLoginLoading = false;
@@ -476,10 +482,12 @@
                var vm = this;
                vm.newUser.password = vm.newPassword;
                vm.$store.dispatch('submit_new_user', vm.newUser).then((response) => {
+                  console.log(response.errors);
+                  
                   if(response == 'success') {
                                           
-                        // show response message for two seconds
-                        vm.loginMessage = response;		
+                     // show response message for four seconds
+                     vm.loginMessage = response;		
                            
                            
                      vm.dropdownSection = 'login';
@@ -487,23 +495,24 @@
                      vm.newUser.state = '';
                   } else {
                      
-                        // show response message for two seconds
+                        // show response message for four seconds
                         vm.loginMessage = response;
                   }
                   
                   setTimeout(function() {
                      vm.loginMessage = null;
                      vm.submitErrors= {};
-                  },3000);
+                  },4000);
                   
                }, (err) => {
+                  console.log(err);
                   vm.submitErrors = err;
                   setTimeout(function() {
                      vm.loginMessage = null;
                      vm.submitErrors= {};
                      vm.dropdownSection = 'login';
                      vm.showPassword = 'password';
-                  },3000);
+                  },4000);
                });
                
             },
@@ -777,7 +786,7 @@
 		display: flex;
 		width: 45%;
 		flex-wrap: wrap;
-		align-items: flex-end;
+		align-items: center;
 	}
 	#page_header .user_controls .links .button {
 		width: 100%;
@@ -926,6 +935,8 @@
    }
 	#page_header .user_controls .dropdown_section .input_message {
       color: var(--highlightColor);
+      top: auto;
+      bottom: 0;
    }
 	#page_header .user_controls .dropdown_section .email_check {
       position:relative;

@@ -329,7 +329,7 @@
 								
 							</div>
                      
-							<div class="panel membership_credit" v-bind:class="member.transaction_method == '11'? 'show' : ''">                             
+							<div class="panel membership_credit show" v-bind:class="member.transaction_method == '11'? 'show' : ''">                             
                         <span class="checkbox_wrapper fal" :class="member.membership_credit? 'fa-check-square' : 'fa-square'">
                            <input class="checkbox " type="checkbox" v-model="member.membership_credit"  :value="1"  />
                         </span>
@@ -710,11 +710,12 @@
 								vm.member = [];
 								vm.searchQuery = '';
 							}
+                     vm.$store.dispatch('get_members').then(() => {
+                        vm.$forceUpdate();	                           
+                     });
+                     vm.member.state = '';
 						}
 					});
-					
-               vm.member.state = '';
-					vm.$forceUpdate();					
 				}
 			}			
 		}

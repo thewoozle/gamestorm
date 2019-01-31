@@ -245,13 +245,10 @@
       // GET USER INFO
       get_user_info({commit}, uuid) {
          
-         var formData = new FormData();
-         formData.set('uuid', uuid);
-         
-         Axios.post(apiDomain + '_get_user_info', formData, {
+         Axios.post(apiDomain + '_get_user_info', {'uuid': uuid}, {
                headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
-            }).then((response) => {		
-            commit ('set_userInfo', response.data);
+            }).then((response) => {	
+            commit ('set_userInfo', response.data.userInfo);
             
          }, (err) => {
             if (err.response.data.errors) {
@@ -436,11 +433,10 @@
       // CHECK EMAIL
       check_email({commit},email) {
          if(email.indexOf('@') >-1) {
-         console.log(email.indexOf('@'));
-            Axios.get(apiDomain+'_check_email', {params: {email : email}}
-            ).then((response) => {
-               console.log(response.data);
-               commit('set_check_email', response.data);
+            return new Promise((resolve,reject) => {
+               Axios.get(apiDomain+'_check_email', {params: {email : email}}).then((response) => {
+                  resolve(response);
+               });
             });
          }
       },
@@ -719,7 +715,6 @@
       
       //SET USER    
       set_userInfo: (state, userInfo) => {
-         console.log(userInfo);
          Vue.set(state, 'userInfo', userInfo);
       },
       //SET USER INFO   
@@ -728,14 +723,11 @@
          // Vue.set(state, 'userInfo', userInfo);
       // },
       
-      // SET CHECK EMAIL
-      set_check_email: (state, emailInfo) => {
-         console.log(emailInfo.users.length+' / ' + emailInfo.users);
-         Vue.set(state,'checkEmail', emailInfo.users.length);         
-      },
+     
 		
 		// SET MEMBERS (chunks of 20%)
 		set_members: (state, { members, action }) => {
+         var vm = this;
          if(action == 'localstorage') {
             if(window.sessionStorage) {
                state.members = JSON.parse(sessionStorage.memberList);
@@ -758,10 +750,9 @@
                   console.log('new');
                }
             });
-            
             if(window.sessionStorage) {  
                sessionStorage.memberList = JSON.stringify(state.members); 
-            }            
+            }     
          }
 		},
 		
@@ -856,7 +847,6 @@
 		currentCon		: state => state.currentCon,
 		user			   : state => state.user,
       userInfo       : state => state.userInfo,
-      checkEmail     : state => state.checkEmail,
 		
 		// reg getters
 		regReport 		: state => state.regReport,

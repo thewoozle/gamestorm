@@ -3,7 +3,7 @@
 		<div class="component edit_profile">
 		
       
-							<form class="user_form" v-if="info.email" method="POST" action="" @submit.prevent="$store.dispatch('update_user_info', info) ">
+							<form class="user_form" v-if="info.uuid" method="POST" action="" @submit.prevent="$store.dispatch('update_user_info', info) ">
 								<div class="rows" >
 									<input type="hidden" name="uuid" v-model="info.uuid" />
 									<div class="form_row">
@@ -42,11 +42,14 @@
 									</div>
 									
 									<div class="form_row">
-											<label for="state">State</label>
-											<select class="select" name="state" id="state" v-model="info.state" >
-												<option value="" style="display: none">select...</option>										
-												@include('includes.states')	
-											</select>
+                              <div class="input_wrapper">
+                                 <select class="select" name="state" id="state" v-model="info.state" @click="submitErrors.state = 'null'" @set="info.state == null? info.state = '' : ''">
+                                    <option value="" style="display: none" >State...</option>
+                                    <option :value="state.state" v-for="state in statesList" >{{state.name}}</option>	
+                                 </select>
+                                 <label>State or Territory</label>
+                                 <span class="form_error" v-if="submitErrors.state" v-text="submitErrors.state? 'State or Territory is required' : ''"></span>
+                              </div>   
 									</div>
 									
 									<div class="form_row">
@@ -95,7 +98,7 @@
 	
 	<script>
 			import Vue from 'vue'
-			import { mapGetters } from 'vuex'
+			import { mapState,mapGetters } from 'vuex'
          import Router from 'vue-router'
 			
 			export default{
@@ -103,7 +106,8 @@
 				
 				data() {
 					return{
-                  info  : [],
+                  info        : {},
+                  submitErrors: {},
 					}
 				},
 				
@@ -113,18 +117,30 @@
 				
 				computed: {
 					...mapGetters({
-						userInfo    : 'userInfo'
+                  userInfo    : 'userInfo',
 					}),
+               ...mapState({
+                  statesList  : 'statesList',   
+               }),
 				},
-				
+            
 				created() {
-               this.set_user_info();
+               var vm = this;
+               vm.get_user_info();
 				},
 				methods: {
-					set_user_info() {
+               
+					get_user_info() {
                   var vm = this;
-                  vm.userInfo.email? vm.info = vm.userInfo : vm.$router.push('/');
-               },
+                  if(vm.userInfo.uuid) {
+                  console.log(vm.userInfo);
+                     vm.info = vm.userInfo;
+                  } else{
+                     vm.$store.dispatch('get_user_info', vm.userInfo.uuid).then(()=>{
+                        vm.info = vm.userInfo;                        
+                     });
+                  } 
+               }
 				}
 			}
 	

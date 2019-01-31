@@ -9,10 +9,12 @@
 	import events_page from '@/components/events_page'
 	import community_page from '@/components/community_page'
 	import connect_page from '@/components/connect_page'
+   
 	import admin_page from '@/components/admin_page'
 	import registration_page from '@/components/registration_page'
 	import reg_reports_page from '@/components/reg_reports_page'
 	import scheduling_page from '@/components/scheduling_page'
+   import news_hub_page from '@/components/news_hub_page'
    
 	Vue.use(Router)
 
@@ -73,7 +75,7 @@
 		}, {
 			path		: '/news_hub',
 			name		: 'newspage',
-			component: scheduling_page
+			component: news_hub_page
 		}, {
          path     : '/registration_reports',
          name     : 'regreportspage',
