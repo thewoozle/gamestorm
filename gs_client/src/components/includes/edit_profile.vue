@@ -3,7 +3,8 @@
 		<div class="component edit_profile">
 		
       
-							<form class="user_form" v-if="info.uuid" method="POST" action="" @submit.prevent="$store.dispatch('update_user_info', info) ">
+							<form class="user_form" v-if="info.uuid" method="POST" action="" @submit.prevent="create_update_user">
+                        <span class="form_message" v-if="formMessage" v-text="formMessage"></span>
 								<div class="rows" >
 									<input type="hidden" name="uuid" v-model="info.uuid" />
 									<div class="form_row">
@@ -43,7 +44,7 @@
 									
 									<div class="form_row">
                               <div class="input_wrapper">
-                                 <select class="select" name="state" id="state" v-model="info.state" @click="submitErrors.state = 'null'" @set="info.state == null? info.state = '' : ''">
+                                 <select class="select" name="state" id="state" v-model="info.state" @click="submitErrors.state = null" >
                                     <option value="" style="display: none" >State...</option>
                                     <option :value="state.state" v-for="state in statesList" >{{state.name}}</option>	
                                  </select>
@@ -65,6 +66,14 @@
 									<div class="form_row">
 										<label for="phone">Phone</label>
 										<input class="input text_box" type="text" name="phone" id="phone" v-model="info.phone" />
+									</div>
+                           
+									<div class="form_row">    
+                              <label for="country">Birthdate</label>
+                              <div class="input_wrapper" title="leave blank if over 18 at time of next convention">
+                                 <datetime type="date" v-model="info.birth_date"   ></datetime>
+                              </div>				
+                              <span class="input_message" v-bind:class="submitErrors.birthDate? 'show' : ''" v-text="submitErrors.birthDate"></span>
 									</div>
 									
 									<div class="form_row">
@@ -97,52 +106,54 @@
 	</template>
 	
 	<script>
-			import Vue from 'vue'
-			import { mapState,mapGetters } from 'vuex'
-         import Router from 'vue-router'
-			
-			export default{
-				name: 'edit_profile',
-				
-				data() {
-					return{
-                  info        : {},
-                  submitErrors: {},
-					}
-				},
-				
-				watch: {
-					
-				},
-				
-				computed: {
-					...mapGetters({
-                  userInfo    : 'userInfo',
-					}),
-               ...mapState({
-                  statesList  : 'statesList',   
-               }),
-				},
+      import Vue from 'vue'
+      import { mapGetters } from 'vuex'
+      import Router from 'vue-router'
+      import { Datetime } from 'vue-datetime'
+		import 'vue-datetime/dist/vue-datetime.css'
+      
+		Vue.use(Datetime);
+      
+      export default{
+         name: 'edit_profile',
+         
+         data() {
+            return{
+               submitErrors: {},
+               formMessage : null,
+            }
+         },
+         
+         watch: {
             
-				created() {
+         },
+         
+         components: {
+				datetime: Datetime,
+         },
+         
+         computed: {
+            ...mapGetters({
+               statesList  : 'statesList', 
+               info        : 'userInfo',
+               user        : 'user',  
+            }),
+         },
+         
+         mounted() {
+         },
+         
+         methods: {
+            create_update_user() {               
                var vm = this;
-               vm.get_user_info();
-				},
-				methods: {
-               
-					get_user_info() {
-                  var vm = this;
-                  if(vm.userInfo.uuid) {
-                  console.log(vm.userInfo);
-                     vm.info = vm.userInfo;
-                  } else{
-                     vm.$store.dispatch('get_user_info', vm.userInfo.uuid).then(()=>{
-                        vm.info = vm.userInfo;                        
-                     });
-                  } 
-               }
-				}
-			}
+            vm.$store.dispatch('create_update_user_info', vm.info).then((response) =>{
+               console.log(response);
+               vm.formMessage = response.message;
+            }); 
+            
+            }
+         }
+      }
 	
 	</script>
 	

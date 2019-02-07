@@ -144,7 +144,7 @@
 				
 				data() {
 					return{
-                  accountSection  : 'intro',
+                  accountSection    : 'intro',
                   
 					}
 				},

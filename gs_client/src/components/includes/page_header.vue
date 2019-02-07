@@ -54,7 +54,7 @@
 							
 							<div class="dropdown_section login_section" :class="{'show': dropdownSection == 'login'}">
 								<form method="post" @submit.prevent="submit_login">
-                           <div class="form_row" v-if="loginUsers.length > 0 && email" >
+                           <div class="form_row" v-if="loginUsers.length > 0 " >
                               <input type="hidden" name="email" v-model="email" />
 										<label for="email">Select shared user account</label>
 										<div class="input_wrapper">
@@ -68,7 +68,7 @@
 									<div class="form_row" v-else >
 										<label for="email">Email</label>
 										<div class="input_wrapper">
-											<input type="text" class="input text_box" v-model="email" @keydown="submitErrors.email = null" name="email" />
+											<input type="text" class="input text_box" v-model="email" @keydown="submitErrors.email = null"  name="email" />
 											<span class="input_message" v-if="submitErrors.email">Enter the email address that is associated with this account</span>
 										</div>
 									</div>
@@ -290,11 +290,8 @@
 	
 	<script>
 		import Vue from 'vue'
-		// import Axios from 'axios'
-		// import VueAxios from 'vue-axios'
 		import { mapState,mapGetters } from 'vuex'
 		import moment from 'moment'
-		//import {apiDomain} from '@/config'
 		import { Datetime } from 'vue-datetime'
 		import 'vue-datetime/dist/vue-datetime.css'
 		import Router from 'vue-router'
@@ -481,7 +478,7 @@
 				submit_new_user(e) {
                var vm = this;
                vm.newUser.password = vm.newPassword;
-               vm.$store.dispatch('submit_new_user', vm.newUser).then((response) => {
+               vm.$store.dispatch('create_update_user_info', vm.newUser).then((response) => {
                   console.log(response.errors);
                   
                   if(response == 'success') {

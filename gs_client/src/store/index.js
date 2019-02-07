@@ -81,24 +81,24 @@
 		
 		
 		// SUBMIT NEW USER
-      submit_new_user({commit}, userInfo) {      
-         return new Promise((resolve, reject) => {   
-            var   vm = this,
-                  _formData = new FormData();
+      // submit_new_user({commit}, userInfo) {      
+         // return new Promise((resolve, reject) => {   
+            // var   vm = this,
+                  // _formData = new FormData();
                    
-            for(var key in userInfo) {
-               _formData.append(key, userInfo[key]);
-            }
-            Axios.post(apiDomain+'_submit_new_user', _formData, {headers : 
-               {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
-            }).then((response) => {
-                  resolve(response.data);
+            // for(var key in userInfo) {
+               // _formData.append(key, userInfo[key]);
+            // }
+            // Axios.post(apiDomain+'_submit_new_user', _formData, {headers : 
+               // {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+            // }).then((response) => {
+                  // resolve(response.data);
                   
-            },(err) => {
-                  reject(err.response.data.errors);
-            }); 
-         });   
-      },
+            // },(err) => {
+                  // reject(err.response.data.errors);
+            // }); 
+         // });   
+      // },
 		
 		// UPDATE CURRENTCON
 		update_currentCon({commit}, {convention}) {
@@ -124,7 +124,8 @@
       
       
       // UPDATE USER INFO
-      update_user_info({commit}, userInfo) {
+      create_update_user_info({commit}, userInfo) {
+         console.log(userInfo);
          return new Promise((resolve, reject) => {
             var   vm = this,
                   _formData = new FormData();
@@ -134,13 +135,13 @@
             Axios.post(apiDomain+'_update_create_user', _formData, {headers : 
                   {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
             }).then((response) => {
-                  
                   resolve(response.data);
-                  commit('set_userInfo', {userInfo});
+                  commit('set_userInfo', userInfo);
                   
-               }, (err) => {
-                  reject(err.response.data.errors);
-                  console.log(err.statusText);
+               }, (err) => {                  
+                  console.log(err.response.data.errors);
+                  reject(err.response.data.errors );
+                  console.log(err.data);
             });
          });
          
@@ -244,7 +245,7 @@
       
       // GET USER INFO
       get_user_info({commit}, uuid) {
-         
+         console.log(uuid);
          Axios.post(apiDomain + '_get_user_info', {'uuid': uuid}, {
                headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
             }).then((response) => {	
@@ -713,15 +714,11 @@
 		},
       
       
-      //SET USER    
+      //SET USER INFO   
       set_userInfo: (state, userInfo) => {
+         console.log(userInfo);
          Vue.set(state, 'userInfo', userInfo);
       },
-      //SET USER INFO   
-      // set_userInfo: (state, userInfo) => {
-         // console.log(userInfo);
-         // Vue.set(state, 'userInfo', userInfo);
-      // },
       
      
 		
