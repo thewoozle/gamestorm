@@ -43,14 +43,12 @@
 									</div>
 									
 									<div class="form_row">
-                              <div class="input_wrapper">
+                                 <label>State or Territory</label>
                                  <select class="select" name="state" id="state" v-model="info.state" @click="submitErrors.state = null" >
                                     <option value="" style="display: none" >State...</option>
                                     <option :value="state.state" v-for="state in statesList" >{{state.name}}</option>	
                                  </select>
-                                 <label>State or Territory</label>
-                                 <span class="form_error" v-if="submitErrors.state" v-text="submitErrors.state? 'State or Territory is required' : ''"></span>
-                              </div>   
+                                 <span class="form_error" v-if="submitErrors.state" v-text="submitErrors.state? 'State or Territory is required' : ''"></span> 
 									</div>
 									
 									<div class="form_row">
@@ -58,10 +56,6 @@
 											<input class="input text_box" type="text" name="zip" id="zip" v-model="info.zip" required/>
 									</div>
 									
-									<div class="form_row">
-										<label for="country">Country</label>
-										<input class="input text_box" type="text" name="country" id="country" v-model="info.country" />
-									</div>						
 								
 									<div class="form_row">
 										<label for="phone">Phone</label>
@@ -70,26 +64,35 @@
                            
 									<div class="form_row">    
                               <label for="country">Birthdate</label>
-                              <div class="input_wrapper" title="leave blank if over 18 at time of next convention">
-                                 <datetime type="date" v-model="info.birth_date"   ></datetime>
-                              </div>				
+                                 <datetime class="input text_box" type="date" v-model="info.birth_date" title="leave blank if over 18 at time of next convention"   ></datetime>
                               <span class="input_message" v-bind:class="submitErrors.birthDate? 'show' : ''" v-text="submitErrors.birthDate"></span>
 									</div>
 									
-									<div class="form_row">
-										<div class="form_element third" title="Receive occasional emails about Gamestorm Events">
-											<label for="email_contact">Email Updates</label>
-											<input class="checkbox" type="checkbox" name="email_contact" id="email_contact" value="1" v-model="info.email_contact" />
+									<div class="form_row checkboxes">
+										<div class="form_element " title="Receive occasional emails about Gamestorm Events">
+                                 <div class="input_wrapper" >
+                                    <span class="checkbox_wrapper fal" :class="info.email_contact? 'fa-check-square' : 'fa-square'">
+                                       <input class="checkbox" type="checkbox" name="email_contact" id="email_contact" value="1" v-model="info.email_contact" />
+                                    </span>
+                                 </div>   
+                                 <label for="email_contact">Receive email updates?</label>
 										</div>	
 										
-										<div class="form_element third">
-											<label for="volunteer_interest">Interested in volunteering?</label>
-											<input class="checkbox" type="checkbox" name="volunteer_interest" id="volunteer_interest" value="1" v-model="info.volunteer_interest" />
-										</div>	
+										<div class="form_element ">
+                                 <div class="input_wrapper" >
+                                    <span class="checkbox_wrapper fal" :class="info.volunteer_interest? 'fa-check-square' : 'fa-square'">
+                                       <input class="checkbox" type="checkbox" name="volunteer_interest" id="volunteer_interest" value="1" v-model="info.volunteer_interest" />
+                                    </span>
+                                 </div>   										
+											<label for="volunteer_interest">Interested in volunteering?</label></div>	
 										
-										<div class="form_element third" title="Receive information about submitting and/or helping run games at the convention">
-											<label for="gm_interest">Interest in Running a game</label>
-											<input class="checkbox" type="checkbox" name="gm_interest" id="gm_interest" value="1" v-model="info.gm_interest" />
+										<div class="form_element " title="Receive information about submitting and/or helping run games at the convention">
+                                 <div class="input_wrapper" >
+                                    <span class="checkbox_wrapper fal" :class="info.gm_interest? 'fa-check-square' : 'fa-square'">
+                                       <input class="checkbox" type="checkbox" name="gm_interest" id="gm_interest" value="1" v-model="info.gm_interest" />
+                                    </span>
+                                 </div>   
+											<label for="gm_interest">Interest in running a game?</label>
 										</div>	
 										
 									</div>
@@ -158,5 +161,24 @@
 	</script>
 	
 	<style>
-	
+      .checkboxes {
+         
+      }
+      .checkboxes label {
+         width: auto;
+         max-width: 8rem;
+         padding-left: .5rem;
+         justify-content: flex-start;
+         border: none;
+         font-size: .9rem;     
+      }
+      .checkboxes .input_wrapper {
+        display: flex;
+        justify-content: center;
+        width: 2rem;
+        padding: 0;
+      }
+      .checkboxes .checkbox_wrapper {
+         width: 2rem;
+      }
 	</style>

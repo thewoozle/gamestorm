@@ -103,8 +103,8 @@
                      
                      
                   	<div class="aside_section intro" :class="accountSection == 'password' ? 'show': ''">
-							<span class="section_title">Account Security</span>
-                     
+                        <span class="section_title">Account Security</span>
+                        <changepassword />  
                      </div>	
                      
                      
@@ -135,54 +135,56 @@
 	</template>
 	
 	<script>
-			import Vue from 'vue'
-			import { mapGetters } from 'vuex'
-         import edit_profile from '@/components/includes/edit_profile'
+      import Vue from 'vue'
+      import { mapGetters } from 'vuex'
+      import edit_profile from '@/components/includes/edit_profile'
+      import changepassword from '@/components/includes/change_password'
 			
-			export default{
-				name: 'account_page',
-				
-				data() {
-					return{
-                  accountSection    : 'intro',
+      export default{
+         name: 'account_page',
+         
+         data() {
+            return{
+               accountSection    : 'intro',
+               
+            }
+         },
+         
+         watch: {
+            
+         },
+         
+         components: {
+            'edit_profile' : edit_profile,
+            'changepassword'  : changepassword,
+         },
+         
+         computed: {
+            ...mapGetters({
+               user        : 'user',
+               userInfo    : 'userInfo',
+               currentCon  : 'currentCon',
+            }),
+         },
+         
+         created() {
+            var vm = this;
+            vm.get_user_info();
+         },
+         
+         methods: {
+            get_user_info() {
+               var vm = this;
+               if(vm.user.uuid) {
+                  vm.$store.dispatch('get_user_info', vm.user.uuid).then(()=>{
+                  });
+               } else {
+                  vm.$router.push('/');
                   
-					}
-				},
-				
-				watch: {
-					
-				},
-            
-            components: {
-               'edit_profile' : edit_profile,
-            },
-				
-				computed: {
-					...mapGetters({
-						user        : 'user',
-                  userInfo    : 'userInfo',
-                  currentCon  : 'currentCon',
-					}),
-				},
-				
-				created() {
-					var vm = this;
-               vm.get_user_info();
-				},
-            
-				methods: {
-					get_user_info() {
-                  var vm = this;
-                  if(vm.user.uuid) {
-                     vm.$store.dispatch('get_user_info', vm.user.uuid).then(()=>{
-                     });
-                  } else {
-                     vm.$router.push('/');
-                     
-                  }
                }
-				}
-			}
+            }
+         }
+      }
 	
 	</script>
 	

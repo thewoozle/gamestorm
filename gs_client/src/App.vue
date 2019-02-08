@@ -3,44 +3,19 @@
       <div class="page_wrapper" ref="app" id="app" :class="[pageName, pageType, pageClasses.pageReady,pageClasses.showMenu,pageClasses.showSlideout,pageClasses.fixFooter]">
      
          <span id="loading" :class="showSpinner? 'show' : ''"><span class="spinner" ></span></span>
+         
+         
          <div class="reset_password" v-if="urlParams.c">
-            <form class="" @submit.prevent="reset_password" v-if="$store.dispatch('validate_reset', {reset_code: urlParams.c})">
+            <div class="" v-if="$store.dispatch('validate_reset', {reset_code: urlParams.c})">
                <span class="warning" v-if="!$route.query.c"> Warning, unknown user. Please request a new password reset link</span>
                <button type="button" class="button close_button" @click="()=>{urlParams = {};}" >Close</button>
                
-               <div class="form_row">
-                  <label for="new_password" title="minimum 6 characters, no spaces or quotes">Password 
-                     <button type="button" class="password_show fal" v-bind:class="showPassword ? 'fa-eye' : 'fa-eye-slash'" @click="showPassword ? showPassword = false : showPassword = true"></button>
-                  </label>
-                  <div class="input_wrappers">
-                     <div class="input_wrapper">
-                        <input id="new_password" v-bind:type="showPassword? 'text' : 'password'" class="input text_box new_password" name="new_password"  v-model="newPassword" required placeholder="Password" @keyup="validate_new_password(); submitErrors.email = null"/>
-                        <i class="pass_icon" v-bind:class="validatePassword == true? 'fal fa-check-square' : 'fas fa-ban fail'" v-if="newPassword"></i>
-                     </div>	
-                     
-                     <div class="input_wrapper">
-                        <input id="compare_password" v-bind:type="showPassword? 'text' : 'password'" class="input text_box verify_password" name="compare_password" required v-model="confPassword" placeholder="Verify Password" @keyup="validate_new_password()"/>
-                        <i class="pass_icon" v-bind:class="newPassword == confPassword? 'fal fa-check-square' : 'fas fa-ban fail'" v-if="newPassword"></i>
-                     </div>
-                     <span class="input_message" v-bind:class="submitErrors.password? 'show' : ''" v-text="submitErrors.password"></span> 
-                  </div>	
-               </div>
-               
-               
-               <div class="form_row controls">
-                  <button type="submit" class="button">Submit</button>			
-               </div>
-               
-               <p class="reset_message" v-if="resetMessage" v-text="resetMessage"></p>
-            
-            </form>
-            
+               <changepassword />  
+            </div>
             <div class="reused_reset" v-else >
             RESET CODE ALREADY USED
             </div>
-            
          </div>
-      
          <div class="main_page" v-else>      
          
             <main_menu class="main_menu "  v-if="pageType == 'public' "/>
@@ -106,6 +81,7 @@
 		import scheduling_page_header from '@/components/includes/scheduling_page_header'
 		import main_menu from '@/components/includes/main_menu'	
 		import Router from 'vue-router'
+      import changepassword from '@/components/includes/change_password'
 		
 		import page_footer from '@/components/includes/page_footer'	
 		import {apiDomain} from './config'
@@ -125,14 +101,8 @@
 				pageType	   : 'public',
 				showSignIn  : false,
             showDevNotes: false,
-            showPassword: false,
-            newPassword : '',
-            confPassword: '',
-            submitErrors: [],
-            validatePassword: false,
             urlParams   : {},
             showSpinner : true,
-            resetMessage: null,
 			}
 		},  
 		  
@@ -143,6 +113,7 @@
 			'reg_page_header'	: reg_page_header,
 			'main_menu' 		: main_menu,
 			'page_footer'		: page_footer,
+         'changepassword'  : changepassword,
          
          'event_submission_form': event_submission_form,
          'user_events_list'   : user_events_list,
@@ -225,39 +196,6 @@
 				
 			},
          
-         
-         /* ---------------------------------------------------------------
-                  VALIDATE NEW PASSWORD
-            ---------------------------------------------------------------   */
-         validate_new_password() {
-            var vm = this;
-            vm.newPassword = vm.newPassword.replace(/ |"|'|`/g, '');
-            vm.confPassword = vm.confPassword.replace(/ |"|'|`/g, '');
-            vm.newPassword.length >= 6? vm.validatePassword = true : vm.validatePassword = false;            
-         },
-         
-         reset_password() {
-            var   vm = this,
-                  userInfo = {};
-            if (vm.urlParams.c ) {  
-               if(vm.confPassword == vm.newPassword) {
-                  userInfo.newPassword = vm.newPassword;
-                  userInfo.uuid = vm.$route.query.c;
-                  
-                  vm.$store.dispatch('update_password', userInfo).then((response) => {
-                        vm.resetMessage = 'Password Reset';
-                        setTimeout(function() {
-                           vm.loginMessage = null;
-                           vm.urlParams = {};
-                           vm.$route.name == 'mainpage'? '' : vm.$router.push({name: 'mainpage'});
-                           },2000);
-                           
-                  }, (err) => {
-                     console.log(err);
-                  });
-               } 
-            }               
-         },
          
          
 			

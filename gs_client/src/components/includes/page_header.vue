@@ -450,7 +450,7 @@
                   vm.showLoginLoading = false;
                });
 					vm.$route.name == 'mainpage'? '' : vm.$router.push({name: 'mainpage'});
-               vm.email = null;
+               //vm.email = null;
                vm.password = null;
                setTimeout(function() {
                   vm.loginMessage = null;
