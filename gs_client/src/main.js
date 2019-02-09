@@ -25,16 +25,20 @@
 				e.target.classList.contains('show')? e.target.classList.remove('show') : e.target.classList.add('show');
 			},
 			article_date(date) {
+            // Mar 12th
 				return  '<span class="month">'+ moment(date).format('MMM')+'</span> <span class="day">'+ moment(date).format('Do')+'</span>';
 			},	
 			month_day_year(date) {
+            // Mar, 12th, 2019
 				return moment(date).format('MMM, Do YYYY');
 			},
 			
          iso_date(date) {
+            // 2019-03-12
             return moment(date).format('YYYY-M-d'); 
          },
 			day_date(date) {
+            // Mar 12th
 				return moment(date).format('MMM Do');
 			},
          
@@ -50,11 +54,15 @@
          },
          
          day_time(date) {
-            return moment(date).format('ddd hh:mm a');            
+            return moment(date).format('ddd hh:mm a');
          },
          
          sql_date_time(date) {
            return moment(date).format('YYYY-MM-DD HH:MM:SS'); 
+         },
+         
+         between_dates(startDate, endDate) {
+            return moment().isBetween(moment(startDate), moment(endDate));
          },
          
          event_duration(startTime, endTime) {

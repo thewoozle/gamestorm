@@ -49,8 +49,9 @@
 								<router-link class="nav_link" :to="'/paw'" >Play &amp; Win</router-link>
 							</div>					
 						</div>				
-					</div>				
-				<!--
+					</div>	
+               
+               
 					<div class="nav_section">
 						<div class="nav_link_wrapper" >
 							<router-link class="nav_link nav_link_tile" :to="'/events'">
@@ -60,14 +61,14 @@
 								<span class="text_wrapper"><span class="text">Events</span></span>
 							</router-link>
 							<div class="nav_sublinks">
-								<router-link class="nav_link">Event List</router-link>
-								<router-link class="nav_link">Submit an Event</router-link>
-								<router-link class="nav_link">My Events</router-link>
+								<router-link  :to="'/events'" class="nav_link">Event List</router-link>
+								<router-link  :to="'/events'" class="nav_link">Submit an Event</router-link>
+								<router-link  :to="'/events'" class="nav_link">My Events</router-link>
 							</div>					
 						</div>				
 					</div>	
 
-            -->               
+               
 				<!--
 					<div class="nav_section">
 						<div class="nav_link_wrapper" >

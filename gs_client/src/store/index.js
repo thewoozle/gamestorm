@@ -65,10 +65,23 @@
 		
 		// GET SITE DATA
 		get_site_data ({commit}) {
+         
+         if(window.sessionStorage.currentCon) {
+					commit('set_current_con', {
+                  info: JSON.parse(sessionStorage.currentCon)
+               });
+         }
+         
 				Axios.get(apiDomain+ '_get_site_data').then((response) => {
-				//Axios.get('https://new.gamestorm.org/public/api/_get_site_data').then((response) => {
+               
+               if(window.sessionStorage) {
+                  sessionStorage.currentCon = JSON.stringify(response.data.convention);
+               }
+               
+					commit('set_current_con', response.data.convention);
+               
+               
 					commit('set_site_data', {
-						info		: response.data.convention, 
 						pageContent	: response.data.pageContent,
 						conventions	: response.data.conventions, 
 						articles 	: response.data.articles,
@@ -80,25 +93,6 @@
 		},
 		
 		
-		// SUBMIT NEW USER
-      // submit_new_user({commit}, userInfo) {      
-         // return new Promise((resolve, reject) => {   
-            // var   vm = this,
-                  // _formData = new FormData();
-                   
-            // for(var key in userInfo) {
-               // _formData.append(key, userInfo[key]);
-            // }
-            // Axios.post(apiDomain+'_submit_new_user', _formData, {headers : 
-               // {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
-            // }).then((response) => {
-                  // resolve(response.data);
-                  
-            // },(err) => {
-                  // reject(err.response.data.errors);
-            // }); 
-         // });   
-      // },
 		
 		// UPDATE CURRENTCON
 		update_currentCon({commit}, {convention}) {
@@ -638,17 +632,24 @@
 	}
 	
 	const mutations = {
-		// SET SITE DATA
-		set_site_data: (state, {info, pageContent, conventions, articles}) => {
+      
+      set_current_con: (state, info) => {
 			state.conventionInfo= info;
-			state.conventions	= conventions;
 			state.currentCon = info;
+         
+      },
+      
+		// SET SITE DATA
+		set_site_data: (state, {pageContent, conventions, articles}) => {
+			state.conventions	= conventions;
 			// set current con as selected con for scheduling if no prev. selection
-			if(localStorage) {
-				if(!localStorage.selectedCon) {
-					localStorage.selectedCon = info.tag_name;
-				}
-			}
+         
+         
+			// if(localStorage) {
+				// if(!localStorage.selectedCon) {
+					// localStorage.selectedCon = info.tag_name;
+				// }
+			// }
 			articles.forEach(function(article) {
 				article.open = false;
 			});

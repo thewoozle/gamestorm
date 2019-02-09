@@ -85,7 +85,6 @@
                if(vm.confPassword == vm.newPassword) {
                   userInfo.newPassword = vm.newPassword;                  
                   userInfo.uuid = vm.$route.query.c || vm.user.uuid;
-                  console.log(userInfo.uuid);
                   vm.$store.dispatch('update_password', userInfo).then((response) => {
                         vm.resetMessage = 'Password Reset';
                         setTimeout(function() {

@@ -206,9 +206,9 @@
             
 				vm.$store.dispatch('update_page_status', {pageReady: 'ready'}).then(() => {
 					vm.pageClasses = this.$store.state.pageStatus;	
-					vm.$store.dispatch('get_con_events').then(() => {
+					// vm.$store.dispatch('get_con_events').then(() => {
                vm.showSpinner = false;	
-               });  
+               // });  
 				});
 			},
 			
@@ -280,6 +280,7 @@
 			--altBackground		: #f9f7ec;
 			--altColor				: #ebeeff;
          --altBackground2     : #c4decd;
+         
 							
 			
 			--borderRadius			: .25rem;
@@ -1937,14 +1938,16 @@
 		}
 		.main_content .sections {
 			display: flex;
-			flex-wrap: wrap;
+            flex-wrap: wrap;
+            justify-content: center;
 			position: relative;
 			width: 100%;
 		}
 		
 		.main_content .section {
-			display: flex;
+			display: flex;         
 			width: 100%;
+         max-width:50rem;
 		}
       
 			

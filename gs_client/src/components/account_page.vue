@@ -77,14 +77,25 @@
 					
                   <div class="section_content aside">
                   	<div class="aside_section intro" :class="accountSection == 'intro' ? 'show': ''">	
+                     
+               <!--  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                             INTRO
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                     
 							<span class="section_title">Intro</span>
 							
                         <div class="content">
-                        
-                           <p v-if="userInfo.con_status ">I HAVE a membership for {{currentCon.name}} {{currentCon.con_num}}</p>
-                           
+                           <p>Hello {{userInfo.first_name+' '+userInfo.last_name}}</p>
+                           <div v-if="userInfo.con_status ">
+                              <p>You HAVE a membership for {{currentCon.name}} {{currentCon.con_num}}</p>
+                              <p v-if="userInfo.badge_name">Your badge name is: 
+                                 <span class="badge_name" v-text="userInfo.badge_name"></span>  
+                                 <span class="badge_name" v-text="userInfo.badge_name2"></span>                                      
+                              </p>
+                              <p v-if="userInfo.badge_number" v-text="'your badge number is: '+userInfo.badge_number"></p>
+                           </div>
                            <div v-else >
-                              <p >I do not have a membership for {{currentCon.name}} {{currentCon.con_num}} </p>
+                              <p >You do not have a membership for {{currentCon.name}} {{currentCon.con_num}} </p>
                               <div class="links">
                                  <a class="link" href="membership">{{currentCon.name}} {{currentCon.con_num}} Memberships </a>
                               </div>
@@ -92,7 +103,9 @@
                         </div>   
 							</div>
                      
-                     
+               <!--  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                             EDIT PROFILE
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                      
                   	<div class="aside_section intro" :class="accountSection == 'my_profile' ? 'show': ''">	
                         <span class="section_title">My Profile</span>
@@ -102,11 +115,19 @@
                      </div>
                      
                      
+               <!--  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                             ACCOUNT SECURITY (change password)
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                     
                   	<div class="aside_section intro" :class="accountSection == 'password' ? 'show': ''">
                         <span class="section_title">Account Security</span>
                         <changepassword />  
                      </div>	
                      
+                     
+               <!--  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                             LINKED ACCOUNTS
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                      
                   	<div class="aside_section intro" :class="accountSection == 'linked_accounts' ? 'show': ''">	
 							<span class="section_title">Linked Accounts</span>
@@ -114,11 +135,37 @@
                      </div>
                      
                      
+               <!--  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                             MY CONVENTION
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                     
                   	<div class="aside_section intro" :class="accountSection == 'my_convention' ? 'show': ''">	
 							<span class="section_title">My Convention</span>
-                     
+                     <pre>
+                        - show membership type with description 
+                        - show users events with icons for type, presenter, seat-of with buttons to cancel (unless presenting)
+                        - separate section or events user is presenting with additional controls, player list (if opt-in) and notes
+                        - link  to signup for events
+                     </pre>
+                        <div class="section_element" v-if="between_dates(currentCon.event_submissions_open, currentCon.event_submissions_close)">
+                        
+                        
+								<router-link :to="'/events'" class="nav_link">Submit an Event</router-link>
+                        
+                        </div>
+                        
+                        
+                        <div class="section_element" v-if="between_dates(currentCon.signups_open, currentCon.signups_close)">
+                        
+                        
+                           <router-link :to="'/events'" class="nav_link">Sign-up for Events</router-link>
+                        </div>
                      </div>
                      
+                     
+               <!--  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                             MY ACCOUNT (transactions)
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                      
                   	<div class="aside_section intro" :class="accountSection == 'my_account' ? 'show': ''">	
 							<span class="section_title">My Account</span>

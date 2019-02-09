@@ -2,14 +2,16 @@
 	<template>
 		<div id="events_page">
 		
-				
+      
 			<div class="sections">	
+         
 				<section class="section events_intro">
 					<div class="content_wrapper">	
 						<span class="section_title">GameStorm Events</span>
-						
-						<article class="content intro" v-if="pageContent.con_intro" v-html="pageContent.events_intro.content"></article> 
-						<p>Event submissions open on {{day_date(conventionInfo.event_submissions_open)}}</p>
+      
+						<article class="content intro" v-if="pageContent.events_intro" v-html="pageContent.events_intro.content"></article> 
+						<p>Event submissions will be Open from {{day_date(currentCon.event_submissions_open)}} through {{day_date(currentCon.event_submissions_close)}}.</p>
+						<p>Event Signups will be Open from {{day_date(currentCon.signups_open)}} through {{day_date(currentCon.signups_close)}}.</p>
 					</div>
 					
 					<div class="news_items">
@@ -28,6 +30,32 @@
 					</div>
 				
 				</section> 
+            
+            
+				<section class="section events_display">
+               <div class="control_bar">
+                  <button type="button" class="control_button" 
+                     @click="eventsDisplayOption== 'list'? eventsDisplayOption = 'grid' : eventsDisplayOption = 'list'" 
+                     v-text="eventsDisplayOption== 'list'? 'grid' : 'list'"
+                  ></button>
+               </div>
+               
+               <div class="event_list" :class="eventsDisplayOption">
+                           
+                  <div class="timeblock">
+                     <span class="time">11:00am</span>
+                     <div class="events">
+                        <div class="event" :class="'tag_'+event.event_tag" v-for="event in conEvents" v-bind:style="{'background-color' : event.track_color}">
+                           <span class="" v-text="event.event_name"></span>
+                           
+                           <span class="presenters">
+                              <span class="presenter" v-for="presenter in event.presenters" v-text="presenter.first_name+' '+presenter.last_name"></span>
+                           </span>
+                        </div>
+                     </div>   
+                  </div>   
+               </div>
+            </section>
 				
 				
 				
@@ -77,8 +105,9 @@
 			
 			data() {
 				return {
-					showEventForm	: null,
-					newGm			: null,
+					showEventForm	   : null,
+					newGm			      : null,
+               eventsDisplayOption: 'list',
 				}
 			},
 			
@@ -92,12 +121,17 @@
 			computed: {
 				...mapGetters({
 					pageContent 	: 'pageContent',
-					articles		: 'articles',
+					articles		   : 'articles',
 					conventionInfo	: 'conventionInfo',
+               currentCon     : 'currentCon',
+               conEvents      : 'conEvents',
 				}),
 			},
 			
-			
+			created() {
+            var vm = this;
+            vm.$store.dispatch('get_con_events').then(()=>{});            
+         },
 			mounted: function() {
 				
 			},
@@ -119,6 +153,43 @@
 				left: 0;
 			width: 12rem;
 		}
+      
+      .events_display .event_list {
+         display: flex;
+         flex-direction: column;
+         padding: .5rem;
+         background: var(--altBackground)
+      }
+      .events_display .timeblock {
+         display: flex;
+            flex-wrap: nowrap;
+            align-items: flex-start;
+         width: 100%;         
+      }
+      .events_display .timeblock .time {
+         display: flex;
+         justify-content: flex-end;
+         height: 100%;
+         width: 6rem;
+         padding: .5rem .5rem 0 0;
+         color: var(--textColor2);
+      }
+      .events_display .events  {
+         display: flex;
+         flex-wrap: wrap;
+         padding: .25rem;
+         border-left: solid 1px #c5c5c5;
+         width: calc(100% - 6rem);
+        
+      }
+      
+      .events_display .events .event {
+         background: #bbb;
+         padding: .5rem;
+         min-height: 3rem;
+         border-radius: .25rem;
+         margin: .25rem; 
+      }
 	
 	
 	

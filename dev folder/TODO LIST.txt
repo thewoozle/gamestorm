@@ -14,9 +14,9 @@
          add info and connect views
          
       
-      registration: 
-      
+      registration:       
          change full membership data chunk to minimal data and add function to get full data for a single member
+         update 'change badge number' function to work and check for used numbers
       
       New Account-
          send email conf. 
