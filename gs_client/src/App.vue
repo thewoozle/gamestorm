@@ -1914,11 +1914,12 @@
 			background-size: cover;
 		}
 		.main_content {
+         position: relative;
 			font-size: 1rem;
 			height: calc(100vh - 6rem);
 			width: 100%;
-			margin-top: 6rem;
-			padding-top: 1rem;
+			margin: 6rem 0  0 0; 
+			padding: 1rem 0 10rem;         
 			white-space: normal;
 			overflow: hidden;
 			overflow-y: auto;
@@ -1934,6 +1935,7 @@
 			font-size: 0;
 			width: 100%;
 			max-width: 90rem;
+         min-height: 100%;
 			margin: 0 auto;
 		}
 		.main_content .sections {
@@ -1947,7 +1949,7 @@
 		.main_content .section {
 			display: flex;         
 			width: 100%;
-         max-width:50rem;
+         max-width:60rem;
 		}
       
 			

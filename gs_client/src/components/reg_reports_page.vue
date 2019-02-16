@@ -9,6 +9,23 @@
                   <button class="close_button fal fa-times" type="button" @click.prevent="showRegReport? showRegReport = false : showRegReport=true" ></button>
 					
                <pre>REG REPORT</pre>
+               
+               
+            <div class="">
+               <span>FILTER BY STATE</span>
+               <div v-for="state in memberFilter('state')" >{{state.name}} - {{state.num}}</div>
+            </div>
+            
+               <p>----------------------------------------------------------------------------------------------</p>
+               <p>REG  REPORT</p>
+            
+						<span class="text">Number of Registered Members</span>
+						<span class="value" v-text="regReport.registeredMembers || '-'"></span><br />                  
+               {{regReport}}
+               <p style="color: white" v-for="(item, key) in regReports.regReport">{{key}} - {{item}}</p>
+               
+               
+               
                </div>
                
                <div class="report_wrapper">
@@ -31,26 +48,22 @@
                   [list by name (filter location, attendance, age, price, reg date, ), badge, staff, guest GM (elegable/accepted), contact, volunteer, GM interest, industry guest, transaction, ]
             </pre>
             
-            <div class="">
-               <span>FILTER BY STATE</span>
-               <div v-for="state in memberFilter('state')" >{{state.name}} - {{state.num}}</div>
-            </div>
-            
-               <p>----------------------------------------------------------------------------------------------</p>
-               <p>REG  REPORT</p>
-            
-						<span class="text">Number of Registered Members</span>
-						<span class="value" v-text="regReport.registeredMembers || '-'"></span><br />                  
-               {{regReport}}
-               <p style="color: white" v-for="(item, key) in regReports.regReport">{{key}} - {{item}}</p>
-               
                <p>----------------------------------------------------------------------------------------------</p>
                <p>VOLUNTEERS REPORT</p>
                <p style="color: white" v-for="person in regReports.volunteers">{{person.first_name+' '+person.last_name}} - {{person.email}}</p>
                
+               
                <p>----------------------------------------------------------------------------------------------</p>
                <p>GUEST GMs REPORT</p>
-               <p style="color: white" v-for="person in regReports.guestgms">{{person.first_name+' '+person.last_name}} - {{person.email}}</p>
+               <p style= "color: white">{{(regReports.guestGm.length)+1}}</p>
+               <p style="color: white" v-for="person in regReports.guestGm">{{person.first_name+' '+person.last_name}} - {{person.email}}</p>
+                            
+               
+               <p>----------------------------------------------------------------------------------------------</p>
+               <p>STAFF  REPORT</p>
+               <p style= "color: white">{{(regReports.staffList.length)+1}}</p>
+               <p style="color: white" v-for="person in regReports.staffList">{{person.department_name+' - ' +person.first_name+' '+person.last_name}} - {{person.email}}</p>
+               
                
                
                   </div>
@@ -128,17 +141,23 @@
                vm.members.forEach((member)=>{
                   if(member.con_status) {
                      //check to see if state is in array and wither ++ or append
+                     
                      states.forEach((state)=>{
+                        console.log(member.state);
                         if(state.name == member.state) {
+                           
                            state.num ++;
                            inState = true;
                         }
                      });   
                      inState? '' : states.push({"name": member.state, 'num' : 1});
                          
+                           
+                           
                      inState = false;
                   }   
                });
+               console.log(states);
                return states;
             }
             
@@ -159,6 +178,9 @@
       /* -----------------------------------------------------------------
                         REGISTRATION REPORTS 
          ----------------------------------------------------------------- */
+         #reg_reports {
+            height: 100%;
+         }
          #reg_reports .sections {
             justify-content: center;
          }
@@ -173,6 +195,9 @@
                top: .5rem;
                z-index: 25;
             width: calc(100% - 1rem);
+            height: calc(100% - 1rem);
+            overflow: hidden;
+            overflow-y: auto;
             min-height: 20rem;
             transition: left .3s;
             border: solid 1px var(--borderColor2);
@@ -185,7 +210,9 @@
          .section.reg_reports .report_wrapper {
             display: flex;
             width: 100%;
-            min-height: 20rem;
+            min-height: 30rem;
+            overflow: hidden;
+            overflow-y: auto;
             border-radius: var(--borderRadius);
             background: #2a2b2d;
             box-shadow: var(--blackBoxShadow);

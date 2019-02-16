@@ -2,7 +2,6 @@
 	<template>
 		<div class="component">
          <div class="sections">	
-            <div class="section_wrapper">
                <section class="section account_section">
                   <div class="section_content main "  >	
                   
@@ -174,7 +173,7 @@
                   
                   </div>
                </section>
-            </div>	
+               
             
          </div>
       

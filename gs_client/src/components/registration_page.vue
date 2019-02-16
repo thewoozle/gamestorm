@@ -362,13 +362,12 @@
 							
 							<div class="controls">
 								<div class="button_wrapper email_status" v-if="member.email" v-bind:class="regSettings.reg_mode >0? '':'show'">
-                           <input type="checkbox" style="vizibility: hidden; position: absolute; z-index: -1;" name="send_email_conf" :checked="member.send_email_conf == '1'" value="1" />
 									<span class="info_text" v-if="member.email_conf">
 										<span class="label">Confirmed: </span>
 										<span class="info" v-text="month_day_year(member.email_conf)"></span>
 									</span>
 									
-									<button type="button" v-else class="toggle_button " v-bind:class="member.send_email_conf == '1'? 'active' : '' "  title="send email confirmation on save" @click="member.send_email_conf=='1'? member.send_email_conf='0' : member.send_email_conf='1'">
+									<button type="button" v-else class="toggle_button "   title="send email confirmation on save" @click="set_email_conf">
 										<span class="text_wrapper">
 											<span class="text">Send Email Confirmation on save</span> 
 										</span>
@@ -663,6 +662,13 @@
 				search_members(e) { 
 					this.searchQuery = e.target.value;
 				}, 
+            
+            // SET EMAIL CONF 
+            set_email_conf() {
+               var vm = this;
+               vm.member.email_conf? Vue.set(vm.member, 'email_conf', null) : Vue.set(vm.member, 'email_conf', vm.iso_date(new Date()));
+               console.log(vm.member.email_conf);
+            },
 				
 				// REMOVE Member				
 				remove_member(uuid){
@@ -1053,8 +1059,9 @@
 			position: relative;
 			display: flex;
 			width: 100%;
+         max-height: 100%;
 			max-width: 20rem;
-			padding: 1rem;
+			padding: .25rem;
 			background: #2a2b2d;
 		}
 		.section.reg_list .section_content {

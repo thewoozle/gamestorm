@@ -35,7 +35,7 @@
 			
          iso_date(date) {
             // 2019-03-12
-            return moment(date).format('YYYY-M-d'); 
+            return moment(date).format('YYYY-M-DD'); 
          },
 			day_date(date) {
             // Mar 12th
