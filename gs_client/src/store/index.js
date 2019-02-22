@@ -296,6 +296,10 @@
 					commit ('set_member', {updatedMember: response.data.response.member.member});
                dispatch('get_reg_report');
 					resolve(response.data.response);
+               if(window.sessionStorage) {
+                  sessionStorage.memberList = JSON.stringify(state.members);
+               } 
+               
 				}, (err) => {
 					if (err.response.data.errors) {
 						errors.errors = err.response.data.errors;

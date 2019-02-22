@@ -65,11 +65,11 @@
                         
                      <div class="links">
                         <button class="link account_button" type="button"   @click="accountSection = 'intro'" >Intro</button>
-                        <button class="link account_button" type="button"   @click="accountSection = 'my_profile' " >edit profile</button>
-                        <button class="link account_button" type="button"   @click="accountSection = 'password' "  >change password</button>						
+                        <button class="link account_button" type="button"   @click="accountSection = 'my_profile' " >Update profile</button>
+                        <button class="link account_button" type="button"   @click="accountSection = 'password' "  >Change password</button>						
                         <button class="link status_button" type="button"  @click="accountSection = 'linked_accounts' "  >My Linked Accounts</button>
                         <button class="link account_button" type="button" @click="accountSection = 'my_convention'">My Convention </button>						
-                        <button class="link status_button" type="button" @click="accountSection = 'my_account'"  >My Account status</button>
+                        <button class="link status_button" type="button" @click="accountSection = 'my_account'"  >My account status</button>
                      </div>					
                   
                   </div>
@@ -130,7 +130,7 @@
                      
                   	<div class="aside_section intro" :class="accountSection == 'linked_accounts' ? 'show': ''">	
 							<span class="section_title">Linked Accounts</span>
-                     
+                     <pre>if multiple accounts on same email address or have chosen to link to this account</pre>
                      </div>
                      
                      
@@ -242,7 +242,7 @@
 		border-radius: var(--borderRadius);
       background: #2a2b2d;
       box-shadow: var(--blackBoxShadow);
-		padding: 3rem 2rem 1rem 2rem;
+		padding: 1rem 0;
       justify-content: space-between;
 	}
 	.section.account_section .section_content {
@@ -251,7 +251,6 @@
    
 	.section.account_section .section_content.main{
       display: flex;
-         flex-wrap: wrap;
       position: relative;
       width: 45%;
       
@@ -269,20 +268,23 @@
 	.section.account_section .user_info {
       display: flex;
       flex-wrap: wrap;
-      padding: 0 2rem;
+      padding: 0 1rem;
       width: 100%;
+      max-width: 25rem;
+      margin: 0 0 auto 0;
 	}
 	.section.account_section .user_info .section_title  {
-		font-size: 1.25rem;
+      font-size: 1.25rem;
 		text-align: center;
       justify-content: center;
       margin: 0 2rem;
+      width: 100%;
 		border-bottom: solid 1px var(--textColor2);
 	}
 	.section.account_section .info_wrapper {
       display: flex;
          flex-wrap: wrap;
-		padding: 1rem 2rem;
+		padding: 1rem .5rem;
       width: 100%;
 		
 	}
@@ -292,8 +294,8 @@
 	.section.account_section .info_wrapper .title{
 		display: flex;
       align-items: center;
-		width: 40%;
-		font-size: .9rem;
+		width: 5rem;
+		font-size: .8rem;
 		text-align: right;
       justify-content: flex-end;
 		padding-right: 1rem;
@@ -344,6 +346,7 @@
 	.section.account_section  .info_wrapper .city_state_zip {
 		display: flex;
       width: 100%;
+      font-size:.9rem;
 	}
 	.section.account_section .info_wrapper .info .info_element {
 		display: flex;
@@ -363,34 +366,29 @@
 	.section.account_section .links {
       display: flex;
          flex-direction: column;
-		border: solid 1px var(--borderColor);
-		border-radius: .15rem;
-		overflow: hidden;
-		width: 15rem;
-      margin: 2rem 6rem;
-		background: var(--lightColor);
+      margin: 2rem 0 auto .75rem;   
+      padding: .25rem .5rem .75rem .5rem;
+      background: rgba(30,77,95,.85);
+      border-radius: .2rem;
+      
 	}
 	
 	
 	.section.account_section .links .link {
       display: flex;
-      width: 15rem;
-		color: var(--textColor3);
-		padding: .5rem 1rem;
+      font-weight: 100;
+      font-size:.9rem;
 		cursor: pointer;
-		font-size: 1.15rem;
-		height: auto;
-		text-transform: capitalize;
-		text-align: left;
-		border-radius: 0;
+      background: none;
+      width: 8rem;
+      padding: 0 0 0 .5rem;
+      line-height: 1.5rem;
 	}
 	.section.account_section .links .link:hover,
 	.section.account_section .links .link.active {
-		background: var(--textColor3);
-		color: var(--lightColor);
+      
 	}
 	.section.account_section .links .link + .link {
-		margin-top: .1rem;
 		
 	}
 	

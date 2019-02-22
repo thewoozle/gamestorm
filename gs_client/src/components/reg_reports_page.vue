@@ -48,10 +48,6 @@
                   [list by name (filter location, attendance, age, price, reg date, ), badge, staff, guest GM (elegable/accepted), contact, volunteer, GM interest, industry guest, transaction, ]
             </pre>
             
-               <p>----------------------------------------------------------------------------------------------</p>
-               <p>VOLUNTEERS REPORT</p>
-               <p style="color: white" v-for="person in regReports.volunteers">{{person.first_name+' '+person.last_name}} - {{person.email}}</p>
-               
                
                <p>----------------------------------------------------------------------------------------------</p>
                <p>GUEST GMs REPORT</p>
@@ -63,6 +59,14 @@
                <p>STAFF  REPORT</p>
                <p style= "color: white">{{(regReports.staffList.length)+1}}</p>
                <p style="color: white" v-for="person in regReports.staffList">{{person.department_name+' - ' +person.first_name+' '+person.last_name}} - {{person.email}}</p>
+               
+               <p>----------------------------------------------------------------------------------------------</p>
+               <p>GM INTEREST REPORT</p>
+               <p style="color: white" v-for="person in regReports.gmInterest">{{person.email}}</p>
+               
+               <p>----------------------------------------------------------------------------------------------</p>
+               <p>VOLUNTEERS REPORT</p>
+               <p style="color: white" v-for="person in regReports.volunteers">{{person.first_name+' '+person.last_name}} - {{person.email}}</p>
                
                
                

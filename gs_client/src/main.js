@@ -24,9 +24,20 @@
 			handle_data_view(e) {
 				e.target.classList.contains('show')? e.target.classList.remove('show') : e.target.classList.add('show');
 			},
+         
+			event_date(date) {
+            // Thursday, Mar 12th
+				return  '<span class="day_name">'+ moment(date).format('dddd')+'</span><span class="day_date">, '  + moment(date).format('MMM Do')+'</span>';
+			},	
+         
+         event_day(date) {
+            // Thu
+            return moment(date).format('dd');
+         },
+         
 			article_date(date) {
             // Mar 12th
-				return  '<span class="month">'+ moment(date).format('MMM')+'</span> <span class="day">'+ moment(date).format('Do')+'</span>';
+				return  '<span class="month">'+ moment(date).format('MMM')+'</span> <span class="day"> '+ moment(date).format('Do')+'</span>';
 			},	
 			month_day_year(date) {
             // Mar, 12th, 2019
@@ -47,6 +58,7 @@
          },
          
          tag_time(date) {
+            // 05:00 am
             return moment(date).format('hh:mm a');
          },
          tag_day(date) {
