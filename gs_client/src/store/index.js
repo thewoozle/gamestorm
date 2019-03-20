@@ -57,6 +57,7 @@
       ageGroups      : {},  
       conLocations   : {},
       memberList     : {},
+		badgeTemplate		: null,
       timeblocks     : [],
       userEvents     : null,
 	}
@@ -91,6 +92,7 @@
 				  console.log('error: '+err.statusText);
 			  });
 		},
+      
 		
 		
 		
@@ -337,6 +339,21 @@
          }   
 		},
       
+      
+      // GET BADGE TEMPLATE
+      get_badge_template({commit}) {
+         var vm = this;
+         Axios.get(apiDomain+'_get_badge_template').then((response) => {
+            var template = response.data.template.trim(' ');
+            commit('set_badge_template', template);
+         }, (err) => {
+            console.log(err);
+         });
+         
+         
+      },
+            
+           
       
       // GET MEMBER INFO
       get_member_info({commit}, uuid) {
@@ -787,6 +804,10 @@
          state.regReports = regReports
       },
 		
+      // SET BADGE TEMPLATE 
+      set_badge_template: (state, template) => {
+         Vue.set(state,'badgeTemplate', template);
+      },
 		
 		// SET MEMBER 
 		set_member: (state, {updatedMember}) => {

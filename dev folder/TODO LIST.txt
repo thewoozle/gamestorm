@@ -1,4 +1,7 @@
 
+      for GS21
+      enable label printing
+      scan and record bar codes
 
       WIP
       
@@ -17,6 +20,7 @@
       registration:       
          change full membership data chunk to minimal data and add function to get full data for a single member
          update 'change badge number' function to work and check for used numbers
+         When a member is registered, clear staff info before setting status
       
       New Account-
          send email conf. 

@@ -147,6 +147,8 @@
                      var   eventDay       = vm.event_day(event.event_start_time),
                            eventTime      = vm.tag_time(event.event_start_time),
                            eventPresenters= '',
+                           eventCapacity  = null,
+                           eventDetails   = '',
                            conEvent       = '';
                            
                      Object.entries(event.presenters).forEach(([key2, presenter]) => {
@@ -154,11 +156,29 @@
                         eventPresenters += '<span class="presenter">'+presenter.first_name+' '+presenter.last_name+'</span>';
                      });
                      
+                     eventCapacity = '<span class="event_capacity"></span>'
+                     
+                     
+                     eventDetails = '<div class="event_dropdown">';
+                     eventDetails += '  <i class=" caret fas fa-caret-up"></i>';
+                     eventDetails +='  <div class="capacity_info">';
+                     eventDetails +='     <span class="detial">this event has x seats available, be the first to sign-up</span>';
+                     eventDetails +='     <span class="detial">this event has x seats with x open seats available. </span>';
+                     eventDetails +='     <span class="detial">this event is full. </span>';
+                     eventDetails +='     <span class="full_message">Adding this event to your schedule will make you #x on the waitlist</span>';
+                     eventDetails += ' </div>';
+                     eventDetails += ' <div class="long_description">'+event.event_description+'</div>';
+                     eventDetails += ' <div class="event_location">'+event.location+'</div>';
+                     eventDetails += '</div>';
+                     
                            
                      conEvent += '<div class="event '+ event.event_tag+'" style="background-color: '+ event.track_color+'">'; 
                      conEvent += '  <span class="event_name" >'+ event.event_name+'</span>';
+                     conEvent +=    eventCapacity;
                      conEvent += '  <span class="presenters">';
-                     conEvent += eventPresenters;
+                     conEvent +=       eventPresenters;
+                     conEvent += '  </span>';
+                     conEvent +=    eventDetails;
                      conEvent += '</div>';
                      
                      
@@ -182,31 +202,6 @@
                   });
                
                }           
-               
-               
-               /*
-                  <div class="day_wrapper">
-                     <span class="day_name">Thursday</span>,
-                     <span class="day_date">Mar 27th</span>
-                  </div>
-               
-                  <div class="timeblock">
-                     <span class="time">11:00am</span>
-                     <div class="events">
-                     
-                     
-                     
-                        <div class="event" :class="'tag_'+event.event_tag" v-for="event in filtered_con_events()" v-bind:style="{'background-color' : event.track_color}">
-                           <span class="" v-text="event.event_name"></span>
-                           
-                           <span class="presenters">
-                              <span class="presenter" v-for="presenter in event.presenters" v-text="presenter.first_name+' '+presenter.last_name"></span>
-                           </span>
-                        </div>
-                     </div>   
-                  </div>   
-               */
-               
                
                return timeblocks;
                
@@ -279,8 +274,9 @@
       }
       
       .events_display .events .event {
+         position: relative;
          display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
          background: #bbb;
          padding: .25rem .35rem;
          min-height: 3rem;
@@ -293,11 +289,13 @@
       }
       .events_display .events .event:hover {
          opacity: .9;
+         z-index: 25;
       }
       .events_display .events .event .event_name {
          display: flex;
-         width: 100%;
+         min-width: 6rem;
          letter-spacing: .025em;
+         padding-right: 3.5rem;
          text-shadow: -1px -1px 0px rgba(0,0,0,0.25);
       }
       .events_display .events .event .presenters {
@@ -308,6 +306,57 @@
          color: #000;
          font-size: .7rem;
          text-shadow: 1px 1px 1px rgba(255,255,255,.35);
+      }
+      .events_display .events .event .event_capacity {
+         position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 10;
+            width: 3rem;
+            height: 1rem;
+            margin: .25rem;
+            border-radius: .1rem;
+            background: rgba(0,0,0,0.35);
+         
+      }
+      .events_display .events .event .event_dropdown {
+         display: flex;
+            flex-wrap: wrap;
+         position: absolute;
+            top: calc(100% + .75rem);
+            left: -5rem;
+            z-index: -1;
+         max-height: 0;
+         width: 100vw;
+         max-width: 30rem;
+         opacity: 0;         
+         border-radius: .35rem;
+         overflow: hidden;
+         color: var(--mainColor);
+         background: var(--altColor);
+         filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.5) );
+         padding: .5rem; 
+         transition: opacity .3s, position .3s, max-height .3s;
+      }
+      .events_display .events .event:hover .event_dropdown {
+         z-index: 10;
+         max-height: 30rem;
+         overflow: visible;
+         opacity: 1;
+         border: solid 3px #444;
+      }
+      .events_display .events .event .event_dropdown .caret {
+         position: absolute;
+            top: -1.4rem;
+            left: 5rem;
+            z-index: 10; 
+         font-size: 2rem;   
+         color: #444;
+      }
+      .events_display .events .event .event_dropdown .capacity_info {
+         display: flex;
+            flex-wrap: wrap;
+         width: 100%;
       }
 	
 	

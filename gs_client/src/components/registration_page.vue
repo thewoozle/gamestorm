@@ -411,11 +411,11 @@
 							<div class="list">
 							
 								<button class="edit_member_button" 
-									v-bind:class="result.con_status > 0? 'attending' : ''" 
 									v-for="result in filteredMembers"   
-									@click="()=> { get_member_info(result.uuid);}" 
+									v-bind:class="result.con_status > 0? 'attending' : ''" 
+                           v-if="badge_sorting(result)"
+									@click="()=> { get_member_info(result.uuid);}"                            
 								>
-								
 									<span class="element status_info" v-if="result.con_status > 0" v-html="result.membership_description"></span>
 									
 									<span class="element name" v-text="result.first_name+' '+result.last_name"></span>			
@@ -454,6 +454,8 @@
 		import Vue from 'vue'
 		import { mapGetters, mapState } from 'vuex'
 		import Router from 'vue-router'
+      
+      
 		
 		Vue.use(Router);
 		
@@ -487,19 +489,19 @@
 			
 			computed: {
             ...mapState({    
-            }),
-				...mapGetters({
+					badgeTemplate	: 'badgeTemplate',
 					conventionInfo	: 'conventionInfo',
-					user		   	: 'user',
-					statesList		: 'states',
 					conventions		: 'conventions',
-					members			: 'members',
-					statesList		: 'statesList',	
+					statesList		: 'statesList',
 					memberTypes		: 'memberTypes',
-					regSettings		: 'regSettings',
 					departments		: 'departments',
 					paymentMethods	: 'paymentMethods',
-					staffPositions	: 'staffPositions',
+					staffPositions	: 'staffPositions',	
+            }),
+				...mapGetters({
+					user		   	: 'user',
+					members			: 'members',
+					regSettings		: 'regSettings',
                memberInfo     : 'memberInfo',
 				}),
 				
@@ -530,14 +532,11 @@
 					if (vm.members.length  !== undefined) {
 						
 						switch(vm.memberSort) {
-							// case 'badge_number' :
-								// members =  vm.members.sort((a, b) => {
-									// return a[vm.memberSort] ? a[vm.memberSort].localeCompare(b[vm.memberSort]) : 1;
-									// return b[vm.memberSort] ? b[vm.memberSort].localeCompare(a[vm.memberSort]) : -1;
-									// //a[vm.memberSort].localeCompare(b[vm.memberSort])
-								// });			
-							
-								// break;
+							case 'badge_number' :
+								members =  vm.members.sort((a, b) => {
+                           return a[vm.memberSort] - b[vm.memberSort];                           
+								});							
+								break;
 								
 							case 'con_department':
 								members =  vm.members.sort((a, b) => {
@@ -594,7 +593,7 @@
 				
 				this.get_store_data();
             vm.member.state = '';
-				
+            dymo.label.framework.init(vm.startupCode);
 			},
 			
 			mounted: ()=> {
@@ -607,6 +606,7 @@
 				get_store_data() {
 					var vm = this;
 					vm.$store.dispatch('get_reg_data').then(()=>{});
+               vm.$store.dispatch('get_badge_template').then(()=>{});
 					vm.$store.dispatch('get_reg_report').then(()=>{});
 					vm.$store.dispatch('get_members').then(() => {});
 					vm.$store.dispatch('get_reg_settings').then(()=>{});
@@ -658,6 +658,17 @@
                vm.member.state = '';
 				},
 				
+            // IF BADGE SORT 
+            badge_sorting(result){
+               var   vm = this,
+                     status = true;
+               if (vm.memberSort == 'badge_number') {
+                  result.badge_number > 0? status = true : status = false;    
+               } else {
+                  status = true;
+               }
+               return status;
+            },
 				// SEARCH QUERY
 				search_members(e) { 
 					this.searchQuery = e.target.value;
@@ -690,6 +701,56 @@
                slideout == 'showGuestGms'? vm.showGuestGms = true : vm.showGuestGms = false;
                slideout == 'showTransactions'? vm.showTransactions = true : vm.showTransactions = false;
             },
+            
+            startupCode() {
+                /* access DYMO Label Framework Library */
+            },
+
+
+            
+            // PRINT BADGE 
+            
+            
+				/*	----------------------------- PRINT BADGES	----------------------	*/
+				print_badge(member){
+               
+                           
+               var vm = this,
+						printers 	= dymo.label.framework.getPrinters(),
+						fullName	   = member.first_name+' '+member.last_name || '',
+						badgeNumber	= ''+member.badge_number || '', 
+						badgeName 	= member.badge_name || member.first_name,
+						badgeName2	= member.badge_name2 || '',
+						//barcode 	= vm.conNum.replace(/_/g, '')+'-'+ vm.member.id,
+						badgeLabel = vm.badgeTemplate; 
+                  
+               
+               if(member.badge_number) {
+                  console.log('printing badge label');
+                  if (printers.length > 0) {
+                     for (var i = 0; i < printers.length; ++i){
+                        var printer = printers[i];
+                        var labelSet = new dymo.label.framework.LabelSetBuilder(); 
+                        var record = labelSet.addRecord(); 
+                        
+                        if (printer.printerType == "LabelWriterPrinter") {
+                           //console.log(printer.name);
+                           //printerName = printer.name;
+                           
+                           record.setText("BADGE_NAME", badgeName);
+                           record.setText("BADGE_NAME_2", badgeName2);
+                           record.setText("BADGE_NUMBER", badgeNumber);
+                           record.setText("FULL_NAME", fullName);
+                           //badgeLabel.setObjectText("BARCODE", barcode);
+                           dymo.label.framework.printLabel(printer.name, null,badgeLabel,labelSet);		
+                        }	
+                     }
+                  }
+               } else {
+                  console.log('no badge number');
+               }
+				},	
+            
             
 				
 				// SUBMIT MEMBER FOR REGISTRATION

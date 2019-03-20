@@ -1,22 +1,33 @@
-   PHP MYADMIN query for members roles at gs_20`
+   PHP MYADMIN query for GS
 
-   SELECT * FROM `gs_20` g
+   - sql query to select all members
+   SELECT first_name, last_name, g.updated_at, email FROM `gs_21_membership` g
    INNER JOIN `users` u ON g.con_uuid = u.uuid
-   WHERE g.con_position > 0
+   WHERE g.con_status > 0
    ORDER BY u.last_name
    
-   sql query for staff gms for gs_20
-   SELECT `first_name`,`last_name`, `short_name`, p.`position` FROM `gs_20` g
+   - sql query for staff gms for gs_21
+   SELECT `first_name`,`last_name`, `short_name`, p.`position` FROM `gs_21_membership` g
    INNER JOIN `users` u ON g.con_uuid = u.uuid
    INNER JOIN `convention_staff`s ON g.con_uuid = s.uuid
    INNER JOIN `staff_positions` p ON g.con_position = p.id
    INNER JOIN `departments` d on g.con_department = d.id
    WHERE g.con_department = 17
    ORDER BY u.last_name
+   
+   - staff list 
+   SELECT `last_name`,`first_name`, `short_name`, m.`type` FROM `gs_21_membership` g
+   INNER JOIN `users` u ON g.con_uuid = u.uuid
+   INNER JOIN `member_types` m ON g.con_status = m.id
+   LEFT JOIN `convention_staff`s ON g.con_uuid = s.uuid
+   LEFT JOIN `staff_positions` p ON g.con_position = p.id
+   LEFT JOIN `departments` d on g.con_department = d.id
+   WHERE g.con_status = 15 or g.con_status = 21
+   ORDER BY u.last_name
+   
+   
 
-
-   GUEST GMS: 
-
+   - GUEST GMS: 
    SELECT * FROM `gs_21_membership` g
    INNER JOIN `users` u ON g.con_uuid = u.uuid
    WHERE g.con_status = 14
@@ -28,4 +39,60 @@
    inner join `event_tracks` t on t.id = e.event_track
    inner join `event_types` x on x.id = e.event_type   
    inner Join `users` u on u.uuid = p.event_uuid
-   Where e.created_at> '2019-01-17'
+   Where e.created_at> '2019-03-6'
+   
+   
+   
+   - staff for CSV  
+   SELECT `badge_number`,`last_name`,`first_name`, `badge_name`, IFNULL(`badge_name2`, ""), u.`barcode` FROM `gs_21_membership` g
+   INNER JOIN `users` u ON g.con_uuid = u.uuid
+   INNER JOIN `member_types` m ON g.con_status = m.id
+   LEFT JOIN `convention_staff`s ON g.con_uuid = s.uuid
+   LEFT JOIN `staff_positions` p ON g.con_position = p.id
+   LEFT JOIN `departments` d on g.con_department = d.id
+   WHERE g.con_status = 15 or g.con_status = 21
+   ORDER BY u.last_name
+   
+   - adult paid, industry guest,  & guest GM for CSV 
+   SELECT `badge_number`,`last_name`,`first_name`, `badge_name`, IFNULL(`badge_name2`, ""), u.`barcode` FROM `gs_21_membership` g
+   INNER JOIN `users` u ON g.con_uuid = u.uuid
+   INNER JOIN `member_types` m ON g.con_status = m.id
+   LEFT JOIN `convention_staff`s ON g.con_uuid = s.uuid
+   LEFT JOIN `staff_positions` p ON g.con_position = p.id
+   LEFT JOIN `departments` d on g.con_department = d.id
+   WHERE g.con_status = 1 or g.con_status = 14 or g.con_status = 20
+   ORDER BY u.last_name
+   
+   - YA paid for CSV 
+   SELECT `badge_number`,`last_name`,`first_name`, `badge_name`, IFNULL(`badge_name2`, ""), u.`barcode` FROM `gs_21_membership` g
+   INNER JOIN `users` u ON g.con_uuid = u.uuid
+   INNER JOIN `member_types` m ON g.con_status = m.id
+   LEFT JOIN `convention_staff`s ON g.con_uuid = s.uuid
+   LEFT JOIN `staff_positions` p ON g.con_position = p.id
+   LEFT JOIN `departments` d on g.con_department = d.id
+   WHERE g.con_status = 6
+   ORDER BY u.last_name
+   
+   
+   - child paid for CSV 
+   SELECT `badge_number`,`last_name`,`first_name`, `badge_name`, IFNULL(`badge_name2`, ""), u.`barcode` FROM `gs_21_membership` g
+   INNER JOIN `users` u ON g.con_uuid = u.uuid
+   INNER JOIN `member_types` m ON g.con_status = m.id
+   LEFT JOIN `convention_staff`s ON g.con_uuid = s.uuid
+   LEFT JOIN `staff_positions` p ON g.con_position = p.id
+   LEFT JOIN `departments` d on g.con_department = d.id
+   WHERE g.con_status = 12
+   ORDER BY u.last_name
+   
+   
+   
+   - dealers for CSV  
+   SELECT `badge_number`,`last_name`,`first_name`, `badge_name`, IFNULL(`badge_name2`, ""), u.`barcode` FROM `gs_21_membership` g
+   INNER JOIN `users` u ON g.con_uuid = u.uuid
+   INNER JOIN `member_types` m ON g.con_status = m.id
+   LEFT JOIN `convention_staff`s ON g.con_uuid = s.uuid
+   LEFT JOIN `staff_positions` p ON g.con_position = p.id
+   LEFT JOIN `departments` d on g.con_department = d.id
+   WHERE g.con_status = 15 or g.con_status = 21
+   ORDER BY u.last_name
+   

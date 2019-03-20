@@ -1685,6 +1685,7 @@
          display: flex;
             align-items: center;
             justify-content: center;
+            flex-wrap: nowrap;
          font-size: 2rem;
 			cursor: pointer;
 			height: 1em;
