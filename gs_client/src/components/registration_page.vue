@@ -40,7 +40,7 @@
 						</div>
 								
 						<div class="control_wrapper ">
-							<button class="toggle_button" v-bind:class="regSettings.reg_mode== 1? 'active':''"  type="button" @click.prevent="update_reg_settings('reg_mode', $event)" >
+							<button class="toggle_button" v-bind:class="regSettings.reg_mode== 1? 'active':''"  type="button" @click.prevent="update_reg_settings('reg_mode')" >
 								<span class="text_wrapper">
 									<span class="text">At-Convention Mode</span> 
 								</span>
@@ -120,6 +120,7 @@
 						
 						<div class="form_content info">
 								<div class="form_content main">
+                           <span class="con_mode_status" v-if="regSettings.reg_mode > 0"> At-Con Mode</span>
 									<div class="form_row">
 										<div class="input_wrapper">
 											<input  class="text_box" type="text" name="first_name" v-model="member.first_name" @keyup="search_members" v-on:keydown.once="formErrors['first_name'] = null" />
@@ -399,10 +400,10 @@
 								<button type="button" class="control_button fal fa-redo-alt" @click.prevent="()=> {searchQuery=''; member={};}"></button>
 							</div>
 							<div class="buttons">
-								<button type="button" class="control_button" :class="memberSort == 'last_name'? 'active' : ''" @click="()=>{memberSort = 'last_name'}">Last Name</button>								
-								<button type="button" class="control_button" :class="memberSort == 'badge_number'? 'active' : ''" @click="()=> {memberSort = 'badge_number'}">Badge Number</button>
-								<button type="button" class="control_button" :class="memberSort == 'con_department'? 'active' : ''" @click="()=> {memberSort = 'con_department'}">Staff</button>
-								<button type="button" class="control_button" :class="memberSort == 'updated_at'? 'active' : ''" @click="()=> {memberSort = 'updated_at'}">Newest</button>
+								<button type="button" class="control_button" :class="memberSort == 'last_name'? 'active' : ''" @click="()=>{memberSort = 'last_name'; get_filtered_members();}">Last Name</button>								
+								<button type="button" class="control_button" :class="memberSort == 'badge_number'? 'active' : ''" @click="()=> {memberSort = 'badge_number'; get_filtered_members();}">Badge Number</button>
+								<button type="button" class="control_button" :class="memberSort == 'con_department'? 'active' : ''" @click="()=> {memberSort = 'con_department'; get_filtered_members()}">Staff</button>
+								<button type="button" class="control_button" :class="memberSort == 'updated_at'? 'active' : ''" @click="()=> {memberSort = 'updated_at'; get_filtered_members()}">Newest</button>
 							</div>
 						</div>	
 						
@@ -412,15 +413,15 @@
 							
 								<button class="edit_member_button" 
 									v-for="result in filteredMembers"   
-									v-bind:class="result.con_status > 0? 'attending' : ''" 
+									v-bind:class="result.badge_number ? 'attending' : ''" 
                            v-if="badge_sorting(result)"
 									@click="()=> { get_member_info(result.uuid);}"                            
 								>
-									<span class="element status_info" v-if="result.con_status > 0" v-html="result.membership_description"></span>
+									<span class="element status_info" v-if="result.badge_number" v-html="result.membership_description"></span>
 									
 									<span class="element name" v-text="result.first_name+' '+result.last_name"></span>			
 									
-									<span class="element badge_wrapper" v-if="result.con_status > 0">
+									<span class="element badge_wrapper" v-if="result.badge_number">
 										<span class="element badge_num" v-text="result.badge_number"></span>
 										<span class="badge_name_wrapper">
 											<span class="element badge_name" v-text="result.badge_name"></span>
@@ -472,6 +473,7 @@
 					showRegSettings: false,
                showGuestGms   : false,
 					showTransactions: false,
+               filteredMembers: {},
 					member			: {},
 				//conNum : 0,
 					searchQuery 	: '',
@@ -519,7 +521,38 @@
 					
 				},
 				
-				filteredMembers: function() {
+				
+				
+			},
+			
+			created() {
+				var vm = this;
+				vm.check_user();
+				
+				this.get_store_data();
+            vm.member.state = '';
+            vm.get_filtered_members();
+            //dymo.label.framework.init(vm.startupCode);
+			},
+			
+			mounted: ()=> {
+				
+			},
+			
+			
+			methods: {				
+				// GET STORE DATA FOR VUEX  
+				get_store_data() {
+					var vm = this;
+					vm.$store.dispatch('get_reg_data').then(()=>{});
+               vm.$store.dispatch('get_badge_template').then(()=>{});
+					vm.$store.dispatch('get_reg_report').then(()=>{});
+					vm.$store.dispatch('get_members').then(() => {});
+					vm.$store.dispatch('get_reg_settings').then(()=>{});
+				},
+            
+            
+				get_filtered_members() {
 					var vm = this,
 						badgeName,
 						badgeNumber,
@@ -527,14 +560,16 @@
 						firstName,
 						lastName,
 						email,
+                  filteredMembers,
 						members;
-						//console.log(vm.members.length);
+						//console.log(vm.members.length);      
+						//vm.filteredMembers = {};
 					if (vm.members.length  !== undefined) {
-						
 						switch(vm.memberSort) {
 							case 'badge_number' :
+                     console.log(vm.memberSort);
 								members =  vm.members.sort((a, b) => {
-                           return a[vm.memberSort] - b[vm.memberSort];                           
+                           return parseInt(a[vm.memberSort]) - parseInt(b[vm.memberSort]);                           
 								});							
 								break;
 								
@@ -561,9 +596,9 @@
 						}
 						
 						if (vm.searchQuery.length > 1) {	
-							return members.filter(function(member) {
+                     filteredMembers = members.filter(function(member) {
 								member.badge_name	? badgeName	= member.badge_name	: badgeName = '';
-								member.badge_number	? badgeNumber= member.badge_number	: badgeNumber = '';
+								member.badge_number	? badgeNumber= parseInt(member.badge_number)	: badgeNumber = 0;
 								member.full_name 	? fullName	= member.full_name	: fullName = '';
 								member.first_name 	? firstName = member.first_name : firstName = '';
 								member.last_name 	? lastName 	= member.last_name 	: lastName = '';
@@ -572,45 +607,22 @@
 								
 								return 	fullName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
 									badgeName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 ||  
-								//	badgeNumber.indexOf(vm.searchQuery ) !== -1 || 
+									badgeNumber.indexOf(vm.searchQuery ) !== -1 || 
 									firstName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
 									lastName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1  || 
                            fullname.indexOf(vm.searchQuery.toLowerCase()) !== -1 ||
 									email.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1;
 							});
+                     
+                     Vue.set(vm,'filteredMembers', filteredMembers);
 						} else {
-							return members;
+                     filteredMembers = members;
+							Vue.set(vm,'filteredMembers', members);
 						}
 					}
 				},
-				
-				
-			},
-			
-			created() {
-				var vm = this;
-				vm.check_user();
-				
-				this.get_store_data();
-            vm.member.state = '';
-            dymo.label.framework.init(vm.startupCode);
-			},
-			
-			mounted: ()=> {
-				
-			},
-			
-			
-			methods: {				
-				// GET STORE DATA FOR VUEX  
-				get_store_data() {
-					var vm = this;
-					vm.$store.dispatch('get_reg_data').then(()=>{});
-               vm.$store.dispatch('get_badge_template').then(()=>{});
-					vm.$store.dispatch('get_reg_report').then(()=>{});
-					vm.$store.dispatch('get_members').then(() => {});
-					vm.$store.dispatch('get_reg_settings').then(()=>{});
-				},
+            
+            
 				
             // GET MEMBER INFO 
             get_member_info(uuid) {
@@ -645,9 +657,18 @@
 				},
 				
 				// UPDATE REG SETTINGS
-				update_reg_settings() {
+				update_reg_settings(setting) {
+               var   vm = this,
+                     mode;
+                     
+               if(setting == 'reg_mode') {
+                  vm.regSettings.reg_mode == 0? mode = 1 : mode = 0;
+               }      
+               
+               vm.$store.dispatch('update_reg_settings', {'reg_mode' : mode}).then(()=>{});
 					
 				},
+            
 				
 				// RESET REG FORM 
 				reset_reg_form(e) {
@@ -657,18 +678,30 @@
 					vm.searchQuery = '';
                vm.member.state = '';
 				},
+            
 				
             // IF BADGE SORT 
-            badge_sorting(result){
+            badge_sorting(result) {
                var   vm = this,
                      status = true;
-               if (vm.memberSort == 'badge_number') {
-                  result.badge_number > 0? status = true : status = false;    
-               } else {
-                  status = true;
-               }
-               return status;
+               
+					switch (vm.memberSort) {
+						case 'badge_number':
+                     result.badge_number > 0? status = true : status = false;    
+							break;
+                  
+						case 'con_department':
+                     result.con_department > 0? status = true : status = false; 
+							break;                  
+							
+						default:
+                     status = true;                  
+					}  
+
+               return status;                  
             },
+            
+            
 				// SEARCH QUERY
 				search_members(e) { 
 					this.searchQuery = e.target.value;
@@ -723,7 +756,7 @@
 						badgeName2	= member.badge_name2 || '',
 						//barcode 	= vm.conNum.replace(/_/g, '')+'-'+ vm.member.id,
 						badgeLabel = vm.badgeTemplate; 
-                  
+                  //console.log(printers);
                
                if(member.badge_number) {
                   console.log('printing badge label');
@@ -774,12 +807,15 @@
 							vm.formErrors = response.errors;
 						} else {
 							if (vm.formErrors.length <1) {
+                        console.log(response.member);
+                        vm.regSettings.reg_mode > 0? vm.print_badge(response.member.member)  : '';
 								vm.member = [];
 								vm.searchQuery = '';
+                        vm.memberSort = 'last_name';
 							}
-                     vm.$store.dispatch('get_members').then(() => {
-                        vm.$forceUpdate();	                           
-                     });
+                     
+                     
+                     vm.get_filtered_members();
                      vm.member.state = '';
 						}
 					});
@@ -965,6 +1001,17 @@
 			flex-wrap: wrap;
 			width: 100%;
 		}
+      .reg_form .con_mode_status {
+         position: absolute;
+         top: 0;
+         left: 0;
+         width: 100%;
+         text-align: center;
+         color: var(--glowColor);
+         font-size: 1.25rem;
+         font-weight: bold;
+         text-shadow: 2px 2px 5px rgba(0,0,0,0.85);
+      }
 		.reg_form .form_row {
 			margin-top: 0;
 			padding: 0;

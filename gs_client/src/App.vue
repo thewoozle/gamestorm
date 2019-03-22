@@ -1167,6 +1167,8 @@
 			left: 13.5%;
 			width: 75%;
 			height: .25rem;
+         border-radius: .1rem;
+         background: var(--glowColor);
 			opacity: 0;
 		}
 		.toggle_button .checkbox {
@@ -1175,7 +1177,7 @@
 			opacity: 0;
 		}
 		.toggle_button:hover .grad_bar {
-			opacity: .25;
+			opacity: .15;
 		}		
 		.toggle_button.active .grad_bar {
 			opacity: 1;

@@ -316,11 +316,16 @@
 		// GET REG SETTINGS	
 		get_reg_settings({commit}) {
 			Axios.get(apiDomain + '_get_reg_settings').then((response) => {
-				commit('set_reg_settings', {regSettings: response.data.regSettings} );
+				commit('set_reg_settings', response.data.regSettings );
 			}, (err) => {
 				  console.log(err.statusText);
-			  });			
+			});			
 		},
+      
+      // UPDATE REG SETTINGS 
+      update_reg_settings({commit}, setting) {
+         commit('set_reg_setting', setting );
+      },
 		
 		// GET MEMBERS
 		get_members({commit}) {
@@ -746,17 +751,19 @@
 		
 		// SET MEMBERS (chunks of 20%)
 		set_members: (state, { members, action }) => {
-         var vm = this;
+         var   vm = this,
+               _members = state.members;
+               
          if(action == 'localstorage') {
             if(window.sessionStorage) {
-               state.members = JSON.parse(sessionStorage.memberList);
+               Vue.set(state, 'members', JSON.parse(sessionStorage.memberList));
             } 
          } else { 
          
             members.forEach((member)=> {
                var inMembers = false;
                
-               state.members.forEach((_member)=>{
+               _members.forEach((_member)=>{
                   if(_member.uuid == member.uuid) {
                      _member = member;
                      inMembers = true;
@@ -764,15 +771,17 @@
                });
                
                if(!inMembers) {
-               state.members.push(member);
+               _members.push(member);
                   inMembers = false;
                   console.log('new');
                }
             });
             if(window.sessionStorage) {  
-               sessionStorage.memberList = JSON.stringify(state.members); 
+               sessionStorage.memberList = JSON.stringify(_members); 
             }     
          }
+         
+         Vue.set(state, 'members', _members);
 		},
 		
 		
@@ -830,8 +839,35 @@
       
 		
 		// 	set reg settings	
-		set_reg_settings: (state, { regSettings }) => {
+		set_reg_settings: (state,  regSettings ) => {
 			state.regSettings = regSettings;
+		},
+      
+		// 	set reg setting (update)	
+		set_reg_setting: (state,  setting ) => {
+         //console.log(setting); 
+         var vm = this;         
+         // update regSettings for setting
+         
+         Object.entries(setting).forEach(([_setting, item])=>{         
+            Object.entries(state.regSettings).forEach(([key, value])=>{
+               _setting == key? state.regSettings[key] = item : '';
+            });
+         });
+                  
+			Axios.post(apiDomain + '_update_reg_settings', state.regSettings, {
+            headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}}).then((response) => {
+			}, (err) => {
+				  console.log(err.statusText);
+			});	
+
+
+            // Axios.post(apiDomain+'_password_reset_request',  {email : email }, {
+               // headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+            // }).then((response) => {
+               
+         
+			//state.regSettings = regSettings;
 		},
 		
 		// SET REG DATA
@@ -875,6 +911,7 @@
 		regReport 		: state => state.regReport,
 		members			: state => state.members,
 		memberTypes		: state => state.memberTypes,
+      memberInfo     : state => state.memberInfo,
 		regSettings		: state => state.regSettings,
 		departments		: state => state.departments,
 		paymentMethods : state => state.paymentMethods,

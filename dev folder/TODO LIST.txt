@@ -1,37 +1,35 @@
 
       for GS21
-      enable label printing
+      enable label printing on save
       scan and record bar codes
 
       WIP
       
-         add membership credit for rollovers. 
-         - make controller handle data 
-         
-         re-doing scheduling system
       
       
       TODO
 
-      Navigation
+      NAVIGATION
          add info and connect views
          
       
-      registration:       
-         change full membership data chunk to minimal data and add function to get full data for a single member
-         update 'change badge number' function to work and check for used numbers
+      REGISTRATION:       
+         //change full membership data chunk to minimal data and add function to get full data for a single member
+         update 'change badge number' function to check for used numbers
          When a member is registered, clear staff info before setting status
+         
+         transaction sort by last for descending
       
-      New Account-
-         send email conf. 
+      ACCOUNT-
+         send email conf. for new account
          
       
       account - 
       
-         
+          
          
    
-      scheduling
+      SCHEDULING
          redo control panel with big display boxes and simple pie chart
          
          redo tab box to use components instead of all that in-page markup and script
@@ -40,6 +38,18 @@
          change event-save to create proper tags
          
          add mass-upload from csv
+         
+         event location select filter by table requst
+         
+         user-table visibility
+         
+         websocket event signups
+         
+         event filter > user favorites
+         
+         signups - get into waitlist with other conflict alert
+         
+         
    
    
    
