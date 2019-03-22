@@ -18,6 +18,8 @@
          update 'change badge number' function to check for used numbers
          When a member is registered, clear staff info before setting status
          
+         create 'name on badge' field with 'no name' checkbox
+         
          transaction sort by last for descending
       
       ACCOUNT-

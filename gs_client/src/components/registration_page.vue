@@ -134,10 +134,17 @@
 											<span class="form_error" v-if="formErrors.last_name" v-text="formErrors.last_name? 'Last Name required' : ''"></span>
 										</div>	
 									</div>
+                           
+									<div class="form_row">
+										<div class="input_wrapper" title="defaults to full name">
+											<input  class="text_box" type="text" name="display_name" v-model="member.display_name" @keyup="search_members" v-on:keydown.once="formErrors['display_name'] = null" placeholder="defaults to full name" />
+											<label>Name shown on Badge</label>
+										</div>
+                           </div>
 									
 									<div class="form_row">	
 										<div class="input_wrapper">
-											<input  class="text_box" type="text" name="badge_name" v-model="member.badge_name" @keyup="search_members"     v-on:keydown.once="formErrors['badge_name'] = null" />
+											<input  class="text_box" type="text" name="badge_name" v-model="member.badge_name" @keyup="search_members"     v-on:keydown.once="formErrors['badge_name'] = null" placeholder="defaults to first name" />
 											<label>Badge Name</label>
 											<span class="form_error" v-if="formErrors.badge_name" v-text="formErrors.badge_name? 'Badge Name Required' : ''"></span>
 										</div>	
@@ -753,7 +760,7 @@
                            
                var vm = this,
 						printers 	= dymo.label.framework.getPrinters(),
-						fullName	   = member.first_name+' '+member.last_name || '',
+						fullName	   = member.display_name || '',
 						badgeNumber	= ''+member.badge_number || '', 
 						badgeName 	= member.badge_name || member.first_name,
 						badgeName2	= member.badge_name2 || '',
@@ -798,6 +805,11 @@
 					if(!vm.member.badge_name) {
 						vm.member.badge_name = vm.member.first_name;
 					}
+               
+					if(!vm.member.display_name) {
+						vm.member.display_name = vm.member.first_name + ' ' + vm.member.last_name;
+					}
+                              
 					if (vm.member.con_status > 0) {
 						vm.member.membership_description = vm.memberTypes.find(type => type.id == vm.member.con_status).membership_description;
 					} else {
