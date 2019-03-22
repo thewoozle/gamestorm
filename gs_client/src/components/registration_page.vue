@@ -607,10 +607,10 @@
 								
 								return 	fullName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
 									badgeName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 ||  
-									badgeNumber.indexOf(vm.searchQuery ) !== -1 || 
+									//badgeNumber.indexOf(vm.searchQuery ) !== -1 || 
 									firstName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
 									lastName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1  || 
-                           fullname.indexOf(vm.searchQuery.toLowerCase()) !== -1 ||
+                           //fullname.indexOf(vm.searchQuery.toLowerCase()) !== -1 ||
 									email.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1;
 							});
                      
@@ -704,7 +704,10 @@
             
 				// SEARCH QUERY
 				search_members(e) { 
-					this.searchQuery = e.target.value;
+					var vm = this;
+               
+               vm.searchQuery = e.target.value;
+               vm.searchQuery? vm.get_filtered_members() : '';
 				}, 
             
             // SET EMAIL CONF 
