@@ -8,9 +8,48 @@
 					<p>convention, active events, database connection</p>
 				</section>
 				
-				<section class="section convention_panel">
+				<section class="section conventions">
 					<p>CONVENTION SETTINGS PANEL</p>
-					<p>basic con settings, like dates, names, venue</p>
+					<p>[ list of cons with past cons un-editable. active button, edit button ]</br>
+                  [ list of venues, active and edit buttons ]</br>
+                  [ new convention and venue forms ]
+               </p>
+               <div class="panel">
+                  <div class="slideout" :class="showConventionSlideout? 'show' : ''">
+                     <form class="">
+                        
+                        <div class="form_row">
+                           <div class="input_wrapper" title="defaults to full name">
+                              <input  class="text_box" type="text" name="convention" v-model="newConvention.name"  v-on:keydown.once="formErrors['convention'] = null"  />
+                              <datalist >
+                                 <option v-for="convention in unique_conventions()"  v-bind:value="convention" v-text="convention"></option>
+                              </datalist>
+                              <label>Convention Name</label>
+                           </div>
+                        </div>
+                     
+                     </form>
+                  </div>
+               
+                  <div class="" v-for="convention in conventions" >
+                     <span class="" v-text="convention.name+' '+convention.con_num"></span>
+                     <span class="" v-text="month_day_year(convention.start_date_time) +' - ' + month_day_year(convention.end_date_time) "></span>
+                     <button class="toggle_control active_toggle fa-circle" v-bind:class="convention.active? 'fas' : 'fal' " v-bind:title="convention.active? 'deactivate' : 'activate'"></button>
+                     <button class="toggle_control edit_toggle fal fa-edit" title="edit convention" ></button>
+                  </div>
+                  <button class="button" @click="showConventionSlideout ? showConventionSlideout = false : showConventionSlideout = true">New Convention</button>
+               </div>
+               
+               
+               <div class="panel">
+                  <div class="" v-for="venue in venues" >
+                     <span class="" v-text="venue.venue_name"></span>
+                     <button class="toggle_control active_toggle fa-circle" v-bind:class="venue.active? 'fas' : 'fal' " v-bind:title="venue.active? 'deactivate' : 'activate'"></button>
+                     <button class="toggle_control edit_toggle fal fa-edit" title="Edit venue" ></button>
+                  </div>
+                  <button class="button">New Venue</button>
+               </div>
+               
 				</section>
 				
 				<section class="section news_panel">
@@ -52,8 +91,10 @@
 			
 			data() {
 				return {
-					userPass : false,
-					
+					userPass                : false,
+					newConvention           : {},
+               newVenue                : {},
+               showConventionSlideout  : false,
 				}
 			},
 			
@@ -67,7 +108,9 @@
 			computed: {
 				...mapGetters({
 					user			: 'user',
-					regReport		: 'regReport'
+					regReport	: 'regReport',
+               conventions : 'conventions',
+               venues      : 'venues',
 				}),
 				
 				
@@ -103,7 +146,19 @@
 						} 
 					}					
 					vm.userPass? '' : vm.$router.push('/mainpage');					
-				}				
+				},
+
+            // GET UNIQUE CONVENTION NAMES
+            unique_conventions() {
+               var   vm       = this,
+                     conNames = [];
+               
+               Object.entries(vm.conventions).forEach((con)=>{
+                  conNames.indexOf(con[1].name) === -1? conNames.push(con[1].name) : '';
+               });
+               
+               return conNames;
+            },
 				
 			}
 			
@@ -119,6 +174,15 @@
 		#admin_page .section * {
 			color: var(--mainColor);
 		}
+      
+      .section.conventions {
+         position: relative;
+         overflow: hidden;
+      }
+      .section.conventions .slideout {
+         background: var(--altColor);
+      }
+      
 		
 	
 	</style>

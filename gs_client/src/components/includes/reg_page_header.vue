@@ -13,7 +13,7 @@
 				<div class="report_box reg_mini_report" >
 					<span class="item">
 						<span class="text">Number of Registered Members</span>
-						<span class="value" v-text="regReport.registeredMembers || '-'"></span>
+						<span class="value" v-text="registeredMembers || '-'"></span>
 					</span>	
 				</div>
 				<div class="response_message reg_form_response"></div>			
@@ -26,7 +26,7 @@
 	
 	<script>
 		import Vue from 'vue'
-		import { mapGetters } from 'vuex'
+		import { mapGetters, mapState } from 'vuex'
 		
 		export default{
 			name: 'reg_page_header',
@@ -42,11 +42,24 @@
 					
 			filters: {},
 			 
+			
 			computed: {
-				...mapGetters ({
-					regReport : 'regReport',
+            ...mapState({    
+					members			: 'members',
 				}),
-			},
+            
+            registeredMembers: function () {
+               var   vm = this,
+                     numMembers = 0;
+                     
+                  Object.entries(vm.members).forEach((member) => {
+                     member[1].badge_number? numMembers++: '';
+                  });
+               
+               
+               return numMembers;
+            },
+			},	
 		  
 			created() {},
 			

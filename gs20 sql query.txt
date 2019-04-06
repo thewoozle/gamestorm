@@ -26,6 +26,24 @@
    ORDER BY u.last_name
    
    
+   - staff list for OSFCI
+   SELECT `first_name`,`last_name`, `short_name`, m.`type`, `address`, `address2`, `city`, `state`, `zip` FROM `gs_21_membership` g
+   INNER JOIN `users` u ON g.con_uuid = u.uuid
+   INNER JOIN `member_types` m ON g.con_status = m.id
+   LEFT JOIN `convention_staff`s ON g.con_uuid = s.uuid
+   LEFT JOIN `staff_positions` p ON g.con_position = p.id
+   LEFT JOIN `departments` d on g.con_department = d.id
+   WHERE g.con_status = 15 or g.con_status = 21 AND g.badge_number > 0
+   ORDER BY u.last_name
+   
+   
+   - Members with/by badge number
+   SELECT badge_number, first_name, last_name, email FROM `gs_21_membership` g
+   INNER JOIN `users` u ON g.con_uuid = u.uuid
+   WHERE g.con_status > 0
+   ORDER BY badge_number
+   
+   
 
    - GUEST GMS: 
    SELECT * FROM `gs_21_membership` g

@@ -17,49 +17,49 @@
 	Vue.use(VueAxios, Axios);
 	
 	const state = {
-		siteContent    : siteContent, 
-		statesList     : statesList,
-      devNotes       : devNotes,
-      eventDuration  : eventDuration,
-      experienceLevels: experienceLevels,
-		showMenu       : false,
-		siteSettings   : {},
-		currentCon     : {},
-		response       : {},
-		conEvents      : {},
+		account        : {},
+      ageGroups      : {},  
       allEvents      : {},
+		articles       : {},
+		badgeTemplate	: null,
+      checkEmail     : null,
+		conEvents      : {},
+      conLocations   : {},
+      conLocations   : {},
 		conventionInfo : {},
 		conventions    : [],
-		liveEvents     : {},
-		pageContent    : {},
-		account        : {},
-		gallery        : {},
-		news           : {},
-		pageStatus     : {},
-		user           : {},
-      userInfo       : {},
-		regSettings    : {},
-		memberTypes    : {},
-      checkEmail     : null,
+		currentCon     : {},
 		departments    : {},
-		paymentMethods : {},
-		members	      : [],
-		regReport      : {},
-      regReports     : {},
-		articles       : {},
-		staffPositions : {},
-		venues         : {},
-      conLocations   : {},
-      schedulingPermissions: {},
-      schedulingAreas: {},
+      devNotes       : devNotes,
+      eventDuration  : eventDuration,
       eventTracks    : {},
       eventTypes     : {},
-      ageGroups      : {},  
-      conLocations   : {},
+      experienceLevels: experienceLevels,
+		gallery        : {},
+		liveEvents     : {},
       memberList     : {},
-		badgeTemplate		: null,
+		members	      : [],
+		memberTypes    : {},
+		news           : {},
+		pageContent    : {},
+		pageStatus     : {},
+		paymentMethods : {},
+		regReport      : {},
+      regReports     : {},
+		regSettings    : {},
+		response       : {},
+      schedulingAreas: {},
+      schedulingPermissions: {},
+		showMenu       : false,
+      siteContent    : siteContent, 
+		siteSettings   : {},
+		staffPositions : {},
+      statesList     : statesList,
       timeblocks     : [],
+		user           : {},
       userEvents     : null,
+      userInfo       : {},
+		venues         : {},
 	}
 	
 	const actions = {
@@ -85,7 +85,8 @@
 					commit('set_site_data', {
 						pageContent	: response.data.pageContent,
 						conventions	: response.data.conventions, 
-						articles 	: response.data.articles,
+                  venues      : response.data.venues,
+						articles 	: response.data.articles,                  
 					});
                console.log(response.data);
 			  }, (err) => {
@@ -666,7 +667,7 @@
       },
       
 		// SET SITE DATA
-		set_site_data: (state, {pageContent, conventions, articles}) => {
+		set_site_data: (state, {pageContent, conventions, venues, articles}) => {
 			state.conventions	= conventions;
 			// set current con as selected con for scheduling if no prev. selection
          
@@ -681,6 +682,7 @@
 			});
 			state.articles 		= articles;
 			
+         state.venues         = venues;
 			
 			pageContent.forEach(function(item) {
 				state.pageContent[item.content_name] = item;
