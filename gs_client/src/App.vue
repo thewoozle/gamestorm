@@ -346,6 +346,7 @@
 		.page_footer .title,
 		.label,
 		.subnav_link,
+      .admin_title,
 		.form_section_title,
 		.article_content,
 		.slide_label,
@@ -404,6 +405,7 @@
 		}
 		
 		/*	------	TITLES	------	*/		
+      
 		.site_title {
 			font-size: 2.85rem;
 			text-transform: uppercase;
@@ -421,7 +423,7 @@
 			color: var(--lightColor);
 			text-shadow: -1px -1px 0px rgba(0,0,0,0.15);
 		}
-		
+      
 		.section_title {
 			display: flex;
 			width: 100%;
@@ -433,6 +435,16 @@
 			color: var(--titleColor);		
 			text-shadow: -1px -1px 1px rgba(0,0,0,0.1);
 		}
+		.admin_title {
+			display: flex;
+			width: 100%;
+			display: flex;
+			width: 100%;
+         font-size: 2rem;
+         line-height: 1em;
+         font-weight: 100;
+         text-shadow: none;
+      }
 		.sections > .section_title {
 			text-align: center;
 		}
