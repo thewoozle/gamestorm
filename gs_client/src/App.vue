@@ -260,7 +260,8 @@
 			--borderColor3			: #0076A3;			
 			--lightColor			: #fff;
 			--contrastColor		: #665976;
-			--passColor				: #7adc8a;					
+			--passColor				: #7adc8a;	
+         --activeColor        : #008000;
 			--button2				: #42634e;
 			--textColor				: #fbffea;
 			--textColor3			: #5590d9;	

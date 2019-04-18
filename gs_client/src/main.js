@@ -46,13 +46,15 @@
 			
          iso_date(date) {
             // 2019-03-12
-            return moment(date).format('YYYY-M-DD'); 
+            //return moment(date).format('YYYY-M-DD'); 
+            return moment(date).toISOString();
          },
 			day_date(date) {
             // Mar 12th
 				return moment(date).format('MMM Do');
 			},
          
+         // Feb 8th 12:18pm
          date_time(date) {
             return moment(date).format('MMM Do hh:mm a');
          },

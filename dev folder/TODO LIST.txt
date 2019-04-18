@@ -1,16 +1,20 @@
-
-      for GS21
-      enable label printing on save
-      scan and record bar codes
-
+  
+      
       WIP
       
+      set admin permissions 
+      create new con 
+      change current con 
+      make reg able to change editing con 
       
       
       TODO
 
       NAVIGATION
          add info and connect views
+         
+      LOGIN
+         change login to set time in local storage and check against that 
          
       
       REGISTRATION:       

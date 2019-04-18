@@ -18,6 +18,7 @@
 	
 	const state = {
 		account        : {},
+      adminPermissions: {},
       ageGroups      : {},  
       allEvents      : {},
 		articles       : {},
@@ -94,13 +95,45 @@
 			  });
 		},
       
-		
-		
+      
+      // GET ADMIN PERMISSIONS 
+      get_admin_permissions({commit}) {
+         var vm = this;
+         
+         Axios.get(apiDomain+'_get_admin_permissions' ).then((response) => {
+            commit('set_admin_permissions', response.data.permissions);
+         },(err) => {
+            console.log(err.response.data.errors);
+         });         
+      },
+      
+      
+      // UPDATE ADMIN PERMISSIONS 
+      update_admin_permission({commit}, member) {
+         commit('set_admin_permission',member);
+      },
+      
 		
 		// UPDATE CURRENTCON
 		update_currentCon({commit}, {convention}) {
 			commit('set_currentCon', {convention});
 		},
+      
+      // SAVE/UPDATE CONVENTION 
+      save_convention({commit}, convention) {
+         return new Promise((resolve, reject) => {
+            var vm = this;
+            Axios.post(apiDomain+'_save_convention', convention, {
+                  headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+               }).then((response) => {
+                  commit('set_convention', convention);
+                  response(response.data.message);   
+               }, (err) => {
+                  console.log(err.response.data.errors);
+                  reject(err.response.data.errors );
+               });
+         });   
+      },
 		
 		// SET PAGE STATUS
 		update_page_status({commit}, pageStatus) {
@@ -497,8 +530,7 @@
          var vm = this;
          
          Axios.get(apiDomain+'_get_scheduling_permissions').then((response) => {
-            console.log(response.data);
-            commit('set_scheduling_permissions', response.data);
+            commit('set_scheduling_permissions', response.data.permissions);
          });
          
       },
@@ -688,7 +720,33 @@
 				state.pageContent[item.content_name] = item;
 			});
 		},
+      
+      //SET ADMIN PERMISSIONS       
+      set_admin_permissions: (state, permissions) => {         
+         var   vm                = this,
+               user              = {},
+               adminPermissions  = [];               
+         
+         // loop through permissions, creating new obeject if uuid different otherwise adding role and level to current object's permissions sub-object
+         Object.entries(permissions).forEach(([key, value]) => {
+            if(value.uuid == user.uuid) {
+               user.roles[value.role] = value.level;
+            } else {   
+               user = {'last_name' : value.last_name, 'first_name': value.first_name, 'uuid': value.uuid, 'roles' : {[value.role] : value.level}};
+               adminPermissions.push(user);
+            }
+         });       
+      
+         state.adminPermissions = adminPermissions;
+      },
 		
+      
+      // SET ADMIN PERMISSION 
+      set_admin_permission: (state, member) => {
+         state.adminPermissions.push(member);
+         
+      },
+      
 		// SET PAGE STATUS
 		set_page_status: (state, {pageStatus}) => {
 			pageStatus.pageReady? state.pageStatus.pageReady = pageStatus.pageReady : '';
@@ -775,7 +833,6 @@
                if(!inMembers) {
                _members.push(member);
                   inMembers = false;
-                  console.log('new');
                }
             });
             if(window.sessionStorage) {  
@@ -794,10 +851,7 @@
          console.log(memberIndex);
          
          
-			state.members.splice(memberIndex,1);
-         
-         
-         
+			state.members.splice(memberIndex,1);         
 			member.con_status				= null;
 			member.con_department 		= null;
 			member.con_position 			= null;
@@ -908,6 +962,7 @@
 		currentCon		: state => state.currentCon,
 		user			   : state => state.user,
       userInfo       : state => state.userInfo,
+      adminPermissions:state => state.adminPermissions,
 		
 		// reg getters
 		regReport 		: state => state.regReport,

@@ -639,6 +639,7 @@
 					vm.showRegSettings = false;
 					vm.showBadgeNumber	= false;
 					vm.showTransactions= false;
+               
                vm.$store.dispatch('get_member_info', {'uuid' : uuid}).then((response)=>{
                   if(response.message) {
                      console.log(response.message);
