@@ -110,7 +110,7 @@
                                     </div>
                                  </div>
                               </div>
-                                                                  
+                              
                               <div class="form_row">
                                  <div class="form_element">
                                     <label>Signups Open</label>
@@ -125,8 +125,7 @@
                                        <datetime type="datetime" v-model="editConvention.signups_close" v-bind:placeholder="editConvention.signups_close? date_time(editConvention.signups_close) : ''" min-datetime="2019-01-01" max-datetime="2049-12-31"  ></datetime> 
                                     </div>
                                  </div>
-                              </div>
-                                 
+                              </div>                                 
                                  
                               <div class="form_row">
                                  <div class="form_element">
@@ -142,7 +141,7 @@
                               </div>
                               
                               <div class="controls">
-                                 <button type="submit" class="button" @click.prevent="save_convention()">Submit</button>
+                                 <button type="submit" class="button" @click.prevent="()=>{save_convention(); showConventionSlideout = false;}">Submit</button>
                               </div>
                            </form>
                         </div>
@@ -151,16 +150,26 @@
                         <button class="button new_con_button" @click="showConventionSlideout ? showConventionSlideout = false : showConventionSlideout = true">New Convention</button>
                      
                         <div class="list_names">
-                           <span class="name current_con" title="X = past convention, highlighted = currently active convention">Current</span>
+                           <span class="name current_con" title="clock = past convention, highlighted = currently active convention, circle is future convention">Status</span>
                            <span class="name con_name">Convention</span>
                            <span class="name con_date">Dates</span>
                         </div>
                         <div class="convention_list">
                            <div class="convention_item" v-bind:class="past_con(convention.end_date_time)? 'past_con' : '' "  v-for="convention in conventions" >                           
-                              <button class="toggle_control current_con " v-bind:class="[convention.current_con? 'current fas' : 'fal',past_con(convention.end_date_time)? 'fa-times-circle' : 'fa-circle' ]" v-bind:title="convention.current_con? 'deactivate' : 'activate'"></button>
+                              <button  class="toggle_control control_button current_con " 
+                                       v-bind:class="[convention.current_con? 'current fas' : 'fal',past_con(convention.end_date_time)? 'fa-clock' : 'fa-circle' ]" 
+                                       v-bind:title="convention.current_con? 'Is current con' : 'Make current con'"
+                                       @click.prevent="set_current_con(convention)"
+                              ></button>
+                              
                               <span class="list_item con_name" v-text="convention.name+' '+convention.con_num"></span>
                               <span class="list_item con_date" v-text="month_day_year(convention.start_date_time) +' - ' + month_day_year(convention.end_date_time) "></span>
-                              <button class="edit_button fas" v-bind:class="showConventionDetails == convention.tag_name? 'fa-caret-up' : 'fa-caret-down'" title="convention details" @click = "showConventionDetails == convention.tag_name?showConventionDetails = null : showConventionDetails = convention.tag_name" ></button>
+                               
+                                 <div class="buttons">
+                                    <button class="control_button fas" v-bind:class="showConventionDetails == convention.tag_name? 'fa-caret-up' : 'fa-caret-down'" title="convention details" @click = "showConventionDetails == convention.tag_name?showConventionDetails = null : showConventionDetails = convention.tag_name" ></button>
+                                    <button class="control_button fal fa-edit" title="Edit Convention" @click="()=>{showConventionDetails = null; editConvention = convention; showConventionSlideout = 'show'}" ></button>
+                                    <button class="control_button fal fa-ban" title="deactivate" @click="()=>{showConventionDetails = null; deactivate_con(convention.tag_name);}" ></button>
+                                 </div>
                               
                               <div class="con_details" :class="showConventionDetails == convention.tag_name? 'open' : ''">
                                  <div class="details">
@@ -188,12 +197,7 @@
                                     </div>                                    
                                     
                                     <span class="con_venue" v-text="'Venue: '+convention.venue_name"></span>
-                                 </div>   
-                                 <div clss="buttons">
-                                    <button class="edit_button fal fa-edit" title="Edit Convention" @click="()=>{editConvention = convention; showConventionSlideout = 'show'}" ></button>
-                                    <button class="" title="Set as current convention" @click.prevent="set_current_con(convention.tag_name)" >set as current con</button>
-                                    <button class="" title="deactivate" >deactivate</button>
-                                 </div>
+                                 </div>  
                               </div>
                            </div>
                         </div>   
@@ -275,7 +279,6 @@
                   </div>   
                   
                </div>
-               
                
 				</section>
 				
@@ -414,10 +417,13 @@
             
             // SET CURRENT CON 
             set_current_con(con) {
-               if(confirm('wana?') == true) {
-                  console.log('setting '+con+' to current.. but not really');
+               var vm = this;
+               if(confirm('Are you sure you want to change the current convention shown on the website to '+con.short_name+'?') == true) {
+                  vm.$store.dispatch('update_current_con', con).then((response)=>{
+                     console.log(response);
+                  }); 
                }
-               console.log(con);
+               
             },
             
             // MEMBER NOT ALREADY ADMIN 
@@ -431,6 +437,11 @@
                });
                
                return found;
+            },
+            
+            // DEACTIVATE CON
+            deactivate_con(tag_name) {
+               console.log('non-funtional');
             },
             
             // SET NEW ADMIN PERMISSION 
@@ -562,6 +573,7 @@
       .site_settings .buttons .button {
          width: 100%;
          font-size: 1.25rem;
+         cursor: pointer;
       }
       .site_settings .buttons .button + .button {
          margin-top: .75rem;
@@ -576,21 +588,18 @@
          display: flex;
             align-items: center;
             flex-wrap: wrap;
+            justify-content: space-between;
          width: 100%;
       }
       .panel_display .convention_item.past_con{
-         font-size: .85rem;
+         font-size: .95rem;
+         opacity: .7;
       }
       .panel_display .convention_item + .convention_item {
          margin-top: .5rem;
       }
       .list_names .current_con,
       .convention_list .current_con {
-         display: flex;
-            justify-content: center;
-         width: 2em;
-         border-radius: 50%;
-         font-size: 1em;
       }  
       .convention_list .current_con.current:before {
          color: var(--activeColor);
@@ -658,22 +667,31 @@
          width: 6rem;
       }
       
-      .convention_list .edit_button {
+      .convention_list .buttons {
+         display: flex;
+            justify-content: space-between;
+            flex-direction: row;
+            flex-wrap: nowrap;
+      }
+      .convention_list .control_button {
          display: flex;
             justify-content: center;
-         border: solid 1px var(--borderColor);
+            align-items: center;
          border-radius: .1rem;
-         width: 3rem;
-         height: 3rem;
-         font-size: 2rem;
-         border-radius: .2em;         
+         width: 2rem;
+         height: 2rem;
+         font-size: 1.5rem;
+         border-color: rgba(0,0,0,0);
+         border-radius: .2rem;
+         background: none;
          cursor: pointer;
          color: var(--borderColor);
       }
-      .convention_list .edit_button:hover {
-         background: #045f04;
+      .convention_list .control_button:hover {
+         background: var(--borderColor3);
+         border-color: var(--borderColor);
       }
-      .convention_list .edit_button:hover:before {
+      .convention_list .control_button:hover:before {
         color: #fff;
       }
       .convention_list .con_details .con_detail{

@@ -85,11 +85,10 @@
                
 					commit('set_site_data', {
 						pageContent	: response.data.pageContent,
-						conventions	: response.data.conventions, 
                   venues      : response.data.venues,
 						articles 	: response.data.articles,                  
 					});
-               console.log(response.data);
+               commit('set_conventions', response.data.conventions);
 			  }, (err) => {
 				  console.log('error: '+err.statusText);
 			  });
@@ -105,6 +104,20 @@
          },(err) => {
             console.log(err.response.data.errors);
          });         
+      },
+      
+      // UPDATE CURRENT CON 
+      update_current_con({commit},con){
+         var vm = this;
+         return new Promise((resolve, reject) => {   
+            Axios.post(apiDomain+'_update_current_con', {'con': con.tag_name}, {
+               headers: {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF8'}
+            }).then((response) =>{
+                  commit('set_conventions', response.data.conventions);
+            }, (err) => {
+               console.log(err);
+            });
+         });
       },
       
       
@@ -126,7 +139,8 @@
             Axios.post(apiDomain+'_save_convention', convention, {
                   headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
                }).then((response) => {
-                  commit('set_convention', convention);
+                  
+                  commit('set_conventions', response.data.conventions);
                   response(response.data.message);   
                }, (err) => {
                   console.log(err.response.data.errors);
@@ -683,11 +697,8 @@
             }, (err) => {
                console.log(err.statusText);
             });
-         });
-         
-      },
-      
-    
+         });         
+      },  
 	}
 	
 	const mutations = {
@@ -695,20 +706,25 @@
       set_current_con: (state, info) => {
 			state.conventionInfo= info;
 			state.currentCon = info;
-         
+      },
+      
+   
+      // SET CONVENTIONS 
+      set_conventions:(state, conventions) => {
+         state.conventions	= conventions;
+         Object.entries(conventions).forEach(([key, convention]) => {
+            if(convention.current_con == 1) {
+               state.currentCon = convention;
+               state.conventionInfo = convention;
+               if(sessionStorage) {
+                  sessionStorage.currentCon = JSON.stringify(convention);
+               }
+            }
+         });
       },
       
 		// SET SITE DATA
-		set_site_data: (state, {pageContent, conventions, venues, articles}) => {
-			state.conventions	= conventions;
-			// set current con as selected con for scheduling if no prev. selection
-         
-         
-			// if(localStorage) {
-				// if(!localStorage.selectedCon) {
-					// localStorage.selectedCon = info.tag_name;
-				// }
-			// }
+		set_site_data: (state, {pageContent, venues, articles}) => {
 			articles.forEach(function(article) {
 				article.open = false;
 			});
@@ -958,7 +974,6 @@
 		statesList 		: state => state.statesList,
 		pageContent		: state => state.pageContent,
 		siteContent		: state => state.siteContent,
-		conventionInfo	: state => state.conventionInfo,
 		currentCon		: state => state.currentCon,
 		user			   : state => state.user,
       userInfo       : state => state.userInfo,

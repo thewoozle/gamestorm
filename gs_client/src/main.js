@@ -17,7 +17,8 @@
 	Vue.config.productionTip = false;
    
    
-	
+	Vue.prototype.$log = console.log;
+   
 	Vue.mixin({
 		created: function() {},
 		methods: {
