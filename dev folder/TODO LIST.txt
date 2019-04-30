@@ -3,8 +3,6 @@
       WIP
       
       set admin permissions 
-      create new con 
-      change current con 
       make reg able to change editing con 
       
       

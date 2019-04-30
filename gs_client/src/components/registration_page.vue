@@ -22,7 +22,7 @@
 					
 						<div class="control_wrapper select_wrapper">
 							<label class="label" for="convention">Convention</label>
-							<select id="convention" class="select" @change="update_reg_settings"  v-model="regSettings.convention" name="convention" >
+							<select id="convention" class="select" @change="()=>{showRegSettings = false; $store.dispatch('get_members', selectedCon);}"  v-model="selectedCon" name="convention" >
 								<option v-for="con in conventions"  :selected="con.tag_name == conventionInfo.tag_name" :value="con.tag_name">{{con.short_name}}</option>
 							</select>
 						</div>	
@@ -113,6 +113,7 @@
 					
 					<form class="reg_form " name="reg_form"  method="post" @submit.prevent="submit_member" >
 						<p class="popup_message" v-bind:class="formMessage? 'show' : '' " v-text="formMessage"></p>
+                  <span class="selected_con_title" v-text="selectedCon"></span>
 						<input type="hidden" name="uuid" v-model="member.uuid"/>	
 						<input type="hidden" name="status" v-model="member.con_status"/>	
 						<input type="hidden" name="badge_number" v-model="member.badge_number"/>	
@@ -476,6 +477,7 @@
 					userPass		   : false,
 					regPanel		   : 'regForm', 
 					formMessage		: null,
+               selectedCon    : '',
 					showBadgeNumber: false,
 					showRegSettings: false,
                showGuestGms   : false,
@@ -535,8 +537,9 @@
 			created() {
 				var vm = this;
 				vm.check_user();
+            vm.selectedCon = vm.conventionInfo.tag_name;
 				
-				this.get_store_data();
+				vm.get_store_data();
             vm.member.state = '';
             vm.get_filtered_members();
             //dymo.label.framework.init(vm.startupCode);
@@ -553,8 +556,8 @@
 					var vm = this;
 					vm.$store.dispatch('get_reg_data').then(()=>{});
                vm.$store.dispatch('get_badge_template').then(()=>{});
-					vm.$store.dispatch('get_reg_report').then(()=>{});
-					vm.$store.dispatch('get_members').then(() => {});
+					vm.$store.dispatch('get_reg_report', vm.selectedCon).then(()=>{});
+					vm.$store.dispatch('get_members', vm.selectedCon).then(() => {});
 					vm.$store.dispatch('get_reg_settings').then(()=>{});
 				},
             
@@ -817,7 +820,7 @@
 						vm.membership_description = null;
 					}
 					
-					vm.$store.dispatch('submit_member', vm.member).then((response)=> {
+					vm.$store.dispatch('submit_member', {'selectedCon':vm.selectedCon, 'member':vm.member}).then((response)=> {
 						
 						if (response.errors) {
 							vm.formErrors = response.errors;
@@ -858,6 +861,14 @@
 		.panel_selection .button {
 			font-size: 2rem;
 		}
+      .selected_con_title {
+         position: absolute;
+            top: 0;
+            left: 0;
+            color: #777;
+            font-size: .95rem;
+            font-style:italic;
+      }
 		.section.reg_panel { 
 			position: relative;
 			display: flex;
@@ -996,9 +1007,12 @@
 			background: var(--button);
 			color: var(--titleColor);
 			border: solid 1px var(--borderColor2);
-			margin: .15rem 0;
-			
+			margin: .15rem 0;			
 		}
+		.section.reg_panel .slide_in .select_wrapper .select option {
+         color: inherit;
+      }
+      
 		.section.reg_panel .slide_in .select_wrapper .label {
 			display: flex;
 			width: 100%;

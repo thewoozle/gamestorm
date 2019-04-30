@@ -85,14 +85,25 @@
                
 					commit('set_site_data', {
 						pageContent	: response.data.pageContent,
-                  venues      : response.data.venues,
-						articles 	: response.data.articles,                  
+                  venues      : response.data.venues,                 
 					});
+               commit('set_news_articles', response.data.articles);
                commit('set_conventions', response.data.conventions);
 			  }, (err) => {
 				  console.log('error: '+err.statusText);
 			  });
 		},
+      
+      // GET NEWS ARTICLES 
+      get_news_articles({commit}) {
+         var vm = this;
+         
+         Axios.get(apiDomain+'_get_news_articles').then((response)=>{
+            commit('set_news_articles', response.data.articles);
+         }, (err) =>{
+            console.log(err.data);
+         });
+      },
       
       
       // GET ADMIN PERMISSIONS 
@@ -104,6 +115,28 @@
          },(err) => {
             console.log(err.response.data.errors);
          });         
+      },
+      
+      // UPDATE ADMIN PERMISSIONS 
+      update_admin_permission({commit}, member) {
+         var vm = this;
+         Axios.post(apiDomain+'_update_admin_permission', member, {
+            headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+         }).then((response)=>{            
+            commit('set_admin_permission',response.data.permission);
+         },(err) => {
+            
+         });
+      },
+      remove_admin_permission({commit}, member) {
+         var vm = this;
+         Axios.post(apiDomain+'_remove_admin_permission', member, {
+            headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+         }).then((response)=>{            
+         commit('set_admin_permissions', response.data.permissions);
+         },(err) => {
+            
+         });
       },
       
       // UPDATE CURRENT CON 
@@ -120,11 +153,6 @@
          });
       },
       
-      
-      // UPDATE ADMIN PERMISSIONS 
-      update_admin_permission({commit}, member) {
-         commit('set_admin_permission',member);
-      },
       
 		
 		// UPDATE CURRENTCON
@@ -316,7 +344,7 @@
       ----------------------------------------------------------- */
 		
 		// GET REG DATA	
-		get_reg_data({commit}) {
+		get_reg_data({commit}, selectedCon) {
 			Axios.get(apiDomain + '_get_reg_data').then((response) => {		
 				commit('set_reg_data', {
 					memberTypes		: response.data.memberTypes,
@@ -330,17 +358,11 @@
 		},
 		 
 		// SUBMIT MEMBER for registration
-		submit_member({dispatch,commit}, member) {
+		submit_member({dispatch,commit}, memberData) {
 			var errors = {errors: []};
 			return new Promise((resolve, reject) => {
             
-            var formData = new FormData();
-            for (var key in member) {
-               formData.append(key, member[key]);               
-            }
-            
-            
-				Axios.post(apiDomain+'_submit_member', formData, {headers : 
+				Axios.post(apiDomain+'_submit_member', memberData, {headers : 
             {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}}).then((response) => {		
             
 					commit ('set_member', {updatedMember: response.data.response.member.member});
@@ -370,26 +392,31 @@
 			});			
 		},
       
+      
       // UPDATE REG SETTINGS 
       update_reg_settings({commit}, setting) {
          commit('set_reg_setting', setting );
       },
 		
+      
+      
 		// GET MEMBERS
-		get_members({commit}) {
-         if (window.sessionStorage) {
-            if(sessionStorage.memberList) {
-               commit('set_members', { members: JSON.parse(sessionStorage.memberList), action: 'localstorage' });
-            }          
-         }
+		get_members({commit}, selectedCon) {
+         var   vm = this;
+
+         selectedCon? '': selectedCon = state.currentCon.tag_name;
+         
          // ten-step request for 20% of records at a time 
          for(var x = 0; x<=4; x++) {
-            Axios.get(apiDomain + '_get_members', {params: {step : x }}).then((response) => {
-               commit('set_members', { members: response.data.members, action: 'update' });
+            Axios.get(apiDomain + '_get_members', {params: {'selectedCon' : selectedCon, 'step' : x }}).then((response) => {
+               var percent = ((100/x) * (parseInt(response.data.step)+1)); 
+               commit('set_members', { members: response.data.members, percent: percent });
             }, (err) => {
                console.log(err.statusText);
             }); 
          }   
+         
+         
 		},
       
       
@@ -439,8 +466,10 @@
 		},
 		
 		// GET REGISTRATION REPORT
-		get_reg_report({commit}) {
-			Axios.get(apiDomain+'_get_reg_report').then((response) => {
+		get_reg_report({commit}, selectedCon) {
+         selectedCon? '' : selectedCon = state.currentCon.tag_name;
+			Axios.post(apiDomain+'_get_reg_report', {'selectedCon': selectedCon}, {headers : 
+            {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}}).then((response) => {
 				commit('set_reg_report',{ regReport: response.data.regReport });   
             commit('set_reg_reports', {regReports: response.data});
 			},(err) => {
@@ -724,44 +753,37 @@
       },
       
 		// SET SITE DATA
-		set_site_data: (state, {pageContent, venues, articles}) => {
-			articles.forEach(function(article) {
-				article.open = false;
-			});
-			state.articles 		= articles;
-			
-         state.venues         = venues;
-			
+		set_site_data: (state, {pageContent, venues, articles}) => {			
+         state.venues         = venues;			
 			pageContent.forEach(function(item) {
 				state.pageContent[item.content_name] = item;
 			});
 		},
       
-      //SET ADMIN PERMISSIONS       
-      set_admin_permissions: (state, permissions) => {         
-         var   vm                = this,
-               user              = {},
-               adminPermissions  = [];               
-         
-         // loop through permissions, creating new obeject if uuid different otherwise adding role and level to current object's permissions sub-object
-         Object.entries(permissions).forEach(([key, value]) => {
-            if(value.uuid == user.uuid) {
-               user.roles[value.role] = value.level;
-            } else {   
-               user = {'last_name' : value.last_name, 'first_name': value.first_name, 'uuid': value.uuid, 'roles' : {[value.role] : value.level}};
-               adminPermissions.push(user);
-            }
-         });       
+      // SET NEWS ARTICLES 
+      set_news_articles: (state, articles) => {
+         state.articles = articles;
+      },
       
-         state.adminPermissions = adminPermissions;
+      //SET ADMIN PERMISSIONS       
+      set_admin_permissions: (state, permissions) => {
+         var   vm                = this;    
+         state.adminPermissions = permissions;
+      },    
+      set_admin_permission: (state, permission) => {         
+         var   vm                = this,
+               found             = found;    
+               console.log(permission);
+         Object.entries(state.adminPermissions).forEach(([key, user])=>{
+            if (permission.uuid == user.uuid) {
+               state.adminPermissions[key] = permission;
+               found = true;
+            }
+         });
+         found? '' : state.adminPermissions.push(permission[0]);
       },
 		
-      
-      // SET ADMIN PERMISSION 
-      set_admin_permission: (state, member) => {
-         state.adminPermissions.push(member);
-         
-      },
+		
       
 		// SET PAGE STATUS
 		set_page_status: (state, {pageStatus}) => {
@@ -826,37 +848,42 @@
      
 		
 		// SET MEMBERS (chunks of 20%)
-		set_members: (state, { members, action }) => {
-         var   vm = this,
+		set_members: (state, { members, percent }) => {
+         var   vm       = this,
                _members = state.members;
                
-         if(action == 'localstorage') {
-            if(window.sessionStorage) {
-               Vue.set(state, 'members', JSON.parse(sessionStorage.memberList));
-            } 
-         } else { 
-         
-            members.forEach((member)=> {
-               var inMembers = false;
-               
-               _members.forEach((_member)=>{
-                  if(_member.uuid == member.uuid) {
-                     _member = member;
-                     inMembers = true;
-                  } 
-               });
-               
-               if(!inMembers) {
-               _members.push(member);
-                  inMembers = false;
-               }
-            });
+         if (percent <= 20) {
+            // first pass, set members = session storage and clear session storage and store variable
             if(window.sessionStorage) {  
-               sessionStorage.memberList = JSON.stringify(_members); 
-            }     
-         }
+               if(window.sessionStorage.memberList) {
+                  state.members =  JSON.parse(sessionStorage.memberList);
+               } else {
+                  sessionStorage.memberList = ''; 
+                  state.members = [];
+               }
+            } else {
+               state.members = [];
+               _members = [];
+            }
+         }   
          
-         Vue.set(state, 'members', _members);
+         members.forEach((member) => {
+            var found = false;
+            _members.forEach((_member) => {
+               if(_member.uuid == member.uuid) {
+                  found = true;
+                  _member = member;
+               } 
+            });
+            found? '' : _members.push(member);
+         });
+            
+         if(percent >= 100) {
+            state.members = _members;
+            if(window.sessionStorage) {  
+               sessionStorage.memberList = JSON.stringify(state.members); 
+            }
+         } 
 		},
 		
 		

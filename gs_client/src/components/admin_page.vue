@@ -223,6 +223,10 @@
                      <div class="panel news"  v-if="siteSetting == 'news'">
                         <p>NEWS PANEL</p>
                         <p>current news items, scheduled items, link to news hub</p>
+                        
+                        <div class="articles_list">
+                           <div class="" v-for="article in articles">{{article}}</div>
+                        </div>
                      </div>
 
                      
@@ -261,13 +265,40 @@
                            <div class="users" >
                               <div class="user" v-for="permission in adminPermissions">
                                  <span class="name" v-text="permission.first_name + ' ' + permission.last_name"></span>
-                                 <span class="role" v-text="permission.roles.admin"></span>
-                                 <span class="role" v-text="permission.roles.news"></span>
-                                 <span class="role" v-text="permission.roles.scheduling"></span>
-                                 <span class="role" v-text="permission.roles.registration"></span>
+                                 
+                                 <select class="select role" v-model="permission.admin"  @change="$store.dispatch('update_admin_permission', permission)">
+                                    <option :value="0">none</option>
+                                    <option :value="1">basic</option>
+                                    <option :value="2">advanced</option>
+                                    <option :value="3">Manage</option>
+                                    <option :value="5">Full</option>
+                                 </select>
+                                 <select class="select role" v-model="permission.news"  @change="$store.dispatch('update_admin_permission', permission)">
+                                    <option :value="0">none</option>
+                                    <option :value="1">basic</option>
+                                    <option :value="2">advanced</option>
+                                    <option :value="3">Manage</option>
+                                    <option :value="5">Full</option>
+                                 </select>
+                                 <select class="select role" v-model="permission.scheduling"  @change="$store.dispatch('update_admin_permission', permission)">
+                                    <option :value="0">none</option>
+                                    <option :value="1">basic</option>
+                                    <option :value="2">advanced</option>
+                                    <option :value="3">Manage</option>
+                                    <option :value="5">Full</option>
+                                 </select>
+                                 <select class="select role" v-model="permission.registration" @change="$store.dispatch('update_admin_permission', permission)">
+                                    <option :value="0">none</option>
+                                    <option :value="1">basic</option>
+                                    <option :value="2">advanced</option>
+                                    <option :value="3">Manage</option>
+                                    <option :value="5">Full</option>
+                                 </select>
+                                 <button class="control_button fal fa-ban" title="remove '+permission.first_name+' admin privilages" @click.prevent="$store.dispatch('remove_admin_permission', permission)"></button> 
                               </div>
                            </div>
                            <div class="new_admin_permission">
+                              <span class="title">New Admin Permission</span>
                               <select class="select" v-model="newAdminPermission" @change="set_new_permission()" >
                                  <option value="">select user...</option>
                                  <option v-bind:value="member" v-for="member in members" v-if="member_not_already_admin(member.uuid)" v-text="member.first_name+' '+member.last_name"></option>
@@ -336,6 +367,7 @@
                venues            : 'venues',
                adminPermissions  : 'adminPermissions',
                members           : 'members',
+               articles          : 'articles',
 				}),
             
 				
@@ -347,6 +379,7 @@
 				vm.$store.dispatch('get_reg_report').then(()=>{});
 				vm.$store.dispatch('get_admin_permissions').then(()=>{});
 				vm.$store.dispatch('get_members').then(() => {});
+				vm.$store.dispatch('get_news_articles').then(() => {});
             vm.clear_edit_convention();
 			},
 			
@@ -356,8 +389,6 @@
 			
 			
 			methods: {
-				
-				
 				
             // CLEAR EDIT CONVENTION 
             clear_edit_convention() {

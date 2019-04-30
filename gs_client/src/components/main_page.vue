@@ -98,13 +98,14 @@
 				...mapGetters({
 					pageContent 	: 'pageContent',
 					siteContent 	: 'siteContent',
-					articles		: 'articles',
+					articles		   : 'articles',
 					//showMenu		: 'showMenu'
 				}),
 			},
 			
 			created: function() { 
-				
+				var vm = this;            
+            vm.$store.dispatch('get_news_articles').then(()=>{});
 			},
 			
 			mounted: function() { 
