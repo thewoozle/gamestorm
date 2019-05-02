@@ -22,7 +22,7 @@
 					
 						<div class="control_wrapper select_wrapper">
 							<label class="label" for="convention">Convention</label>
-							<select id="convention" class="select" @change="()=>{showRegSettings = false; $store.dispatch('get_members', selectedCon);}"  v-model="selectedCon" name="convention" >
+							<select id="convention" class="select" @change="update_memberlist(selectedCon)"  v-model="selectedCon" name="convention" >
 								<option v-for="con in conventions"  :selected="con.tag_name == conventionInfo.tag_name" :value="con.tag_name">{{con.short_name}}</option>
 							</select>
 						</div>	
@@ -400,7 +400,7 @@
 				<section class="section reg_list" >			
 					<div class="section_content ">
                   <span class="update_status" v-text="members.length > 0? 'Records => '+ members.length : 'connecting...' "></span>
-						<span class="loading"  :class="members.length> 0? '' : 'show'">Loading... </span>
+						<span class="loading"  :class="showLoading? 'show' : ''">Loading... </span>
 					
 						<div class="search_panel">
 							<div class="input_wrapper">
@@ -481,6 +481,7 @@
 					showBadgeNumber: false,
 					showRegSettings: false,
                showGuestGms   : false,
+               showLoading    : true,
 					showTransactions: false,
                filteredMembers: {},
 					member			: {},
@@ -553,13 +554,21 @@
 			methods: {				
 				// GET STORE DATA FOR VUEX  
 				get_store_data() {
-					var vm = this;
+					let vm = this;
+               vm.filteredMembers = {};
 					vm.$store.dispatch('get_reg_data').then(()=>{});
                vm.$store.dispatch('get_badge_template').then(()=>{});
 					vm.$store.dispatch('get_reg_report', vm.selectedCon).then(()=>{});
-					vm.$store.dispatch('get_members', vm.selectedCon).then(() => {});
+					vm.$store.dispatch('get_members', vm.selectedCon).then((response) => {
+                  if(parseInt(response) >= 100) {
+                     vm.showLoading = false;
+                  console.log(response);
+                     vm.$forceUpdate();
+                  }
+               });
 					vm.$store.dispatch('get_reg_settings').then(()=>{});
 				},
+            
             
             
 				get_filtered_members() {
@@ -571,13 +580,14 @@
 						lastName,
 						email,
                   filteredMembers,
-						members;
-						//console.log(vm.members.length);      
-						//vm.filteredMembers = {};
+						members;   
+                  
+                  vm.filteredMembers = {};
+						
 					if (vm.members.length  !== undefined) {
 						switch(vm.memberSort) {
 							case 'badge_number' :
-                     console.log(vm.memberSort);
+                     //console.log(vm.memberSort);
 								members =  vm.members.sort((a, b) => {
                            return parseInt(a[vm.memberSort]) - parseInt(b[vm.memberSort]);                           
 								});							
@@ -604,9 +614,10 @@
 									//''+a[vm.memberSort].localeCompare(''+b[vm.memberSort]);
 								});									
 						}
-						
-						if (vm.searchQuery.length > 1) {	
-                     filteredMembers = members.filter(function(member) {
+                  
+                  
+						//if (vm.searchQuery.length > 1) {	
+                     vm.filteredMembers = members.filter(function(member) {
 								member.badge_name	? badgeName	= member.badge_name	: badgeName = '';
 								member.badge_number	? badgeNumber= parseInt(member.badge_number)	: badgeNumber = 0;
 								member.full_name 	? fullName	= member.full_name	: fullName = '';
@@ -624,14 +635,27 @@
 									email.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1;
 							});
                      
-                     Vue.set(vm,'filteredMembers', filteredMembers);
-						} else {
-                     filteredMembers = members;
-							Vue.set(vm,'filteredMembers', members);
-						}
+						// } else {
+                     
+                     // vm.filteredMembers = members;             
+						// }
 					}
 				},
             
+            // UPDATE MEMBER LIST
+            update_memberlist(selectedCon) {
+               let vm = this;
+               vm.showLoading = true;
+               
+               vm.showRegSettings = false;
+                  vm.filteredMembers = {}; 
+               vm.$store.dispatch('get_members', selectedCon).then((response) =>{
+                  if(response >= 100) {
+                     vm.get_filtered_members();
+                     vm.showLoading = false;
+                  }
+               });
+            },
             
 				
             // GET MEMBER INFO 

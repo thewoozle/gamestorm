@@ -401,22 +401,24 @@
       
       
 		// GET MEMBERS
-		get_members({commit}, selectedCon) {
+		get_members({commit}, selectedCon)  {
          var   vm = this;
+         
+         return new Promise((resolve, reject) => {
 
-         selectedCon? '': selectedCon = state.currentCon.tag_name;
-         
-         // ten-step request for 20% of records at a time 
-         for(var x = 0; x<=4; x++) {
-            Axios.get(apiDomain + '_get_members', {params: {'selectedCon' : selectedCon, 'step' : x }}).then((response) => {
-               var percent = ((100/x) * (parseInt(response.data.step)+1)); 
-               commit('set_members', { members: response.data.members, percent: percent });
-            }, (err) => {
-               console.log(err.statusText);
-            }); 
-         }   
-         
-         
+            selectedCon? '': selectedCon = state.currentCon.tag_name;
+            
+            // ten-step request for 20% of records at a time 
+            for(let x = 0; x<=4; x++) {
+               Axios.get(apiDomain + '_get_members', {params: {'selectedCon' : selectedCon, 'step' : x }}).then((response) => {
+                  let percent = (25*x); 
+                  percent >= 100? resolve(percent) : '';
+                  commit('set_members', { members: response.data.members, percent: percent });
+               }, (err) => {
+                  console.log(err.statusText);
+               }); 
+            }   
+         });         
 		},
       
       
@@ -849,7 +851,7 @@
 		
 		// SET MEMBERS (chunks of 20%)
 		set_members: (state, { members, percent }) => {
-         var   vm       = this,
+         let   vm       = this,
                _members = state.members;
                
          if (percent <= 20) {
@@ -859,27 +861,27 @@
                   state.members =  JSON.parse(sessionStorage.memberList);
                } else {
                   sessionStorage.memberList = ''; 
-                  state.members = [];
+                  Vue.set(state, 'members', []);
                }
-            } else {
+            } 
                state.members = [];
                _members = [];
-            }
          }   
          
          members.forEach((member) => {
-            var found = false;
+            let found = false;
             _members.forEach((_member) => {
                if(_member.uuid == member.uuid) {
                   found = true;
-                  _member = member;
+                  _member = _member;
                } 
             });
             found? '' : _members.push(member);
          });
-            
+         
          if(percent >= 100) {
-            state.members = _members;
+            
+            Vue.set(state, 'members', _members);
             if(window.sessionStorage) {  
                sessionStorage.memberList = JSON.stringify(state.members); 
             }
