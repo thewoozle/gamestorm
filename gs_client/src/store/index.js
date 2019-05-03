@@ -22,6 +22,7 @@
       ageGroups      : {},  
       allEvents      : {},
 		articles       : {},
+      allArticles    : {},
 		badgeTemplate	: null,
       checkEmail     : null,
 		conEvents      : {},
@@ -80,7 +81,7 @@
                   sessionStorage.currentCon = JSON.stringify(response.data.convention);
                }
                
-					commit('set_current_con', response.data.convention);
+					response.data.convention? commit('set_current_con', response.data.convention) : '';
                
                
 					commit('set_site_data', {
@@ -94,6 +95,7 @@
 			  });
 		},
       
+      
       // GET NEWS ARTICLES 
       get_news_articles({commit}) {
          var vm = this;
@@ -104,6 +106,17 @@
             console.log(err.data);
          });
       },
+      get_all_articles({commit}) {
+         var vm = this;
+         
+         Axios.get(apiDomain+'_get_all_articles').then((response)=>{
+            commit('set_all_articles', response.data.articles);
+         }, (err) =>{
+            console.log(err.data);
+         });
+      },
+      
+      
       
       
       // GET ADMIN PERMISSIONS 
@@ -122,7 +135,7 @@
          var vm = this;
          Axios.post(apiDomain+'_update_admin_permission', member, {
             headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
-         }).then((response)=>{            
+         }).then((response)=>{     
             commit('set_admin_permission',response.data.permission);
          },(err) => {
             
@@ -162,19 +175,15 @@
       
       // SAVE/UPDATE CONVENTION 
       save_convention({commit}, convention) {
-         return new Promise((resolve, reject) => {
-            var vm = this;
-            Axios.post(apiDomain+'_save_convention', convention, {
-                  headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
-               }).then((response) => {
-                  
-                  commit('set_conventions', response.data.conventions);
-                  response(response.data.message);   
-               }, (err) => {
-                  console.log(err.response.data.errors);
-                  reject(err.response.data.errors );
-               });
-         });   
+         var vm = this;
+         Axios.post(apiDomain+'_save_convention', convention, {
+            headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+         }).then((response) => {                  
+            commit('set_conventions', response.data.conventions);
+         }, (err) => {
+            console.log(err.response.data.errors);
+            reject(err.response.data.errors );
+         });
       },
 		
 		// SET PAGE STATUS
@@ -402,23 +411,21 @@
       
 		// GET MEMBERS
 		get_members({commit}, selectedCon)  {
-         var   vm = this;
-         
+         var   vm = this;         
+         selectedCon? '': selectedCon = state.currentCon.tag_name;
          return new Promise((resolve, reject) => {
-
-            selectedCon? '': selectedCon = state.currentCon.tag_name;
             
             // ten-step request for 20% of records at a time 
             for(let x = 0; x<=4; x++) {
                Axios.get(apiDomain + '_get_members', {params: {'selectedCon' : selectedCon, 'step' : x }}).then((response) => {
                   let percent = (25*x); 
-                  percent >= 100? resolve(percent) : '';
                   commit('set_members', { members: response.data.members, percent: percent });
+                  percent >= 100? resolve(percent) : '';
                }, (err) => {
                   console.log(err.statusText);
                }); 
             }   
-         });         
+         });            
 		},
       
       
@@ -766,6 +773,9 @@
       set_news_articles: (state, articles) => {
          state.articles = articles;
       },
+      set_all_articles: (state, articles) => {
+         state.allArticles = articles;
+      },
       
       //SET ADMIN PERMISSIONS       
       set_admin_permissions: (state, permissions) => {
@@ -774,15 +784,15 @@
       },    
       set_admin_permission: (state, permission) => {         
          var   vm                = this,
-               found             = found;    
-               console.log(permission);
+               found             = false; 
+               
          Object.entries(state.adminPermissions).forEach(([key, user])=>{
             if (permission.uuid == user.uuid) {
                state.adminPermissions[key] = permission;
                found = true;
             }
          });
-         found? '' : state.adminPermissions.push(permission[0]);
+         found? '' : state.adminPermissions.push(permission);
       },
 		
 		
@@ -859,10 +869,7 @@
             if(window.sessionStorage) {  
                if(window.sessionStorage.memberList) {
                   state.members =  JSON.parse(sessionStorage.memberList);
-               } else {
-                  sessionStorage.memberList = ''; 
-                  Vue.set(state, 'members', []);
-               }
+               } 
             } 
                state.members = [];
                _members = [];
@@ -879,13 +886,10 @@
             found? '' : _members.push(member);
          });
          
-         if(percent >= 100) {
-            
-            Vue.set(state, 'members', _members);
-            if(window.sessionStorage) {  
-               sessionStorage.memberList = JSON.stringify(state.members); 
-            }
-         } 
+         Vue.set(state, 'members', _members);
+         if(window.sessionStorage) {  
+            sessionStorage.memberList = JSON.stringify(state.members); 
+         }
 		},
 		
 		
@@ -893,9 +897,6 @@
 		unset_member(state, uuid) {
 			var member = state.members.find(member => member.uuid === uuid.uuid);
 			var memberIndex = state.members.findIndex(member => member.uuid === uuid.uuid);
-         console.log(memberIndex);
-         
-         
 			state.members.splice(memberIndex,1);         
 			member.con_status				= null;
 			member.con_department 		= null;
@@ -1031,6 +1032,9 @@
       schedulingPermissions: state => state.schedulingPermissions,
       conLocations   : state => state.conLocations,
       userEvents     : state => state.userEvents,
+      
+      // ADMIN GETTERS
+      allArticles    : state=> state.allArticles,
 	}
 	
 	export default new Vuex.Store ({

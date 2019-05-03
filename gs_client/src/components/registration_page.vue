@@ -135,14 +135,7 @@
 											<span class="form_error" v-if="formErrors.last_name" v-text="formErrors.last_name? 'Last Name required' : ''"></span>
 										</div>	
 									</div>
-                           
-									<div class="form_row">
-										<div class="input_wrapper" title="defaults to full name">
-											<input  class="text_box" type="text" name="display_name" v-model="member.display_name" @keyup="search_members" v-on:keydown.once="formErrors['display_name'] = null" placeholder="defaults to full name" />
-											<label>Name shown on Badge</label>
-										</div>
-                           </div>
-									
+                           									
 									<div class="form_row">	
 										<div class="input_wrapper">
 											<input  class="text_box" type="text" name="badge_name" v-model="member.badge_name" @keyup="search_members"     v-on:keydown.once="formErrors['badge_name'] = null" placeholder="defaults to first name" />
@@ -216,6 +209,20 @@
 											
 										</div>								
 									</div>
+                           
+									<div class="form_row different_name_row">
+                              <div class="input_wrapper checkbox_wrapper different_name_checkbox">
+                                 <span class="checkbox_wrapper fal" :class="differentName? 'fa-check-square' : 'fa-square'">
+                                    <input class="checkbox " type="checkbox" v-model="differentName" @click="differentName? differentName = false : differentName = true" :value="1"  />
+                                 </span>
+                                 <label >Display different full-name on badge?</label>
+                              </div>
+										<div class="input_wrapper display_name_wrapper" :class="differentName? 'show' : ''" title="defaults to full name">
+											<input  class="text_box" type="text" name="display_name" v-model="member.display_name" @keyup="search_members" v-on:keydown.once="formErrors['display_name'] = null" placeholder="defaults to full name" />
+											<label>Name shown on Badge</label>
+                                 
+										</div>
+                           </div>
 									
 									<div class="form_row">		
 										<div class="input_wrapper">
@@ -300,6 +307,7 @@
 										<div class="form_row transaction_row" 
 											:class="member.transaction_method == '1'? 'show' 
 													:member.transaction_method == '2'? 'show' 
+													:member.transaction_method == '3'? 'show' 
 													: member.transaction_method == '4'? 'show' 
 													: '' "
 										>	
@@ -338,7 +346,7 @@
 								
 							</div>
                      
-							<div class="panel membership_credit show" v-bind:class="member.transaction_method == '11'? 'show' : ''">                             
+							<div class="panel membership_credit show" v-bind:class="member.transaction_method == '11'? 'show' : ''">
                         <span class="checkbox_wrapper fal" :class="member.membership_credit? 'fa-check-square' : 'fa-square'">
                            <input class="checkbox " type="checkbox" v-model="member.membership_credit"  :value="1"  />
                         </span>
@@ -399,8 +407,8 @@
 				
 				<section class="section reg_list" >			
 					<div class="section_content ">
-                  <span class="update_status" v-text="members.length > 0? 'Records => '+ members.length : 'connecting...' "></span>
-						<span class="loading"  :class="showLoading? 'show' : ''">Loading... </span>
+                  <span class="update_status" v-text="memberPercent+'%'"></span>
+						<span class="loading"  :class="memberPercent<100? 'show' : ''">Loading... </span>
 					
 						<div class="search_panel">
 							<div class="input_wrapper">
@@ -483,8 +491,10 @@
                showGuestGms   : false,
                showLoading    : true,
 					showTransactions: false,
+               memberPercent  : 0,
                filteredMembers: {},
 					member			: {},
+               differentName  : false,
 				//conNum : 0,
 					searchQuery 	: '',
 					formErrors		: [],
@@ -560,11 +570,8 @@
                vm.$store.dispatch('get_badge_template').then(()=>{});
 					vm.$store.dispatch('get_reg_report', vm.selectedCon).then(()=>{});
 					vm.$store.dispatch('get_members', vm.selectedCon).then((response) => {
-                  if(parseInt(response) >= 100) {
-                     vm.showLoading = false;
-                  console.log(response);
-                     vm.$forceUpdate();
-                  }
+                  vm.memberPercent = parseInt(response);
+                  console.log(vm.members.length);
                });
 					vm.$store.dispatch('get_reg_settings').then(()=>{});
 				},
@@ -1214,6 +1221,32 @@
 			margin: .5rem 0;
 			width: 100%;
 		}
+      .reg_form .different_name_checkbox {
+         width: 100%;
+         flex: none;
+      }
+      .reg_form .different_name_row {
+         flex-wrap: wrap;
+         justify-content: center;
+      }
+      .reg_form .different_name_checkbox label {
+         width: 10rem;
+      }
+      .reg_form .display_name_wrapper {
+         width: calc(100% - 2.5rem);
+         flex: none;
+         margin-left: .5rem;
+         background: rgba(0,0,0,0.2);
+         max-height: 0;
+         overflow: hidden;
+         transition: max-height .4s, padding.4s, border .4s, margin .4s;
+      }
+      .reg_form .display_name_wrapper.show {
+         max-height: 5rem;
+         padding: .5rem 1rem;
+         border: solid 1px #444;
+         margin-bottom: .5rem;
+      }
 		
 		
 		

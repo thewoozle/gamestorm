@@ -58,7 +58,7 @@
                                  <div class="form_element">
                                     <label>Con Short Name</label>
                                     <div class="input_wrapper" >
-                                       <input type="text" class="text_box" v-model="editConvention.short_name" @input="set_con_tag()" />
+                                       <input type="text" class="text_box" title="typically the initials of the convention name" v-model="editConvention.short_name" @input="set_con_tag()" />
                                     </div>
                                  </div>
                               </div>
@@ -225,7 +225,7 @@
                         <p>current news items, scheduled items, link to news hub</p>
                         
                         <div class="articles_list">
-                           <div class="" v-for="article in articles">{{article}}</div>
+                           <div class="" v-for="article in allArticles">{{article}}</div>
                         </div>
                      </div>
 
@@ -367,7 +367,7 @@
                venues            : 'venues',
                adminPermissions  : 'adminPermissions',
                members           : 'members',
-               articles          : 'articles',
+               allArticles       : 'allArticles',
 				}),
             
 				
@@ -379,7 +379,7 @@
 				vm.$store.dispatch('get_reg_report').then(()=>{});
 				vm.$store.dispatch('get_admin_permissions').then(()=>{});
 				vm.$store.dispatch('get_members').then(() => {});
-				vm.$store.dispatch('get_news_articles').then(() => {});
+				vm.$store.dispatch('get_all_articles').then(() => {});
             vm.clear_edit_convention();
 			},
 			
@@ -441,8 +441,8 @@
             // SAVE/UPDATE CONVENTION 
             save_convention() {
                var vm = this;
-               vm.$store.dispatch('save_convention',vm.editConvention).then(()=>{
-                  console.log(convention.tag_name+' saved');
+               vm.$store.dispatch('save_convention',vm.editConvention).then(()=>{                  
+                  console.log(vm.editConvention.tag_name+' saved');
                });
             },
             

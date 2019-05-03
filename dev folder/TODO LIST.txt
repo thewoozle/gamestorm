@@ -1,10 +1,7 @@
   
       
       WIP
-      
-      set admin permissions 
-      make reg able to change editing con 
-      
+         Reg - semd email conf 
       
       TODO
 
@@ -16,17 +13,16 @@
          
       
       REGISTRATION:       
-         //change full membership data chunk to minimal data and add function to get full data for a single member
          
          update 'change badge number' function to check for used numbers
          
          When a member is registered, clear staff info before setting status
          
-         change reg_report ajax to be less intrusive
          
          clear print buffer for label printers
          
          zipcode selects state
+         add 'xx' to states
          
          create 'name on badge' field with 'no name' checkbox
          
