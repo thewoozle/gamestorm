@@ -571,7 +571,6 @@
 					vm.$store.dispatch('get_reg_report', vm.selectedCon).then(()=>{});
 					vm.$store.dispatch('get_members', vm.selectedCon).then((response) => {
                   vm.memberPercent = parseInt(response);
-                  console.log(vm.members.length);
                });
 					vm.$store.dispatch('get_reg_settings').then(()=>{});
 				},
@@ -674,7 +673,7 @@
 					vm.showBadgeNumber	= false;
 					vm.showTransactions= false;
                
-               vm.$store.dispatch('get_member_info', {'uuid' : uuid}).then((response)=>{
+               vm.$store.dispatch('get_member_info', {'uuid' : uuid, 'selectedCon':vm.selectedCon}).then((response)=>{
                   if(response.message) {
                      console.log(response.message);
                      vm.member = {};

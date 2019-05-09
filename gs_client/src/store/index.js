@@ -445,9 +445,10 @@
            
       
       // GET MEMBER INFO
-      get_member_info({commit}, uuid) {
+      get_member_info({commit}, data) {    
          return new Promise((resolve, reject) => {   
-            Axios.get(apiDomain+'_get_member_info', {params: {uuid: uuid.uuid}}).then((response) => {
+            Axios.post(apiDomain+'_get_member_info', {'uuid': data.uuid, 'selectedCon' : data.selectedCon}, {headers : 
+            {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}}).then((response) => {
                resolve(response.data);               
             }, (err) => {
                console.log(err);               

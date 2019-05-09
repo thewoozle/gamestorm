@@ -1,7 +1,6 @@
   
       
       WIP
-         Reg - semd email conf 
       
       TODO
 
@@ -12,8 +11,12 @@
          change login to set time in local storage and check against that 
          
       
-      REGISTRATION:       
-         
+      REGISTRATION:                
+         change reg form to require email OR phone
+         read email_conf and update local storage with email conf
+         reg form not showing errors
+         not getting / displaying badge number on save
+         add 'game library ' flag for people with no address
          update 'change badge number' function to check for used numbers
          
          When a member is registered, clear staff info before setting status
