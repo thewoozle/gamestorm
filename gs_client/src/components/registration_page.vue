@@ -853,7 +853,19 @@
 					vm.$store.dispatch('submit_member', {'selectedCon':vm.selectedCon, 'member':vm.member}).then((response)=> {
 						
 						if (response.errors) {
-							vm.formErrors = response.errors;
+                     var errors = {};
+                     vm.formMessage = response.message;
+                     setTimeout(function() {
+                        vm.formMessage = null;
+                     },3000);
+                     Object.entries(response.errors).forEach((error) => {
+                        let errorKey = error[0].replace('member.', '');
+                        let errorText = error[1][0].replace('member.', '');
+                       errors[errorKey] = errorText;
+                     });
+                     
+							vm.formErrors = errors;
+                     console.log(errors);
 						} else {
 							if (vm.formErrors.length <1) {
                         console.log(response.member);

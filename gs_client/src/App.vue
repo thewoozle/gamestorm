@@ -1359,7 +1359,8 @@
 			opacity: 0;	
 			padding: 2rem;
 			width: 100%;
-			background: rgba(255,225,0,.5);
+			background: rgba(138,6,6,.5);
+         color: #fff;
 			display: flex;
 			justify-content: center;
 			align-items: center;

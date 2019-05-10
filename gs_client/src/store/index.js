@@ -383,8 +383,8 @@
                
 				}, (err) => {
 					if (err.response.data.errors) {
-						errors.errors = err.response.data.errors;
-						resolve(errors);
+                  console.log(err.response.data);
+						resolve(err.response.data);
 					}						
 					console.log(err.statusText+' - ' + JSON.stringify(err.response.data.errors));
 				});
