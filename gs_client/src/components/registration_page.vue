@@ -9,7 +9,7 @@
 				<section class="section reg_panel" :class="regPanel == 'regForm'? 'show' : ''">
 					<div class="control_bar">					
 						<button class="control_button fal fa-cog" type="button" @click.prevent="handle_slideouts('showRegSettings')" title="Show Reg. settings"  ></button>
-						<button class="control_button fal fa-redo-alt"   type="button" @click="member={}" title="Clear reg. form" ></button>
+						<button class="control_button fal fa-redo-alt"   type="button" @click="() => {member={}; formErrors = {};}" title="Clear reg. form" ></button>
 						<button class="control_button fal fa-repeat-1-alt"  v-if="member.uuid" type="button" @click.prevent="showBadgeNumber? showBadgeNumber = false : showBadgeNumber = true" title="Update badge number" ></button>
 						<button class="control_button fal fa-usd-circle"  v-if="member.uuid" type="button"@click="showTransactions? showTransactions = false : showTransactions = true" title="Show transaction history" ></button>
 						<button class="control_button fal fa-user-times"  v-if="member.uuid" type="button" @click="remove_member(member.uuid)"title="Deactivate member entry" ></button>	
@@ -497,7 +497,7 @@
                differentName  : false,
 				//conNum : 0,
 					searchQuery 	: '',
-					formErrors		: [],
+					formErrors		: {},
 					memberSort		: 'last_name',
 				}
 			},
@@ -621,30 +621,23 @@
 								});									
 						}
                   
-                  
-						//if (vm.searchQuery.length > 1) {	
-                     vm.filteredMembers = members.filter(function(member) {
-								member.badge_name	? badgeName	= member.badge_name	: badgeName = '';
-								member.badge_number	? badgeNumber= parseInt(member.badge_number)	: badgeNumber = 0;
-								member.full_name 	? fullName	= member.full_name	: fullName = '';
-								member.first_name 	? firstName = member.first_name : firstName = '';
-								member.last_name 	? lastName 	= member.last_name 	: lastName = '';
-								member.email 		? email 	= member.email 		: email = '';
-                        var fullname = firstName.toLowerCase() + ' '+ lastName.toLowerCase();
-								
-								return 	fullName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
-									badgeName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 ||  
-									//badgeNumber.indexOf(vm.searchQuery ) !== -1 || 
-									firstName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
-									lastName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1  || 
-                           //fullname.indexOf(vm.searchQuery.toLowerCase()) !== -1 ||
-									email.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1;
-							});
+                  vm.filteredMembers = members.filter(function(member) {
+                     member.badge_name	   ? badgeName	= member.badge_name	: badgeName = '';
+                     member.badge_number	? badgeNumber= parseInt(member.badge_number)	: badgeNumber = 0;
+                     member.full_name 	   ? fullName	= member.full_name	: fullName = '';
+                     member.first_name 	? firstName = member.first_name : firstName = '';
+                     member.last_name 	   ? lastName 	= member.last_name 	: lastName = '';
+                     member.email 		   ? email 	= member.email 		: email = '';
+                     let fullName = firstName.toLowerCase() + ' '+ lastName.toLowerCase();
                      
-						// } else {
-                     
-                     // vm.filteredMembers = members;             
-						// }
+                     return 	fullName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
+                        badgeName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 ||  
+                        //badgeNumber.indexOf(vm.searchQuery ) !== -1 || 
+                        firstName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1 || 
+                        lastName.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1  || 
+                        //fullname.indexOf(vm.searchQuery.toLowerCase()) !== -1 ||
+                        email.toLowerCase().indexOf(vm.searchQuery.toLowerCase() ) !== -1;
+                  });
 					}
 				},
             
@@ -745,8 +738,7 @@
             
 				// SEARCH QUERY
 				search_members(e) { 
-					var vm = this;
-               
+					var vm = this;               
                vm.searchQuery = e.target.value;
                vm.searchQuery? vm.get_filtered_members() : '';
 				}, 
@@ -870,7 +862,7 @@
 							if (vm.formErrors.length <1) {
                         console.log(response.member);
                         vm.regSettings.reg_mode > 0? vm.print_badge(response.member.member)  : '';
-								vm.member = [];
+								vm.member = {};
 								vm.searchQuery = '';
                         vm.memberSort = 'last_name';
 							}
@@ -1393,7 +1385,7 @@
 			opacity: 1;
 		}
 		.section.reg_list  .edit_member_button.attending {
-			padding: .5rem;
+			padding: .35rem .5rem;
 		}
 		.section.reg_list  .edit_member_button .dept_info {
 			display: flex;
@@ -1412,8 +1404,8 @@
 			padding: 0 0 0 1rem;
 			color: var(--textColor3);
 			font-weight: 300;
-			font-size: .85rem;
-			line-height: 1rem;
+			font-size: .65rem;
+			line-height: 1em;
 		}	
 		
 		.section.reg_list .name {
@@ -1434,8 +1426,8 @@
 			max-height: 4rem;
 			border-top: solid 1px #5f5f5f;
 			border-bottom: solid 1px #5f5f5f;
-			margin: .5rem 0;
-			padding: .25rem .25rem .35rem .5rem;
+			margin: .35rem 0;
+			padding: .25rem .25rem 0 .5rem;
 			background: rgba(0,0,0,0.1);
 		}
 		.section.reg_list .badge_num {

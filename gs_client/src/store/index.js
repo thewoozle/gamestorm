@@ -410,13 +410,32 @@
       
       
 		// GET MEMBERS
-		get_members({commit}, selectedCon)  {
+		// get_members({commit}, selectedCon)  {
+         // var   vm = this;         
+         // selectedCon? '': selectedCon = state.currentCon.tag_name;
+         // return new Promise((resolve, reject) => {
+            
+            // // ten-step request for 20% of records at a time 
+            // for(let x = 0; x<=4; x++) {
+               // Axios.get(apiDomain + '_get_members', {params: {'selectedCon' : selectedCon, 'step' : x }}).then((response) => {
+                  // console.log(response.data.members.length);
+                  // let percent = (20*x); 
+                  // commit('set_members', { members: response.data.members, percent: percent });
+                  // percent >= 100? resolve(percent) : '';
+               // }, (err) => {
+                  // console.log(err.statusText);
+               // }); 
+            // }   
+         // });            
+		// },
+      
+      get_members({commit}, selectedCon)  {
          var   vm = this;         
          selectedCon? '': selectedCon = state.currentCon.tag_name;
          return new Promise((resolve, reject) => {
             
             // ten-step request for 20% of records at a time 
-            for(let x = 0; x<=4; x++) {
+            for(let x = 1; x<=4; x++) {
                Axios.get(apiDomain + '_get_members', {params: {'selectedCon' : selectedCon, 'step' : x }}).then((response) => {
                   let percent = (25*x); 
                   commit('set_members', { members: response.data.members, percent: percent });
@@ -427,6 +446,7 @@
             }   
          });            
 		},
+      
       
       
       // GET BADGE TEMPLATE
@@ -886,10 +906,13 @@
             });
             found? '' : _members.push(member);
          });
-         
          Vue.set(state, 'members', _members);
-         if(window.sessionStorage) {  
-            sessionStorage.memberList = JSON.stringify(state.members); 
+         //console.log(state.members.length);
+         
+         if(percent <= 100) {
+            if(window.sessionStorage) {  
+               sessionStorage.memberList = JSON.stringify(state.members); 
+            }
          }
 		},
 		
