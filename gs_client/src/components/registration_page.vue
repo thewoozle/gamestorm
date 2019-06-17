@@ -491,7 +491,6 @@
                showGuestGms   : false,
                showLoading    : true,
 					showTransactions: false,
-               memberPercent  : 0,
                filteredMembers: {},
 					member			: {},
                differentName  : false,
@@ -519,6 +518,7 @@
 					departments		: 'departments',
 					paymentMethods	: 'paymentMethods',
 					staffPositions	: 'staffPositions',	
+               memberPercent  : 'memberPercent',
             }),
 				...mapGetters({
 					user		   	: 'user',
@@ -569,9 +569,7 @@
 					vm.$store.dispatch('get_reg_data').then(()=>{});
                vm.$store.dispatch('get_badge_template').then(()=>{});
 					vm.$store.dispatch('get_reg_report', vm.selectedCon).then(()=>{});
-					vm.$store.dispatch('get_members', vm.selectedCon).then((response) => {
-                  vm.memberPercent = parseInt(response);
-               });
+					vm.$store.dispatch('get_members', vm.selectedCon).then();
 					vm.$store.dispatch('get_reg_settings').then(()=>{});
 				},
             

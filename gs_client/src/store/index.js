@@ -42,6 +42,7 @@
       memberList     : {},
 		members	      : [],
 		memberTypes    : {},
+      memberPercent  : 0,
 		news           : {},
 		pageContent    : {},
 		pageStatus     : {},
@@ -430,19 +431,23 @@
 		// },
       
       get_members({commit}, selectedCon)  {
-         var   vm = this;         
+         var   vm = this,
+               percent = 0;         
          selectedCon? '': selectedCon = state.currentCon.tag_name;
          return new Promise((resolve, reject) => {
             
             // ten-step request for 20% of records at a time 
-            for(let x = 1; x<=4; x++) {
-               Axios.get(apiDomain + '_get_members', {params: {'selectedCon' : selectedCon, 'step' : x }}).then((response) => {
-                  let percent = (25*x); 
-                  commit('set_members', { members: response.data.members, percent: percent });
-                  percent >= 100? resolve(percent) : '';
-               }, (err) => {
-                  console.log(err.statusText);
-               }); 
+            for(let x = 0; x<=4; x++) {
+               setTimeout(function() {                  
+                  Axios.get(apiDomain + '_get_members', {params: {'selectedCon' : selectedCon, 'step' : x }}).then((response) => {
+                     percent = (20*(x+1)); 
+                     setTimeout(function() {
+                        commit('set_members', { members: response.data.members, percent: percent });
+                     },200);
+                  }, (err) => {
+                     console.log(err.statusText);
+                  }); 
+               },250);
             }   
          });            
 		},
@@ -907,7 +912,7 @@
             found? '' : _members.push(member);
          });
          Vue.set(state, 'members', _members);
-         //console.log(state.members.length);
+         Vue.set(state, 'memberPercent', percent);
          
          if(percent <= 100) {
             if(window.sessionStorage) {  
@@ -1056,6 +1061,7 @@
       schedulingPermissions: state => state.schedulingPermissions,
       conLocations   : state => state.conLocations,
       userEvents     : state => state.userEvents,
+      memberPercent  : state => state.memberPercent,
       
       // ADMIN GETTERS
       allArticles    : state=> state.allArticles,
