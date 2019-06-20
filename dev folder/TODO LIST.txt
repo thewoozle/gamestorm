@@ -28,6 +28,8 @@
          create 'name on badge' field with 'no name' checkbox
          
          transaction sort by last for descending
+         
+         for 'get members' use response for chunks
       
       ACCOUNT-
          send email conf. for new account

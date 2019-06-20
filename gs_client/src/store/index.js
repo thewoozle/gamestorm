@@ -410,44 +410,26 @@
 		
       
       
-		// GET MEMBERS
-		// get_members({commit}, selectedCon)  {
-         // var   vm = this;         
-         // selectedCon? '': selectedCon = state.currentCon.tag_name;
-         // return new Promise((resolve, reject) => {
-            
-            // // ten-step request for 20% of records at a time 
-            // for(let x = 0; x<=4; x++) {
-               // Axios.get(apiDomain + '_get_members', {params: {'selectedCon' : selectedCon, 'step' : x }}).then((response) => {
-                  // console.log(response.data.members.length);
-                  // let percent = (20*x); 
-                  // commit('set_members', { members: response.data.members, percent: percent });
-                  // percent >= 100? resolve(percent) : '';
-               // }, (err) => {
-                  // console.log(err.statusText);
-               // }); 
-            // }   
-         // });            
-		// },
-      
       get_members({commit}, selectedCon)  {
          var   vm = this,
                percent = 0;         
+         commit('clear_member_percent');     
          selectedCon? '': selectedCon = state.currentCon.tag_name;
          return new Promise((resolve, reject) => {
             
             // ten-step request for 20% of records at a time 
+            console.log('create function return for success');
             for(let x = 0; x<=4; x++) {
                setTimeout(function() {                  
                   Axios.get(apiDomain + '_get_members', {params: {'selectedCon' : selectedCon, 'step' : x }}).then((response) => {
                      percent = (20*(x+1)); 
                      setTimeout(function() {
                         commit('set_members', { members: response.data.members, percent: percent });
-                     },200);
+                     },750);
                   }, (err) => {
                      console.log(err.statusText);
                   }); 
-               },250);
+               },1600);
             }   
          });            
 		},
@@ -884,7 +866,9 @@
       },
       
      
-		
+		clear_member_percent(state) {
+         Vue.set(state, 'memberPercent', 0);
+      },
 		// SET MEMBERS (chunks of 20%)
 		set_members: (state, { members, percent }) => {
          let   vm       = this,
@@ -912,11 +896,13 @@
             found? '' : _members.push(member);
          });
          Vue.set(state, 'members', _members);
+         console.log(percent);
          Vue.set(state, 'memberPercent', percent);
          
-         if(percent <= 100) {
+         if(percent >= 100) {
             if(window.sessionStorage) {  
                sessionStorage.memberList = JSON.stringify(state.members); 
+               Vue.set(state, 'memberPercent', 100);
             }
          }
 		},

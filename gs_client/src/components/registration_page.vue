@@ -706,7 +706,7 @@
 				reset_reg_form(e) {
 					var vm = this;
 					//e.preventDefault();
-					vm.member = [];
+					vm.member = {};
 					vm.searchQuery = '';
                vm.member.state = '';
 				},
@@ -755,7 +755,7 @@
 						vm.$store.dispatch('remove_member', uuid).then(()=>{
 							vm.$forceUpdate();
 						});
-						vm.member = [];
+						vm.member = {};
 						vm.searchQuery = '';
 					}
 				},
