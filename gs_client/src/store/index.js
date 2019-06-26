@@ -47,6 +47,7 @@
 		pageContent    : {},
 		pageStatus     : {},
 		paymentMethods : {},
+      partners       : {},
 		regReport      : {},
       regReports     : {},
 		regSettings    : {},
@@ -300,6 +301,16 @@
          });            
       },
       
+      // GET PARTNERS 
+      get_partners({commit}) {
+      Axios.get(apiDomain+'_get_partners', {params:{convention:state.currentCon.info.name.toUpperCase()}}
+         ).then((response)=>{
+            commit('set_partners', response.data.partners);
+         },(err)=>{
+            console.log(err.data);
+         });
+      },
+      
       // GET USERS EVENTS 
       get_users_events({commit}, uuid) {
          Axios.post(apiDomain+'_get_users_events', {uuid: uuid}, {
@@ -409,30 +420,28 @@
       },
 		
       
+      get_members({dispatch}, selectedCon)  {
+         var   vm = this;         
+         selectedCon? '': selectedCon = state.currentCon.tag_name;         
+         dispatch('get_member_list', {selectedCon});         
+      },
       
-      get_members({commit}, selectedCon)  {
-         var   vm = this,
-               percent = 0;         
-         commit('clear_member_percent');     
-         selectedCon? '': selectedCon = state.currentCon.tag_name;
-         return new Promise((resolve, reject) => {
+      get_member_list({commit,dispatch}) {
+               Vue.set(state, 'memberPercent', state.memberPercent +=20);
+               //console.log(state.memberPercent);
             
-            // ten-step request for 20% of records at a time 
-            console.log('create function return for success');
-            for(let x = 0; x<=4; x++) {
-               setTimeout(function() {                  
-                  Axios.get(apiDomain + '_get_members', {params: {'selectedCon' : selectedCon, 'step' : x }}).then((response) => {
-                     percent = (20*(x+1)); 
-                     setTimeout(function() {
-                        commit('set_members', { members: response.data.members, percent: percent });
-                     },750);
-                  }, (err) => {
-                     console.log(err.statusText);
-                  }); 
-               },1600);
-            }   
-         });            
-		},
+            setTimeout(function(selectedCon) {      
+            
+               Axios.get(apiDomain + '_get_members', {params: {'selectedCon' : selectedCon, 'percent' : state.memberPercent}}).then((response) => {
+                              commit('set_members', { members: response.data.members});
+                        }, (err) => {
+                           console.log(err.statusText);
+                        }); 
+                        state.memberPercent < 100 ? dispatch('get_member_list') :  '';
+            },3500);
+      },
+      
+
       
       
       
@@ -866,15 +875,13 @@
       },
       
      
-		clear_member_percent(state) {
-         Vue.set(state, 'memberPercent', 0);
-      },
+		
 		// SET MEMBERS (chunks of 20%)
-		set_members: (state, { members, percent }) => {
+		set_members: (state, { members}) => {
          let   vm       = this,
                _members = state.members;
                
-         if (percent <= 20) {
+         if (state.memberPercent <= 20) {
             // first pass, set members = session storage and clear session storage and store variable
             if(window.sessionStorage) {  
                if(window.sessionStorage.memberList) {
@@ -896,14 +903,15 @@
             found? '' : _members.push(member);
          });
          Vue.set(state, 'members', _members);
-         console.log(percent);
-         Vue.set(state, 'memberPercent', percent);
+         //console.log(percent);
+         //Vue.set(state, 'memberPercent', percent);
          
-         if(percent >= 100) {
+         if(state.memberPercent >= 100) {
             if(window.sessionStorage) {  
                sessionStorage.memberList = JSON.stringify(state.members); 
-               Vue.set(state, 'memberPercent', 100);
+               //Vue.set(state, 'memberPercent', 100);
             }
+         state.memberPercent =0; 
          }
 		},
 		
@@ -954,7 +962,9 @@
          }
 		},
       
-		
+		set_partners:(state, partners) => {
+         state.partners = partners;
+      },
 		// 	set reg settings	
 		set_reg_settings: (state,  regSettings ) => {
 			state.regSettings = regSettings;
@@ -1022,6 +1032,7 @@
 		currentCon		: state => state.currentCon,
 		user			   : state => state.user,
       userInfo       : state => state.userInfo,
+      partners       : state => state.partners,
       adminPermissions:state => state.adminPermissions,
 		
 		// reg getters

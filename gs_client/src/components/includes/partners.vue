@@ -1,7 +1,9 @@
 
 	<template>
-		<div id="partners">
-		PARTNERS are US
+		<div id="partners" class="partners">
+         <div class="slideshow " v-for="partner in partners">
+            <div class="slide"><img class="img" v-bind:src="'/static/images/partners/'+partner.image" /></div>
+         </div>
 		</div>
 	
 	</template>
@@ -34,14 +36,14 @@
 			
 			
 			computed: {
-			...mapState([
-				'pageContent'
-				]),
+			...mapState({
+               partners    : 'partners',
+         }),
 			},
 			
 			created() {
-				
-				
+				let vm = this;
+            vm.$store.dispatch('get_partners').then(()=>{});				
 			},
 			
 			

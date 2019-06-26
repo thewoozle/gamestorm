@@ -114,25 +114,13 @@
 			'main_menu' 		: main_menu,
 			'page_footer'		: page_footer,
          'changepassword'  : changepassword,
-         
          'event_submission_form': event_submission_form,
          'user_events_list'   : user_events_list,
 		},
-		  
-			
-		  created() {
-            var vm = this,
-               _urlParams;
-            _urlParams = new URL(window.location.href).searchParams.has('c');
-            _urlParams? vm.urlParams.c = new URL(window.location.href).searchParams.get('c') : vm.urlParams = {}; 
-            vm.$store.dispatch('get_site_data').then(()=>{});
-				vm.handle_page_load();  
-		  },
-		  
 		  computed: {
            ...mapState({
-               devNotes  : 'devNotes',
-               currentCon: 'currentCon',
+               devNotes    : 'devNotes',
+               currentCon  : 'currentCon',
                userEvents  : 'userEvents',
            }),
            ...mapGetters({
@@ -142,6 +130,19 @@
 				return this.$route.name;
 			},
 		  },
+		  
+			
+		  created() {
+            var vm = this,
+               _urlParams;
+            _urlParams = new URL(window.location.href).searchParams.has('c');
+            _urlParams? vm.urlParams.c = new URL(window.location.href).searchParams.get('c') : vm.urlParams = {}; 
+            vm.$store.dispatch('get_site_data').then(()=>{
+            });
+            
+				vm.handle_page_load();  
+		  },
+		  
 		  
 		  watch: {
 				pageName(name) {

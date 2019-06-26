@@ -647,7 +647,7 @@
                vm.showRegSettings = false;
                   vm.filteredMembers = {}; 
                vm.$store.dispatch('get_members', selectedCon).then((response) =>{
-                  if(response >= 100) {
+                  if(vm.memberPercent >= 100) {
                      vm.get_filtered_members();
                      vm.showLoading = false;
                   }
