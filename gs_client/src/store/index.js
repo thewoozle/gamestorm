@@ -303,11 +303,17 @@
       
       // GET PARTNERS 
       get_partners({commit}) {
-      Axios.get(apiDomain+'_get_partners', {params:{convention:state.currentCon.info.name.toUpperCase()}}
-         ).then((response)=>{
-            commit('set_partners', response.data.partners);
-         },(err)=>{
-            console.log(err.data);
+         return new Promise ((resolve, reject) => {
+            if(state.currentCon.info.name) {   
+               Axios.get(apiDomain+'_get_partners', {params:{convention:state.currentCon.info.name.toUpperCase()}}
+               ).then((response)=>{
+                  let partners = response.data.partners;                  
+                  commit('set_partners', partners);
+                  resolve(partners);
+               },(err)=>{
+                  console.log(err.data);
+               });
+            }
          });
       },
       
@@ -963,7 +969,7 @@
 		},
       
 		set_partners:(state, partners) => {
-         state.partners = partners;
+         Vue.set(state, 'partners', partners);
       },
 		// 	set reg settings	
 		set_reg_settings: (state,  regSettings ) => {
