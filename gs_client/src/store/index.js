@@ -47,7 +47,7 @@
 		pageContent    : {},
 		pageStatus     : {},
 		paymentMethods : {},
-      partners       : {},
+      partners       : null,
 		regReport      : {},
       regReports     : {},
 		regSettings    : {},
@@ -303,16 +303,18 @@
       
       // GET PARTNERS 
       get_partners({commit}) {
-         return new Promise ((resolve, reject) => {
-            if(state.currentCon.info.name) {   
-               Axios.get(apiDomain+'_get_partners', {params:{convention:state.currentCon.info.name.toUpperCase()}}
-               ).then((response)=>{
-                  let partners = response.data.partners;                  
-                  commit('set_partners', partners);
-                  resolve(partners);
-               },(err)=>{
-                  console.log(err.data);
-               });
+         return new Promise ((resolve, reject) => { 
+            if(!state.partners) {           
+                  Axios.get(apiDomain+'_get_partners', {params:{convention:state.currentCon.info.name.toUpperCase()}}
+                  ).then((response)=>{
+                     let partners = response.data.partners;                  
+                     commit('set_partners', partners);
+                     resolve(partners);
+                  },(err)=>{
+                     console.log(err.data);
+                  });
+            } else {
+               resolve(state.partners);
             }
          });
       },
@@ -426,26 +428,31 @@
       },
 		
       
-      get_members({dispatch}, selectedCon)  {
-         var   vm = this;         
-         selectedCon? '': selectedCon = state.currentCon.tag_name;         
-         dispatch('get_member_list', {selectedCon});         
+      get_members({commit,dispatch}, selectedCon)  {
+         var   vm = this,
+               selectedCon = selectedCon;
+         selectedCon? '': selectedCon = state.currentCon.tag_name;  
+         Vue.set(state, 'memberPercent', 0);       
+         commit('set_members_from_localstorage');
+         dispatch('get_member_list', selectedCon);         
       },
       
-      get_member_list({commit,dispatch}) {
-               Vue.set(state, 'memberPercent', state.memberPercent +=20);
-               //console.log(state.memberPercent);
-            
-            setTimeout(function(selectedCon) {      
-            
-               Axios.get(apiDomain + '_get_members', {params: {'selectedCon' : selectedCon, 'percent' : state.memberPercent}}).then((response) => {
-                              commit('set_members', { members: response.data.members});
-                        }, (err) => {
-                           console.log(err.statusText);
-                        }); 
-                        state.memberPercent < 100 ? dispatch('get_member_list') :  '';
-            },3500);
+      get_member_list({commit,dispatch}, selectedCon) {
+         var vm = this;
+            Axios.get(apiDomain + '_get_members', {params: {'selectedCon' : selectedCon, 'percent' : state.memberPercent}}).then((response) => {    
+               let percent =response.data.percent;
+               commit('set_members', { members: response.data.members, percent: percent });
+
+         
+                  if(percent < 100) {
+                     dispatch('get_member_list', selectedCon);
+                  } 
+                  
+            }, (err) => {
+               console.log(err.statusText);
+            }); 
       },
+      
       
 
       
@@ -881,44 +888,45 @@
       },
       
      
-		
-		// SET MEMBERS (chunks of 20%)
-		set_members: (state, { members}) => {
-         let   vm       = this,
-               _members = state.members;
-               
-         if (state.memberPercent <= 20) {
-            // first pass, set members = session storage and clear session storage and store variable
-            if(window.sessionStorage) {  
+     set_members_from_localstorage() {        
+          if(window.sessionStorage) {  
                if(window.sessionStorage.memberList) {
                   state.members =  JSON.parse(sessionStorage.memberList);
                } 
             } 
-               state.members = [];
-               _members = [];
-         }   
+     },
+		
+		// SET MEMBERS (chunks of 20%)
+		set_members: (state, { members, percent}) => {
+         let   vm       = this,
+               _members = state.members;  
+         if (percent <= 20) {
+            // first pass, set members = session storage and clear session storage and store variable           
+            //Vue.set(state, 'memberPercent',  []);
+            _members = members;         
+         }  else {  
+               for( let i = 0; i < members.length; i++)  {
+                  var   found = false,
+                        member = members[i];
+                  for(let f = 0; f < _members.length; f++) {
+                     let _member = _members[f];
+                     if(_members[f].uuid == member.uuid) {
+                        found = true;
+                     } 
+                  }
+                  found? '' : _members.push(member);
+               }
          
-         members.forEach((member) => {
-            let found = false;
-            _members.forEach((_member) => {
-               if(_member.uuid == member.uuid) {
-                  found = true;
-                  _member = _member;
-               } 
-            });
-            found? '' : _members.push(member);
-         });
-         Vue.set(state, 'members', _members);
-         //console.log(percent);
-         //Vue.set(state, 'memberPercent', percent);
+         }
          
          if(state.memberPercent >= 100) {
             if(window.sessionStorage) {  
                sessionStorage.memberList = JSON.stringify(state.members); 
-               //Vue.set(state, 'memberPercent', 100);
             }
-         state.memberPercent =0; 
          }
+         Vue.set(state, 'members', _members);
+         Vue.set(state, 'memberPercent', percent);
+         
 		},
 		
 		

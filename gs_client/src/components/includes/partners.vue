@@ -57,6 +57,7 @@
 			computed: {
 			...mapState({
                partners    : 'partners',
+               conventionInfo:'conventionInfo',
          }),
 			},
 			
@@ -64,7 +65,7 @@
 				let vm = this;
             vm.$store.dispatch('get_partners').then((response)=>{
                response? vm.set_up_slideshow() : '';
-            });				
+            });
 			},
 			
 			
@@ -96,7 +97,7 @@
                setTimeout(function() {
                   vm.toggle_slides('next');
                   vm.animate_partners();
-               },10000);  
+               },30000);  
                
             },
             
