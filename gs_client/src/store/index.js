@@ -37,7 +37,7 @@
       eventTracks    : {},
       eventTypes     : {},
       experienceLevels: experienceLevels,
-		gallery        : {},
+		galleryData    : {},
 		liveEvents     : {},
       memberList     : {},
 		members	      : [],
@@ -366,6 +366,18 @@
          
       },
 		
+      
+		/*-----------------------------------------------------------
+                  GALLERY DATA 
+      ----------------------------------------------------------- */
+		get_gallery_data({commit}, selectedCon) {
+         console.log(selectedCon);
+         Axios.get(apiDomain+'_get_gallery_data').then((response)=>{
+            commit('set_gallery_data', response.data.galleryData);
+         });
+         
+      },
+      
       
 		
 		/*-----------------------------------------------------------
@@ -825,7 +837,10 @@
          found? '' : state.adminPermissions.push(permission);
       },
 		
-		
+		// SET GALLERY DATA 
+      set_gallery_data: (state, galleryData) => {
+         state.galleryData = galleryData;
+      },
       
 		// SET PAGE STATUS
 		set_page_status: (state, {pageStatus}) => {

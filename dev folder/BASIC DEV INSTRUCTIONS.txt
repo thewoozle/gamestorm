@@ -1,3 +1,10 @@
 
    in development, site is at localhost:8080
    
+   
+   two console windows:
+      xampp/htdocs/gamestorm/gs_server - php artisan serve
+      xampp/htodcs/gamestorm/gs_client - npm run dev 
+      
+      
+      

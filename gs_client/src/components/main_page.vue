@@ -26,10 +26,6 @@
 			<div class="sections">
 				<section class="section intro">
 				
-					<div class="content_wrapper">	
-						<article class="content intro" v-if="pageContent.con_intro" v-html="pageContent.con_intro.content"></article>
-					</div>
-					
 					<div class="news_items">
 						<div class="news_item" v-if="articles" v-for="article in articles">
 						
@@ -44,14 +40,25 @@
 							</footer>
 						</div>
 					</div>
+               
+               
+					<div class="content_wrapper">	
+						<article class="content intro" v-if="pageContent.con_intro" v-html="pageContent.con_intro.content"></article>
+					</div>
+					
 				
 				</section> 
 				
 				
-				<section class="">
+				<section class="section current_con_intro">
+				<p>Current Convention intro (GS22)</p>
+            <pre>show artwork, guests</pre>
 				
+				</section>
 				
-				
+				<section class="section previous_con_intro">
+				<p>Previous Convention intro (GS21)</p>
+				<pre> show some gallery images and a couple comments</pre>
 				</section>
 				
 				
@@ -120,7 +127,7 @@
 	
 	
 	<style>	
-		
+   
 		.section.intro {
 			max-width: 50rem;
 			margin: 8rem auto 0;

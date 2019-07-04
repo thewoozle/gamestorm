@@ -24,8 +24,8 @@
 								
 								<router-link  :to="'/signin?action=register'" class="nav_link" v-if="!user.uuid">New Account</router-link>	
 								
-								<router-link :to="'/shop'" class="nav_link"  >Merch</router-link>
-								<router-link :to="'/connect'" class="nav_link"  >Connect</router-link>
+								<router-link :to="'/shop'" class="nav_link disabled"  >Merch</router-link>
+								<router-link :to="'/connect'" class="nav_link disabled"  >Connect</router-link>
 								
 							</div>					
 						</div>				
@@ -41,12 +41,12 @@
 							</router-link>
 							<div class="nav_sublinks">
 								<router-link class="nav_link" :to="'/gallery'">Gallery</router-link>								
-								<router-link class="nav_link" :to="'/venue'">Venue</router-link>
-								<router-link class="nav_link" :to="'/membership'" >Convention Membership</router-link>
-								<router-link class="nav_link" :to="'/dealers'">Dealers</router-link>
-								<router-link class="nav_link" :to="'/orpg'" title="Adventures League, Pathfinder Society, Cult of Chaos, Shadowrun Organized Play" >Organized RolePlaying</router-link>
-								<router-link class="nav_link" :to="'/gamelab'" >GameLab</router-link>
-								<router-link class="nav_link" :to="'/paw'" >Play &amp; Win</router-link>
+								<router-link class="nav_link disabled" :to="'/venue'">Venue</router-link>
+								<router-link class="nav_link disabled" :to="'/membership'" >Convention Membership</router-link>
+								<router-link class="nav_link disabled" :to="'/dealers'">Dealers</router-link>
+								<router-link class="nav_link disabled" :to="'/orpg'" title="Adventures League, Pathfinder Society, Cult of Chaos, Shadowrun Organized Play" >Organized RolePlaying</router-link>
+								<router-link class="nav_link disabled" :to="'/gamelab'" >GameLab</router-link>
+								<router-link class="nav_link disabled" :to="'/paw'" >Play &amp; Win</router-link>
 							</div>					
 						</div>				
 					</div>	
