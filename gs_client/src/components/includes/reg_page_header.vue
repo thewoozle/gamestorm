@@ -13,7 +13,7 @@
 				<div class="report_box reg_mini_report" >
 					<span class="item">
 						<span class="text">Number of Registered Members</span>
-						<span class="value" v-text="registeredMembers || '-'"></span>
+						<span class="value" v-text="regReport.registeredMembers || '-'"></span>
 					</span>	
 				</div>
 				<div class="response_message reg_form_response"></div>			
@@ -45,7 +45,7 @@
 			
 			computed: {
             ...mapState({    
-					members			: 'members',
+					regReport         : 'regReport',
 				}),
             
             registeredMembers: function () {

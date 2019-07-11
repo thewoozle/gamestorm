@@ -371,9 +371,31 @@
                   GALLERY DATA 
       ----------------------------------------------------------- */
 		get_gallery_data({commit}, selectedCon) {
-         console.log(selectedCon);
+         var   gallery  = [],
+               category = [],
+               conNum   = null;
+         
          Axios.get(apiDomain+'_get_gallery_data').then((response)=>{
-            commit('set_gallery_data', response.data.galleryData);
+            
+            Object.entries(response.data.galleryData).forEach((item)=> {  
+            
+               if(item[1].con_num != conNum) {
+                  
+                  conNum? gallery.push(category) : '';
+                  
+                  category = {
+                     title   : item[1].convention+' '+item[1].con_num,
+                     items   : [item[1]],
+                  };                  
+                  conNum = item[1].con_num;                  
+               } else {
+                  category.items.push(item[1]);
+               }
+            });
+            
+            gallery.push(category);
+            
+            commit('set_gallery_data', gallery);
          });
          
       },
