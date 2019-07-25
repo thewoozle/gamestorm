@@ -1,12 +1,27 @@
 
 	<template>
-		<div class="component">
-		
-         <pre>
-            show current message queue</br>
-            list past messages</br>
-            message create/edit form</br>
-         </pre>
+		<div id="news_hub" class="news_hub admin_page">
+         <span class="title admin_title">News Hub</span>
+               
+         <section class="section articles">                        
+                        <div class="articles_list">
+                           <div class="article" :class="article.active? 'active' : 'inactive'" v-for="article in allArticles">
+                              <div class="header" @click.prevent="article.show? article.show = false : article.show = true">
+                              {{article.show}}
+                                 <span class="active_icon" :class="article.active? 'active fas fa-circle':'inactive fal fa-power-off'"></span>
+                                 <span class="article_title" v-text="article.article_title"></span>
+                                 <div class="dates">
+                                    <span class="" v-text="article.start_date? 'start: '+date_time(article.start_date) : 'start: auto'"></span>
+                                    <span class="" v-text="article.end_date? 'end: '+ date_time(article.end_date): 'end: open'"></span>
+                                 </div>                                 
+                                 <span class="expand fal " :class="article.show? 'expand fa-arrow-square-up' : 'fa-arrow-square-down'"></span>
+                              </div>   
+                              <div class="article_body" :class="article.show? 'show' : ''" v-html="article.article_body"></div>
+                              <span class="" v-text="article.article_tags"></span>                           
+                           </div >
+                        </div>
+         </section>
+
 		</div>
 	</template>
 	
@@ -24,7 +39,6 @@
          
          data() {
             return{
-            
             }
          },
          
@@ -32,20 +46,37 @@
             
          },
          
-         computed: {
-            ...mapGetters({
-               
-            }),
-            ...mapState({
-               
-            }),
-         },
+         
+			computed: {
+				...mapGetters({
+               allArticles       : 'allArticles',
+					user			      : 'user',
+				}),
+            
+				
+			},
          
          created() {
-            
+            var vm = this;
+				vm.check_user();
+				vm.$store.dispatch('get_all_articles').then(() => {});
          },
          methods: {
             
+				// CHECK USER PAGE PERMISSION
+				check_user() {
+					var vm = this;					
+					if (vm.user) {
+						if (vm.user.permissions) {
+							if (vm.user.permissions.admin) {
+								vm.userPass = true;
+							} 
+						} 
+					}		          
+					vm.userPass? '' : vm.$router.push('/mainpage');					
+				},
+            
+                        
          }
 		}
 	
@@ -53,5 +84,77 @@
    
 	
 	<style>
+      .news_hub .admin_title {
+         justify-content: center;
+      }
+      .news_hub .active_title {
+         display: flex;
+         width: 100%;
+         font-weight: bold;
+      }
+      .news_hub .article {
+         padding: .5rem;
+      }
+      .news_hub .article + .article{
+         margin-top: .5rem;
+         position: relative;
+      }
+      .news_hub .article.active {
+         background: rgba(255,255,255,.25);
+         
+      }
+      .news_hub .article.inactive {
+         background: rgba(0,0,0,0.15);
+      }
+      
+      .news_hub .article .header {
+         display: flex;
+         cursor: pointer;
+         align-items: center;
+         justify-content: space-between;
+      }
+      .news_hub .article .article_title {
+         display: flex;
+         flex: 1;
+         padding: 0 .5rem;
+      }
+      .news_hub .article .active_icon {
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         border-radius: 50%;
+         margin: 0 .5rem;
+         width: 1.25rem;
+         height: 1.25rem;
+         font-size: 1.15rem;
+         overflow: hidden;
+      }
+      .news_hub .article .active_icon.active {
+         color: var(--passColor);
+         border: solid 2px var(--button2);
+      }
+      .news_hub .article .active_icon.inactive {
+         color: var(--button);
+      }
+      .news_hub .article .dates {
+         display: flex;
+         flex-direction: column;
+         font-size: .9rem;
+      }
+      .news_hub .article .expand {
+         display: flex;
+         font-size: 1.5rem;
+         margin: 0 .5rem;
+      }
+      .news_hub .article .article_body {
+         max-height: 0;         
+         overflow: hidden;
+         transition: max-height .3s;
+      }
+      .news_hub .article .article_body.show {
+         max-height: 30rem;
+         border: solid 1px #aaa;
+         border-radius: .25rem;
+      }
 	
 	</style>

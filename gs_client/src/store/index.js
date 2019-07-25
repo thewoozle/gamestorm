@@ -345,9 +345,8 @@
       
       
       // GET USER INFO
-      get_user_info({commit}, uuid) {
-         console.log(uuid);
-         Axios.post(apiDomain + '_get_user_info', {'uuid': uuid}, {
+      get_user_info({commit}, data) {
+         Axios.post(apiDomain + '_get_user_info', data, {
                headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
             }).then((response) => {	
             commit ('set_userInfo', response.data.userInfo);
@@ -838,6 +837,10 @@
          state.articles = articles;
       },
       set_all_articles: (state, articles) => {
+         // creates the 'show' atribute for accordions
+         Object.entries(articles).forEach(([key, value]) => {
+            value.show = false;
+         });
          state.allArticles = articles;
       },
       

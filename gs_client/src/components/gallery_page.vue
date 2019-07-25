@@ -1,15 +1,17 @@
 
 	<template>
 		<div class="component gallery_page">
-      
+         <div class="show_image" v-bind:class="showImage? 'show' : ''" @click.prevent="showImage = null">
+            <span class="image"  v-bind:style="{'background-image' : 'url('+showImage+')'}" ></span>
+         </div>
       
       
          <section class="section gallery">
             <div class="category"  v-for="category in galleryData">
             
                <span class="gallery_title title"  v-text="category.title"></span>
-               <div class="item" v-for="item in category.items">
-                  <span class="">{{item.file_description}}</span>
+               <div class="item" v-for="item in category.items" @click.prevent="showImage = galleryLocation + item.file_name">
+                  <span class="description">{{item.file_description}}</span>
                   <span class="image" v-bind:style="{'background-image' : 'url('+galleryLocation + item.file_name+')'}" ></span>
                </div>
                
@@ -31,7 +33,8 @@
          
          data() {
             return{
-               galleryLocation : '/static/images/gallery/',
+               galleryLocation: '/static/images/gallery/',
+               showImage      : null,    
             }
          },
          
@@ -69,6 +72,31 @@
    
 	
 	<style>
+      .gallery_page .show_image {
+         position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+         display: flex;
+         opacity: 0;
+         pointer-events: none;
+         height: 100vh;
+         width: 100vw;
+         cursor: pointer;
+         transition: opacity .3s, z-index .3s;
+      }
+      .gallery_page .show_image.show {
+         opacity: 1;
+         z-index: 100;
+         pointer-events: auto;
+         background: rgba(0,0,0,0.75);
+      }
+      .gallery_page .show_image .image{
+         height: 100%;
+         width: 100%;
+         background-position: center center;
+         background-size: contain;
+      }
       .gallery {
          display: flex;
          flex-direction: column;
@@ -86,15 +114,34 @@
          color: var(--titleColor);
       }
       .gallery .item {
+         position: relative;
          width: 15rem;
          height: 15rem;      
+         padding: .35rem;         
+         cursor: pointer;
+         transition: padding .3s;
+      }
+      .gallery .item:hover {
+         padding: 0;
+      }
+      .gallery .item .description {
+         display: flex;
+         position: absolute;
+            z-index: -1;
+            top: 0;
+            left: 0;
+         width: 100%;   
+         opacity: 0;
+         
       }
       .gallery .image {
          display: flex;
          width: 100%;
          height: 100%;
+         border-radius: .15rem;
          background-size: cover;   
          background-position: center center;
+         box-shadow: .1rem -.1rem .15rem rgba(0,0,0,0.3memspector5);
          overflow: hidden;
       }
 	

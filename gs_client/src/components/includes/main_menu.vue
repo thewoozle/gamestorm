@@ -42,7 +42,7 @@
 							<div class="nav_sublinks">
 								<router-link class="nav_link" :to="'/gallery'">Gallery</router-link>								
 								<router-link class="nav_link disabled" :to="'/venue'">Venue</router-link>
-								<router-link class="nav_link disabled" :to="'/membership'" >Convention Membership</router-link>
+								<router-link class="nav_link " :to="'/membership'" >Convention Membership</router-link>
 								<router-link class="nav_link disabled" :to="'/dealers'">Dealers</router-link>
 								<router-link class="nav_link disabled" :to="'/orpg'" title="Adventures League, Pathfinder Society, Cult of Chaos, Shadowrun Organized Play" >Organized RolePlaying</router-link>
 								<router-link class="nav_link disabled" :to="'/gamelab'" >GameLab</router-link>

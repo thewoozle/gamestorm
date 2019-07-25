@@ -233,7 +233,7 @@
 					default: 
 						vm.pageType = 'public';
 				}
-				console.log('name:'+name+' / ' + vm.pageType);
+				//console.log('name:'+name+' / ' + vm.pageType);
 			},
 			
 			
@@ -419,15 +419,19 @@
 			text-shadow: -1px -1px 0px rgba(0,0,0,0.15);		
 		}
 		.page_title {
+         display: flex;
+         justify-content: center;
 			font-size: 2.25rem;
 			text-transform: uppercase;
 			letter-spacing: .05em;
-			color: var(--lightColor);
-			text-shadow: -1px -1px 0px rgba(0,0,0,0.15);
-		}
+         color: var(--altColor);
+         text-shadow: -1px -1px 4px rgba(190,0,0,0.5);
+	}
+	
       
 		.section_title {
 			display: flex;
+         justify-content: flex-start;
 			width: 100%;
 			font-size: 2rem;
 			line-height: 1.5em;
@@ -437,6 +441,11 @@
 			color: var(--titleColor);		
 			text-shadow: -1px -1px 1px rgba(0,0,0,0.1);
 		}
+      .section_title .text {
+         min-width: 50%;
+         justify-content: flex-end;
+         text-align: right;
+      }
 		.admin_title {
 			display: flex;
 			width: 100%;
@@ -1943,7 +1952,24 @@
 			overflow-y: auto;
 			background-size: cover;
 			background: rgba(0,0,0,0.1);
+         transition: margin .2s;
 		}
+      
+   #app.scroll_40 .main_content {
+      margin-top: 5.5rem;
+   }
+   
+   #app.scroll_80 .main_content {
+      margin-top: 5rem;
+   }
+   #app.scroll_120 .main_content {
+      margin-top: 4.5rem;
+   }
+   
+   #app.scroll_160 .main_content {
+      margin-top: 4rem;
+   }
+   
 		.main_view {
 			display: flex;
 			flex-wrap: wrap;
@@ -1970,39 +1996,6 @@
          max-width:60rem;
 		}
       
-			
-		/*------------	PAGE HEADER		------------	*/
-		
-		.page_header {
-			display: flex;
-			position: fixed;
-				top: 0;
-				left: 0;
-				z-index: 50;
-			width: calc(100% - 1rem);
-			height: 6rem;
-			margin: 0 auto;
-			font-size: 0.45rem;
-		}
-			
-		.page_header .header_inner {
-			position: relative;
-			display: flex;
-			justify-content: center;
-			font-size: 1em;
-			height: 100%; 
-			width: 100%;	
-			transition: height .5s, background .5s;
-		}	
-		
-		.page_header .signin_button {
-			position: absolute;
-			top: 0;
-			right: 0;
-			z-index: 90;
-			display: none;
-		}
-		
 		
 		.page_content {
 			position: relative;
@@ -2178,6 +2171,12 @@
          width: 100%;
          text-align: center;
       }
+      
+      
+		.admin_page  * {
+			color: var(--mainColor);
+		}
+      
 		
 	
 		/*  ---------------------------------------------------------------------------------

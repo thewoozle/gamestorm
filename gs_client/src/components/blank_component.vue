@@ -1,6 +1,19 @@
 
 	<template>
 		<div class="component">
+         <span class="page_title">PAGE TITLE</span>
+      
+      
+         <div class="sections">
+            <section class="section section_class">
+               <span class="section_title"></span>
+               
+               <div class="section_content"></div>
+            
+            </section>
+            
+            
+            
 		
 		</div>
 	</template>

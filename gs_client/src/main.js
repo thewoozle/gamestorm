@@ -19,66 +19,111 @@
    
 	Vue.prototype.$log = console.log;
    
+   
 	Vue.mixin({
 		created: function() {},
 		methods: {
+         
+         
+				/*	----------------------------------------------------------- 
+								CHECK LOGGED IN	
+					-----------------------------------------------------------	*/
+				check_logged_in() {
+					var vm = this;
+					if (Vue.ls.get('user') && Vue.ls.get('user').length > 0) {
+               console.log(Vue.ls.get('user').length);
+						vm.$store.dispatch('update_user', Vue.ls.get('user') );						
+					} else {
+						if (vm.$route.name != 'mainpage') {
+							vm.$router.replace({name: 'mainpage'});
+						}
+					}					
+				},	
+            
 			handle_data_view(e) {
 				e.target.classList.contains('show')? e.target.classList.remove('show') : e.target.classList.add('show');
 			},
          
 			event_date(date) {
             // Thursday, Mar 12th
-				return  '<span class="day_name">'+ moment(date).format('dddd')+'</span><span class="day_date">, '  + moment(date).format('MMM Do')+'</span>';
+            let formattedDate = '';
+            date? formattedDate = '<span class="day_name">'+ moment(date).format('dddd')+'</span><span class="day_date">, '  + moment(date).format('MMM Do')+'</span>' : '';
+            return formattedDate;
 			},	
          
          event_day(date) {
             // Thu
-            return moment(date).format('dd');
+            let formattedDate = '';
+            date? formattedDate = moment(date).format('dd') : '';
+            return formattedDate;
          },
          
 			article_date(date) {
             // Mar 12th
-				return  '<span class="month">'+ moment(date).format('MMM')+'</span> <span class="day"> '+ moment(date).format('Do')+'</span>';
+            let formattedDate = '';
+            date? formattedDate = '<span class="month">'+ moment(date).format('MMM')+'</span> <span class="day"> '+ moment(date).format('Do')+'</span>' : '';
+				return  formattedDate;
 			},	
 			month_day_year(date) {
             // Mar, 12th, 2019
-				return moment(date).format('MMM, Do YYYY');
+            let formattedDate = '';
+            date? formattedDate = moment(date).format('MMM, Do YYYY') : '';
+            return formattedDate
 			},
 			
          iso_date(date) {
             // 2019-03-12
-            //return moment(date).format('YYYY-M-DD'); 
-            return moment(date).toISOString();
+            let formattedDate = '';
+            date? formattedDate = moment(date).toISOString() : '';
+            return formattedDate;
          },
 			day_date(date) {
             // Mar 12th
-				return moment(date).format('MMM Do');
+            let formattedDate = '';
+            date? formattedDate = moment(date).format('MMM Do') : '';
+				return formattedDate;
 			},
          
          // Feb 8th 12:18pm
          date_time(date) {
-            return moment(date).format('MMM Do hh:mm a');
+            let formattedDate = '';
+            date? formattedDate = moment(date).format('MMM Do hh:mm a') : '';            
+            return formattedDate;
          },
          
          tag_time(date) {
             // 05:00 am
-            return moment(date).format('hh:mm a');
+            let formattedDate = '';
+            date? formattedDate = moment(date).format('hh:mm a') : '';
+            return formattedDate;
          },
          tag_day(date) {
-            return moment(date).format('ddd');
+            let formattedDate = '';
+            date? formattedDate = moment(date).format('ddd') : '';
+            return formattedDate;
          },
          
          day_time(date) {
-            return moment(date).format('ddd hh:mm a');
+            let formattedDate = '';
+            date? formattedDate = moment(date).format('ddd hh:mm a') : '';
+            return formattedDate;
          },
          
          sql_date_time(date) {
-           return moment(date).format('YYYY-MM-DD HH:MM:SS'); 
+            let formattedDate = '';
+            date? formattedDate = moment(date).format('YYYY-MM-DD HH:MM:SS') : ''; 
+            return formattedDate;
          },
          
          between_dates(startDate, endDate) {
             return moment().isBetween(moment(startDate), moment(endDate));
          },
+         
+         
+         before_date(targetDate) {
+            return moment(moment()).isBefore(moment(targetDate));
+         },
+         
          
          event_duration(startTime, endTime) {
             var returnTime, hours, minutes;
@@ -99,6 +144,8 @@
             
             return returnTime;
          },
+         
+         
          
 		}
 	});

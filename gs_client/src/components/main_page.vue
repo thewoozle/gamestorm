@@ -51,14 +51,32 @@
 				
 				
 				<section class="section current_con_intro">
-				<p>Current Convention intro (GS22)</p>
-            <pre>show artwork, guests</pre>
-				
+            <span class="section_title"><span class="text">GameStorm 22</span></span>
+				<p>GS 22 will be at teh Jantzen Beach Red Lion again this year</p>
+            <pre>show artwork, guests as available, number of registered members (not staff)</pre>
+            
+            
+            <pre>Membership registration for GS22 is now open</pre>
+                           <div v-if="userInfo.con_status ">
+                              <p>You HAVE a membership for {{currentCon.name}} {{currentCon.con_num}}</p>
+                              <p v-if="userInfo.badge_name">you have a membership for  {{currentCon.name}} {{currentCon.con_num}}</p>
+                           </div>
+                           <div v-else >
+                           
+                              <router-link class="link" :to="'/membership'" >Membership info for {{currentCon.name}} {{currentCon.con_num}} </router-link>
+                        
+                           </div> 
+
+
+
+               <pre>Event Registration / submit events</pre>               
+                           
+                           
 				</section>
 				
 				<section class="section previous_con_intro">
-				<p>Previous Convention intro (GS21)</p>
-				<pre> show some gallery images and a couple comments</pre>
+            <span class="section_title"><span class="text">GameStorm 21 was another smash hit</span></span>
+				<pre> show some gallery images and a couple comments, number of guest GM memberships</pre>
 				</section>
 				
 				
@@ -106,6 +124,9 @@
 					pageContent 	: 'pageContent',
 					siteContent 	: 'siteContent',
 					articles		   : 'articles',
+               userInfo       : 'userInfo',
+               currentCon     : 'currentCon',
+               user           : 'user',
 					//showMenu		: 'showMenu'
 				}),
 			},
@@ -113,14 +134,27 @@
 			created: function() { 
 				var vm = this;            
             vm.$store.dispatch('get_news_articles').then(()=>{});
-			},
-			
+            vm.get_user_info();
+				vm.check_logged_in();
+         },
+         
+         methods: {
+            
+            get_user_info() {
+               var vm = this;
+               if(vm.user) {
+                  vm.$store.dispatch('get_user_info', {'uuid' : vm.user.uuid, 'selectedCon' : vm.currentCon.tag_name}).then(()=>{
+                  });
+               } else {
+                  vm.$router.push('/');
+                  
+               }
+            }
+         },
 			mounted: function() { 
 			},
 			
 			
-			methods: {	
-			}
 			
 		}
 	</script>
@@ -142,7 +176,15 @@
 			text-align: center;
 			text-shadow: -1px -1px 1px rgba(0,0,0,0.35);
 		}
-		
+      .main_view .section {
+         flex-wrap: wrap;
+      }
+      .main_view .section + .section {
+         margin-top: 2rem;
+      }
+		.main_view .section_title {
+         justify-content: center;
+      }
 		.news_items {
 			position: absolute;
 				top: 0;

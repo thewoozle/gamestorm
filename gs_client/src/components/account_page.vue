@@ -222,7 +222,7 @@
             get_user_info() {
                var vm = this;
                if(vm.user.uuid) {
-                  vm.$store.dispatch('get_user_info', vm.user.uuid).then(()=>{
+                  vm.$store.dispatch('get_user_info', {'uuid' : vm.user.uuid, 'selectedCon' : vm.currentCon.tag_name}).then(()=>{
                   });
                } else {
                   vm.$router.push('/');

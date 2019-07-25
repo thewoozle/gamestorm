@@ -10,6 +10,7 @@
 	import community_page from '@/components/community_page'
 	import connect_page from '@/components/connect_page'
    import gallery_page from '@/components/gallery_page'
+   import membership_page from '@/components/membership_page'
    
 	import admin_page from '@/components/admin_page'
 	import registration_page from '@/components/registration_page'
@@ -50,6 +51,10 @@
          path     : '/gallery',
          name     : 'gallerypage',
          component: gallery_page   
+      }, {
+         path     : '/membership',
+         name     : 'membershippage',
+         component: membership_page
       },
       
       // FORGOT PASSWORD 

@@ -1,6 +1,6 @@
 
 	<template>
-		<div id="admin_page">
+		<div id="admin_page" class="admin_page">
 		
 			<div class="sections">
 				<section class="section admin_report">
@@ -13,7 +13,6 @@
                
                <div class="panel_display">
                   <div class="buttons">
-                     <button type="button" v-if="user.permissions.admin >=2"class="button":class="siteSetting== 'news'? 'active' : ''" @click="siteSetting = 'news'">News</button>
                      <button type="button" v-if="user.permissions.admin >=3"class="button":class="siteSetting== 'conventions'? 'active' : ''" @click="siteSetting = 'conventions'">Conventions</button>
                      <button type="button" v-if="user.permissions.admin >=3"class="button":class="siteSetting== 'venues'? 'active' : ''" @click="siteSetting = 'venues'">Venues</button>
                      <button type="button" v-if="user.permissions.admin >=5"class="button":class="siteSetting== 'users'? 'active' : ''" @click="siteSetting = 'users'">Users</button>
@@ -216,19 +215,7 @@
                         <button class="button">New Venue</button>
                      </div>
                      
-                     
-                  <!--  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                         NEWS 
-                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            -->
-                     <div class="panel news"  v-if="siteSetting == 'news'">
-                        <p>NEWS PANEL</p>
-                        <p>current news items, scheduled items, link to news hub</p>
-                        
-                        <div class="articles_list">
-                           <div class="" v-for="article in allArticles">{{article}}</div>
-                        </div>
-                     </div>
-
+                    
                      
                      
                   <!--  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -589,10 +576,6 @@
          overflow: hidden;
          overflow-y: auto;
       }
-		#admin_page .section * {
-			color: var(--mainColor);
-		}
-      
       
       .site_settings .admin_title {
          justify-content: center;

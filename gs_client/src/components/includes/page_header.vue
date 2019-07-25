@@ -2,12 +2,10 @@
 	<template>
 
 			<div  id="page_header" class="header_inner":class="pageName == 'mainpage' ? '' : 'minimized'"> 	
-<!--         
+         
 				<router-link :to="'/'" class="nav_link header_logo">
 					<span class="gs_num">{{conventionInfo.con_num}}</span>						
 				</router-link>
--->			
-				<a href="https://gamestorm.org" class="nav_link header_logo"><span class="gs_num">{{conventionInfo.con_num}}</span></a>
             
 				<div class="header_element convention_element">
 					<div class="con_info">
@@ -23,15 +21,10 @@
 				
 					<div class="control_element " v-if="user.uuid">
 						<div class="links">
-							<div class="column">
 								<router-link :to="'/account'" class="button" >My Account</router-link>								
-								<router-link :to="'/my_convention'" class="button" >My Convention</router-link>								
-							</div> 
-							
-							<div class="column">							
+								<router-link :to="'/my_convention'" class="button" >My Convention</router-link>		
 								<router-link v-if="user.permissions && user.permissions.admin > 0" :to="'/admin'" class="button" >Admin</router-link>								
 								<button type="button" class="button" @click.prevent="logout">Sign Out</button>
-							</div>
 						</div>						
 					</div>
 					
@@ -385,21 +378,6 @@
 				},	
 				
 				
-				/*	----------------------------------------------------------- 
-								CHECK LOGGED IN	
-					-----------------------------------------------------------	*/
-				check_logged_in() {
-					var vm = this;
-					if (Vue.ls.get('user') && Vue.ls.get('user').length > 0) {
-               console.log(Vue.ls.get('user').length);
-						vm.$store.dispatch('update_user', Vue.ls.get('user') );						
-					} else {
-						if (vm.$route.name != 'mainpage') {
-							vm.$router.replace({name: 'mainpage'});
-						}
-					}					
-				},	
-            
             /* -----------------------------------------------------------
                         CHECK EMAIL
                ----------------------------------------------------------- */
@@ -578,6 +556,43 @@
                                     PAGE HEADER
         -----------------------------------------------------------------------------------------------------    */ 
   
+			
+		/*------------	PAGE HEADER		------------	*/
+		
+		.page_header {
+			display: flex;
+         justify-content: center;
+			position: fixed;
+				top: 0;
+				left: 0;
+				z-index: 50;
+			width: calc(100% - 1rem);
+			height: 6rem;
+			margin: 0 auto;
+			font-size: 0.45rem;
+         transition: height .2s;
+		}
+			
+		.page_header .header_inner {
+			position: relative;
+			display: flex;
+         align-items: center;
+			justify-content: space-between;
+			font-size: 1em;
+			height: 100%; 
+			width: 100%;	
+         max-width: 1300px;
+			transition: height .5s, background .5s;
+		}	
+		
+		.page_header .signin_button {
+			position: absolute;
+			top: 0;
+			right: 0;
+			z-index: 90;
+			display: none;
+		}
+		
 	
 	#page_header .header_inner {
 		height: 100%; 
@@ -616,17 +631,16 @@
 	
 	#page_header .header_logo {
 		--fontSize : 3.75rem;
-		position: absolute;
-			top: 0;
-			left: 23%;
+      position: relative;
 		display: flex;
 		font-size: var(--fontSize);
-		height: 100%;
+		height: 1.7em;
 		width: 5em;
-		transform:translateX(-2.5em);
+      border: 0;
+      margin-left: 1em;
 		background: url(/static/images/gamestorm_logo_small.png) no-repeat top center;
 		background-size: contain;
-		transition: opacity .3s, transform .3s, width .3s;
+		transition: opacity .3s, transform .3s, width .3s, height .3s, margin .3s;
 	}	
 	
 	#page_header .header_logo:active {
@@ -704,7 +718,23 @@
 	#page_header.minimized .header_logo,
 	#app.scroll_160 #page_header .header_logo {		
 		--fontSize: 1.75rem;
+      margin-left: 2em;
 	}
+   
+   #app.scroll_40 .page_header {
+      height: 5.5rem;
+   }
+   #app.scroll_80 .page_header {
+      height: 5rem;
+   }
+   
+   #app.scroll_120 .page_header {
+      height: 4.5rem;
+   }
+   
+   #app.scroll_160 .page_header {
+      height: 4rem;
+   }
 	
 	
 	#page_header .site_title span{
@@ -719,11 +749,11 @@
 	/*	------	CONVENTION ELEMENT	------	*/
 	#page_header .convention_element {
 		display: flex;
-		justify-content: center;
-		flex-wrap: wrap;
-		align-items: flex-start;
+      flex-direction: column;
+      height: auto;
 		padding: .5rem 0 0 0;
 		width: 100%;
+      height: 100%;
 		max-width: 25rem;
 		transition: transform .3s;
 	}
@@ -734,6 +764,7 @@
 	#page_header .convention_element .con_info {
 		display: flex;
 		justify-content: center;
+      padding: .25rem 0;
 		width: 100%;
 	}
 	#page_header .convention_element .item {
@@ -754,14 +785,8 @@
 	
 	/*	------	User Controls	------	*/
 	#page_header .user_controls {
-		position: absolute;
-			top: 0;
-			right: 0; 
-			z-index: 50;
 		display: flex;
-		height: 100%; 
-		width: 100%;
-		max-width: 20rem;
+		height: 100%;      
 	}
 	#page_header .user_controls .control_element{
 		display: flex;
@@ -777,18 +802,23 @@
 	
 	#page_header .user_controls .links {
 		display: flex;
-		justify-content: space-around;
+      flex-wrap: wrap;
+      align-items: center;
+      height: 100%;
+		justify-content: flex-end;
 	}
-	#page_header .user_controls .links .column {
-		display: flex;
-		width: 45%;
-		flex-wrap: wrap;
-		align-items: center;
-	}
+   
 	#page_header .user_controls .links .button {
-		width: 100%;
+		width: calc(50% - 1rem);
 		font-size: 1rem;
-		margin: .2rem 0;
+		margin: 1% .5rem;
+      transition: width .3s;
+      min-height: 0;
+      height: 42%;
+	}
+	#page_header.minimized .user_controls .links .button {
+		width: calc(25% - 1rem);
+      min-width: 5rem;
 	}
    
 	
@@ -1147,19 +1177,6 @@
 	
 	
 	
-	
-	/*	------	page title	------	*/ 
-	.page_title {
-		display: inline-block;
-		position: absolute;
-			top: 100%;
-			left: 0;
-			right: 0;
-		color: var(--champagne);
-		text-align: center;
-		text-shadow: -1px -1px 4px rgba(190,0,0,0.5);
-		transition: all .3s ease 0s;
-	}
 	
 	
 	/*	------	scroll state	------	*/	
