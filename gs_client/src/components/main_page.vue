@@ -164,7 +164,7 @@
    
 		.section.intro {
 			max-width: 50rem;
-			margin: 8rem auto 0;
+			margin: 5vh auto 0;
 			padding: 0 0 0 1rem;
 		}
 		.section.intro .intro p {
@@ -183,7 +183,6 @@
          margin-top: 2rem;
       }
 		.main_view .section_title {
-         justify-content: center;
       }
 		.news_items {
 			position: absolute;

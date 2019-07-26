@@ -422,8 +422,8 @@
          display: flex;
          justify-content: center;
 			font-size: 2.25rem;
+         line-height: 1.5em;
 			text-transform: uppercase;
-			letter-spacing: .05em;
          color: var(--altColor);
          text-shadow: -1px -1px 4px rgba(190,0,0,0.5);
 	}
@@ -1976,7 +1976,6 @@
 			justify-content: space-around;
 			min-height: 50vh;
 			position: relative;
-			font-size: 0;
 			width: 100%;
 			max-width: 90rem;
          min-height: 100%;

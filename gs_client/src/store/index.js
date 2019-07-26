@@ -79,6 +79,8 @@
          
 				Axios.get(apiDomain+ '_get_site_data').then((response) => {
                
+               response.data.convention.price_breaks = JSON.parse(response.data.convention.price_breaks);
+               
                if(window.sessionStorage) {
                   sessionStorage.currentCon = JSON.stringify(response.data.convention);
                }
@@ -814,6 +816,7 @@
       set_conventions:(state, conventions) => {
          state.conventions	= conventions;
          Object.entries(conventions).forEach(([key, convention]) => {
+            convention.price_breaks = JSON.parse(convention.price_breaks);
             if(convention.current_con == 1) {
                state.currentCon = convention;
                state.conventionInfo = convention;
@@ -923,7 +926,6 @@
       
       //SET USER INFO   
       set_userInfo: (state, userInfo) => {
-         console.log(userInfo);
          Vue.set(state, 'userInfo', userInfo);
       },
       

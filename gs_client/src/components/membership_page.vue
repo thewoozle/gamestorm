@@ -1,12 +1,10 @@
 
 	<template>
 		<div id="membership_page">
-         <span class="page_title">MEMBERSHIP PAGE</span>
+         <span class="title page_title">MEMBERSHIP PAGE</span>
       
          <div class="sections">
             <section class="section membership_intro ">
-               <span class="section_title"><span class="text">Intro</span></span>
-               
                <div class="section_content">
                   <p>Four day membership for GameStorm 22.  This membership will grant you access to the entire convention on March 28th thru March 31st.</p>
                </div>               
@@ -14,25 +12,35 @@
             
             <section class="section membership_pricing ">
                <span class="section_title"><span class="text">Pricing</span></span>
+               <p>The Adult and Young-Adult (15-17) membership price is discounted for pre-registered memberships, depending on how early a membership is purchased. 
+                  Child memberships (6-14) are not discounted. There is no cap on the number 
+                  of memberships so it will always be possible to purchase memberships at teh door.</p>
                
-               <div class="price_options">
-                  <span class="price_title">Discounted pre-registration prices</span>
-               
-                  <span class="price_option" 
-                        v-for="priceBreak in priceBreaks" 
-                        v-if="before_date(priceBreak.stopDate)" 
-                        v-text="day_date(priceBreak.startDate)+' - ' + day_date(priceBreak.stopDate)+ ' : $' +priceBreak.price">
+               <div class="price_options"> 
+                  <span class="price_option"><span class="text">Children 5 and under:</span><span class="price">free</span></span> 
+                  <span class="price_option"><span class="text">Children 6-14 :</span><span class="price">$25</span></span>
+                  <span class="price_option"><span class="text">Adults and Young Adults(15-17):</span><span class="price"> $80</span> </span>
+                  <span class="price_title">Discounted Adult and Young Adult(15-17) pre-registration prices</span>
+                  
+                  <p> VALID UNTIL PRE_REG CLOSES on {{day_date(currentCon.prereg_close)}}</p>
+                  
+                  <span class="price_option option_breakdown" 
+                        v-for="priceBreak in currentCon.price_breaks" 
+                        v-if="before_date(priceBreak.stopDate)"
+                  >
+                  
+                     <span class="text" v-text="day_date(priceBreak.startDate)+' - ' + day_date(priceBreak.stopDate)+ ' :'"></span>
+                     <span class="price" v-text="'$' +priceBreak.price"></span>                        
                   </span>
-                  <pre>two columns with clarification in light font</pre>
-                  <span class="price_title">At-Con Prices</span>
-                  <span class="price_option">Adults and children 15-17: $80</span> 
-                  <span class="price_option">Children 6-14 : $25</span> 
-                  <span class="price_option">Memberships for children 5 and under are free</span> 
-                  <span class="price_title">Single Day Prices</span>
-                  <span class="price_option">Thursday: $30</span> 
-                  <span class="price_option">Friday: $45</span> 
-                  <span class="price_option">Saturday: $45</span> 
-                  <span class="price_option">Sunday: $30</span> 
+                  
+                  
+                  
+                  <span class="price_title"><span class="text">Single Day Prices</span></span>
+                  <p>Single-day memberships are only available at the convention. </p>
+                  <span class="price_option"><span class="text">Thursday:</span><span class="price"> $30</span></span> 
+                  <span class="price_option"><span class="text">Friday:</span><span class="price"> $45</span></span> 
+                  <span class="price_option"><span class="text">Saturday:</span><span class="price"> $45</span></span> 
+                  <span class="price_option"><span class="text">Sunday:</span><span class="price"> $30</span></span> 
 
                </div>   
                
@@ -111,13 +119,6 @@
 			
 			data() {
 				return {
-               priceBreaks    : [
-                  {'startDate': '2019-03-01', 'stopDate' : '2019-05-12','price': '35.00'}, 
-                  {'startDate': '2019-05-13', 'stopDate' : '2019-07-28','price': '45.00'}, 
-                  {'startDate': '2019-07-29', 'stopDate' : '2019-10-27','price': '55.00'}, 
-                  {'startDate': '2019-10-28', 'stopDate' : '2019-12-31','price': '65.00'}, 
-                  {'startDate': '2020-01-01', 'stopDate' : '2020-03-01','price': '70.00'}, 
-               ],
             }
 			},
 			
@@ -140,7 +141,6 @@
 			},
 			
 			created() {
-				console.log(this.priceBreaks);
 				
 			},
 			
@@ -163,15 +163,46 @@
    .price_options {
       display: flex;
       flex-direction: column;
+      width: 100%;
+      max-width: 30rem;
+      margin: 0 auto;
    }
    .price_options .price_title {
       display: flex;
       width: 100%;
+      margin-top: .5rem;
       font-weight: bold;
    }
-   .price_options .privce_option {
+   .price_options .price_option {
       display: flex;
+      justify-content: space-between;
       width: 100%;
    }
+   .price_options .option_breakdown {
+      display: flex;
+   }
+   .price_options .price_option
+   .option_breakdown .text{
+      justify-content: center;
+   }
+   .price_options .price_option .text {
+      display: flex;
+      justify-content: flex-end;
+      min-width: 60%;      
+   }
+   .price_options .price_option .price{
+      display: flex;
+   }
+   .price_options p {
+      display: flex;
+      width: 100%;
+      font-weight: 100;
+      font-size: .8rem;
+      margin-top: .1rem;
+      padding: 0 2rem;
+      font-style: italic;
+      color: var(--altColor);
+   }
+   
 	
 	</style>
