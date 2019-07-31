@@ -129,8 +129,39 @@
                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                      
                   	<div class="aside_section intro" :class="accountSection == 'linked_accounts' ? 'show': ''">	
-							<span class="section_title">Linked Accounts</span>
-                     <pre>if multiple accounts on same email address or have chosen to link to this account</pre>
+                        <span class="section_title">Linked Accounts</span>
+                        <p>Accounts may be linked by using a randomly generated five-character code that the linked accounts share. 
+                           Linking accounts allow purchasing eachother's convention memberships or scheduling events. 
+                           This is particularly useful for the parents of children or if multiple people share an email address. </p>
+                        
+                        <div class="content">
+                           <div v-if="linkCode" class="link_code" >
+                              <p>Your curent code is: <span span="code" >{{linkCode}}</span><span class="small_print">The letters "I", "L", and "O" are not used. </span></p>
+                              
+                              <div class="linked_accounts">
+                                 <span class="title">Accounts</span>
+                                 
+                                 
+                                 <div class="account" v-for="account in linkedAccounts">
+                                 {{account}}
+                                 </div>
+                              </div>
+                              
+                           </div>
+                           
+                           <div>
+                              
+                              <p>Click to generate a link code to share with accounts that you would like to link to this account. </p>
+                              <button class="button" @click.prevent="create_link_code()">Create Code</button>
+                              <button class="button" v-if="linkCode" @click.prevent="clear_link_code()">Clear link code</button>
+                           </div>
+                        
+                        
+                        </div>
+                        
+                     
+                     
+                     
                      </div>
                      
                      
@@ -182,7 +213,7 @@
 	
 	<script>
       import Vue from 'vue'
-      import { mapGetters } from 'vuex'
+      import { mapGetters, mapState } from 'vuex'
       import edit_profile from '@/components/includes/edit_profile'
       import changepassword from '@/components/includes/change_password'
 			
@@ -206,16 +237,23 @@
          },
          
          computed: {
+            
+            ...mapState({
+                  currentCon     : 'currentCon',
+                  linkCode       : 'linkCode',
+                  linkedAccounts : 'linkedAccounts',
+            }),
+         
             ...mapGetters({
-               user        : 'user',
-               userInfo    : 'userInfo',
-               currentCon  : 'currentCon',
+               user              : 'user',
+               userInfo          : 'userInfo',
             }),
          },
          
          created() {
             var vm = this;
             vm.get_user_info();
+            vm.get_link_code();
          },
          
          methods: {
@@ -228,7 +266,29 @@
                   vm.$router.push('/');
                   
                }
-            }
+            },
+            
+            create_link_code() {
+               var vm = this;
+               if(vm.linkCode) {
+                  if(confirm('are you sure you want to remove this code from your account and create a new code with no accounts linked to it?')) {
+                     vm.$store.dispatch('create_link_code', vm.user.uuid).then(()=>{});
+                  } 
+               } else {
+                  vm.$store.dispatch('create_link_code', vm.user.uuid).then(()=>{});
+               }
+            },
+            
+            
+            clear_link_code() {
+               var vm  = this;
+               vm.$store.dispatch('clear_link_code', vm.user.uuid);
+            },
+            
+            get_link_code() {
+               var vm  = this;
+               vm.$store.dispatch('get_link_code', vm.user.uuid);
+            },
          }
       }
 	

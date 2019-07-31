@@ -1992,7 +1992,7 @@
 		.main_content .section {
 			display: flex;         
 			width: 100%;
-         max-width:60rem;
+         max-width:65rem;
 		}
       
 		

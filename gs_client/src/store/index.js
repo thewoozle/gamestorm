@@ -38,6 +38,8 @@
       eventTypes     : {},
       experienceLevels: experienceLevels,
 		galleryData    : {},
+      linkCode       : null,
+      linkedAccounts : {},
 		liveEvents     : {},
       memberList     : {},
 		members	      : [],
@@ -368,9 +370,46 @@
       },
 		
       
-		/*-----------------------------------------------------------
+      // GET LINK CODE  
+      /* ----------------------------------------------------------
+                     GET LINK CODE
+         ----------------------------------------------------------  */
+      get_link_code({commit}, uuid) {
+         Axios.post(apiDomain+'_get_link_code', {'uuid' : uuid}, {
+               headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+            }).then((response)=>{
+            commit('set_link_code', response.data.account.link_code);
+         });
+         
+      }, 
+       
+      // CREATE LINK CODE  
+      /* ----------------------------------------------------------
+                     CREATE LINK CODE
+         ----------------------------------------------------------  */           
+      create_link_code({commit}, uuid) {
+         Axios.post(apiDomain+'_create_link_code', {'uuid' : uuid}, {
+               headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+            }).then((response)=>{
+            commit('set_link_code', response.data);
+         });
+         
+      },
+      
+      // CLEAR LINK CODE 
+      clear_link_code({commit}, uuid) {
+         Axios.post(apiDomain+'_clear_link_code', {'uuid':uuid}, {
+               headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+            }).then((response)=>{
+            commit('set_link_code', null);
+            });
+         
+      },
+      
+      
+		/* -----------------------------------------------------------
                   GALLERY DATA 
-      ----------------------------------------------------------- */
+         ----------------------------------------------------------- */
 		get_gallery_data({commit}, selectedCon) {
          var   gallery  = [],
                category = [],
@@ -922,6 +961,11 @@
             Vue.set(state, 'user', {});
          }
 		},
+      
+      // SET LINK CODE 
+      set_link_code: (state, code) => {
+         Vue.set(state,'linkCode', code);
+      },
       
       
       //SET USER INFO   

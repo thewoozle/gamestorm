@@ -81,7 +81,6 @@
 							<div class="nav_sublinks">
 								<router-link class="nav_link" :to="'/'">Press</router-link>
 								<router-link class="nav_link" :to="'/'">News center</router-link>
-								<router-link class="nav_link" :to="'/'">Gallery</router-link>
 								<router-link class="nav_link" :to="'/policies'" >Policies</router-link>
 								<router-link class="nav_link" :to="'/'" >Benifits of Volunteering</router-link>
 							</div>					
@@ -96,6 +95,8 @@
 									<img class="image" src="/static/images/GameStormGarage_i.jpg"/>
 								</span>
 								<span class="text_wrapper"><span class="text">Connect</span></span>
+								<router-link class="nav_link" :to="'/'">Forum</router-link>
+								<router-link class="nav_link" :to="'/'">Event Calendar</router-link>
 							</router-link>
 							<div class="nav_sublinks">
 								

@@ -137,7 +137,7 @@
 			...mapState({
                currentCon  : 'currentCon',
 				
-         }),
+            }),
 			},
 			
 			created() {
