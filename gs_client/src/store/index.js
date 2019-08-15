@@ -80,8 +80,11 @@
          }
          
 				Axios.get(apiDomain+ '_get_site_data').then((response) => {
-               
-               response.data.convention.price_breaks = JSON.parse(response.data.convention.price_breaks);
+               if(response.data.convention.price_breaks) {
+                  response.data.convention.price_breaks = JSON.parse(response.data.convention.price_breaks);
+               }else {
+                  response.data.convention.price_breaks = [];
+               }
                
                if(window.sessionStorage) {
                   sessionStorage.currentCon = JSON.stringify(response.data.convention);
@@ -309,7 +312,7 @@
       get_partners({commit}) {
          return new Promise ((resolve, reject) => { 
             if(!state.partners) {           
-                  Axios.get(apiDomain+'_get_partners', {params:{convention:state.currentCon.info.name.toUpperCase()}}
+                  Axios.get(apiDomain+'_get_partners' 
                   ).then((response)=>{
                      let partners = response.data.partners;                  
                      commit('set_partners', partners);
@@ -375,13 +378,42 @@
                      GET LINK CODE
          ----------------------------------------------------------  */
       get_link_code({commit}, uuid) {
+         var linkCode;
          Axios.post(apiDomain+'_get_link_code', {'uuid' : uuid}, {
                headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
             }).then((response)=>{
-            commit('set_link_code', response.data.account.link_code);
+            response.data.account? linkCode = response.data.account.link_code : linkCode = null;
+            commit('set_link_code', linkCode);
          });
          
       }, 
+        
+      /* ----------------------------------------------------------
+                     GET LINKED ACCOUNTS
+         ----------------------------------------------------------  */
+      get_linked_accounts({commit}, uuid) {
+         var linkCode;
+         Axios.post(apiDomain+'_get_linked_accounts', {'uuid' : uuid, 'sellectedCon': state.currentCon.tag_name }, {
+               headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+            }).then((response)=>{  
+            commit('set_linked_accounts', response.data.accounts);
+         });
+         
+      }, 
+      
+      
+      
+      
+      /* ----------------------------------------------------------
+                     ADD LINK CODE
+         ----------------------------------------------------------  */
+      add_link_code({commit}, data) {
+         Axios.post(apiDomain+'_add_link_code', data, {
+               headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+            }).then((response)=>{
+            commit('set_link_code', response.data.account.link_code);
+         });     
+      },   
        
       // CREATE LINK CODE  
       /* ----------------------------------------------------------
@@ -967,10 +999,13 @@
          Vue.set(state,'linkCode', code);
       },
       
-      
+      // SET LINKED ACCOUNTS 
+      set_linked_accounts: (state, accounts) =>{
+         Vue.set(state, 'linkedAccounts', accounts);         
+      },
       //SET USER INFO   
       set_userInfo: (state, userInfo) => {
-         Vue.set(state, 'userInfo', userInfo);
+         userInfo? Vue.set(state, 'userInfo', userInfo) : Vue.set(state, 'userInfo', {});
       },
       
      

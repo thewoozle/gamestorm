@@ -48,7 +48,7 @@
                                     <span class="info">Credit to attend one GameStorm Convention</span>
                                  </span>
                            </div>
-                           <div class="form_row info_row" >
+                           <div class="form_row info_row" v-if="user.permissions" >
                                  <span class="info_element" v-if="Object.keys(user.permissions).length > 0">
                                     <span class="title">Account Permissions</span>
                                     <span class="info_group">
@@ -64,12 +64,12 @@
                      </div>
                         
                      <div class="links">
-                        <button class="link account_button" type="button"   @click="accountSection = 'intro'" >Intro</button>
-                        <button class="link account_button" type="button"   @click="accountSection = 'my_profile' " >Update profile</button>
-                        <button class="link account_button" type="button"   @click="accountSection = 'password' "  >Change password</button>						
-                        <button class="link status_button" type="button"  @click="accountSection = 'linked_accounts' "  >My Linked Accounts</button>
-                        <button class="link account_button" type="button" @click="accountSection = 'my_convention'">My Convention </button>						
-                        <button class="link status_button" type="button" @click="accountSection = 'my_account'"  >My account status</button>
+                        <button class="link account_button" :class="accountSection=='intro'? 'active' : '' " type="button"   @click="accountSection = 'intro'" >Intro</button>
+                        <button class="link account_button" :class="accountSection=='my_profile'? 'active' : '' " type="button"   @click="accountSection = 'my_profile' " >Update profile</button>
+                        <button class="link account_button" :class="accountSection=='password'? 'active' : '' " type="button"   @click="accountSection = 'password' "  >Change password</button>						
+                        <button class="link status_button" :class="accountSection=='linked_accounts'? 'active' : '' " type="button"  @click="accountSection = 'linked_accounts' "  >My Linked Accounts</button>
+                        <button class="link account_button" :class="accountSection=='my_convention'? 'active' : '' " type="button" @click="accountSection = 'my_convention'">My Convention </button>						
+                        <button class="link status_button" :class="accountSection=='my_account'? 'active' : '' " type="button" @click="accountSection = 'my_account'"  >My account status</button>
                      </div>					
                   
                   </div>
@@ -130,23 +130,32 @@
                      
                   	<div class="aside_section intro" :class="accountSection == 'linked_accounts' ? 'show': ''">	
                         <span class="section_title">Linked Accounts</span>
-                        <p>Accounts may be linked by using a randomly generated five-character code that the linked accounts share. 
-                           Linking accounts allow purchasing eachother's convention memberships or scheduling events. 
+                        <div class="content">
+                           <p>Accounts may be linked by using a randomly generated five-character code that the linked accounts share. 
+                              Linking accounts allow purchasing eachother's convention memberships or scheduling events. 
                            This is particularly useful for the parents of children or if multiple people share an email address. </p>
                         
-                        <div class="content">
                            <div v-if="linkCode" class="link_code" >
-                              <p>Your curent code is: <span span="code" >{{linkCode}}</span><span class="small_print">The letters "I", "L", and "O" are not used. </span></p>
+                              <p>Your curent code is: <span class="code" >{{linkCode}}</span><span class="small_print">( The letters "I", "L", and "O" are not used ) </span></p>
                               
                               <div class="linked_accounts">
                                  <span class="title">Accounts</span>
                                  
-                                 
+                                 <div class="account_header">
+                                    <span class="title name">Name</span>
+                                    <span class="title type">Convention Membership for {{currentCon.short_name}}</span>
+                                 </div>
                                  <div class="account" v-for="account in linkedAccounts">
-                                 {{account}}
+                                    <span class="element name" v-text="account.first_name+' '+account.last_name"></span>
+                                    <span class="element type"><span class="icon fad fa-thumbs-up"></span><span class="text" v-text="account.membership_description? account.membership_description : 'no membership'"></span></span>
                                  </div>
                               </div>
                               
+                           </div>
+                           
+                           <div v-else class="link_code" >
+                              <p>enter a link-code from another account: <input type="text" v-model="addLinkCode"/></p>
+                              <button class="button" @click.prevent="add_link_code">Submit</button>
                            </div>
                            
                            <div>
@@ -223,7 +232,7 @@
          data() {
             return{
                accountSection    : 'intro',
-               
+               addLinkCode       : null,
             }
          },
          
@@ -232,7 +241,7 @@
          },
          
          components: {
-            'edit_profile' : edit_profile,
+            'edit_profile'    : edit_profile,
             'changepassword'  : changepassword,
          },
          
@@ -254,6 +263,7 @@
             var vm = this;
             vm.get_user_info();
             vm.get_link_code();
+            vm.get_linked_accounts();
          },
          
          methods: {
@@ -268,26 +278,59 @@
                }
             },
             
+            
+            /* -------------------------------------------------------------
+                     LINKED ACCOUNT HANDLING
+               -------------------------------------------------------------  */
+               // a five-digit code may be used to link accounts. these functions handle getting, creating, adding, or clearing the link code
             create_link_code() {
                var vm = this;
                if(vm.linkCode) {
                   if(confirm('are you sure you want to remove this code from your account and create a new code with no accounts linked to it?')) {
-                     vm.$store.dispatch('create_link_code', vm.user.uuid).then(()=>{});
+                     vm.$store.dispatch('create_link_code', vm.user.uuid).then(()=>{
+                        vm.$forceUpdate();
+                     });
                   } 
                } else {
-                  vm.$store.dispatch('create_link_code', vm.user.uuid).then(()=>{});
+                  vm.$store.dispatch('create_link_code', vm.user.uuid).then(()=>{
+                        vm.$forceUpdate();
+                  });
                }
+            },
+            
+            add_link_code() {
+               var vm  = this;
+               vm.$store.dispatch('add_link_code', {'uuid': vm.user.uuid, 'code': vm.addLinkCode}).then(()=>{
+                  vm.$forceUpdate();                        
+               });
             },
             
             
             clear_link_code() {
                var vm  = this;
-               vm.$store.dispatch('clear_link_code', vm.user.uuid);
+               vm.$store.dispatch('clear_link_code', vm.user.uuid).then(()=>{
+                  vm.$forceUpdate();                        
+               });
             },
             
             get_link_code() {
                var vm  = this;
-               vm.$store.dispatch('get_link_code', vm.user.uuid);
+               if(vm.user) {
+                  vm.$store.dispatch('get_link_code', vm.user.uuid).then(()=>{
+                    vm.$forceUpdate();
+                  });
+               }
+            },
+            
+            get_linked_accounts() {
+               var vm  = this;
+               if(vm.user) {
+                  vm.$store.dispatch('get_linked_accounts', vm.user.uuid).then(()=>{
+                    vm.$forceUpdate();
+                  });
+               }
+               
+               
             },
          }
       }
@@ -446,7 +489,10 @@
 	}
 	.section.account_section .links .link:hover,
 	.section.account_section .links .link.active {
-      
+      color: var(--passColor);
+	}
+	.section.account_section .links .link.active {
+      border-bottom: 0;
 	}
 	.section.account_section .links .link + .link {
 		
@@ -470,13 +516,15 @@
 		transition: opacity .4s, z-index .4s;
 	}
 	.section.account_section  .section_content.aside .aside_section .content  {
-		color: var(--textColor2);
-		font-size: 1.5rem;
+		color: var(--textColor);
+		font-size: 1.25rem;
+      font-weight: 300;
 		text-shadow: none;
 		text-align: left;
 	}
 	.section.account_section  .section_content.aside .aside_section .content p {
 		text-shadow: inherit;
+      font-size: 1rem;
 		color: inherit;
 	}
 	.section.account_section  .section_content.aside .aside_section.show {
@@ -485,7 +533,65 @@
 		z-index: 10;
 		color: black;
 		min-height: 15rem;
-	}
+	}.section.account_section  .section_content.aside .link_code {
+      margin-top: .65rem;
+      padding: 0 .5rem;
+   }
+	.section.account_section  .section_content.aside .link_code p {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      line-height: 1.5rem;      
+   }
+	.section.account_section  .section_content.aside .link_code .code {
+      font-size: 1.5rem;      
+      color: var(--titleColor);
+      font-weight: 500;
+      padding: 0 .5rem;
+   }
+	.section.account_section  .section_content.aside .link_code .small_print {
+      font-size: .8rem;      
+      line-height: 1em;
+      width: 100%;
+      display: flex;
+      color: #ddd;
+      justify-content: center;
+      font-style: italic;
+   }
+   .section.account_section .linked_accounts .title {
+      font-weight: bold;
+   }
+   .section.account_section .linked_accounts .account_header {
+      display: flex;      
+   }
+   .section.account_section .linked_accounts .account_header .title {
+      display: flex;
+      font-size: .85rem;
+      font-family: 'Source Sans Pro', Arial, sans-serif;
+      justify-content: center;
+   }
+   .section.account_section .linked_accounts .account {
+      display: flex;      
+   }
+   .section.account_section .linked_accounts .name {
+      width: 40%;
+   }
+   .section.account_section .linked_accounts .type {
+      width: 60%;
+   }
+   .section.account_section .linked_accounts .account .name, 
+   .section.account_section .linked_accounts .account .type {
+      display: flex;
+      padding-left: 1rem;
+   }
+   .section.account_section .linked_accounts .account .type .icon {
+      display: flex;
+      width: 3rem;
+      justify-content: center;
+   }
+   .section.account_section .linked_accounts {
+      
+   }
 	.section.account_section .aside_section form {
 		padding: 1rem 0;
 		margin: 0 auto;

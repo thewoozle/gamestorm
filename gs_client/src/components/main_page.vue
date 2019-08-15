@@ -57,17 +57,8 @@
             
             
             <pre>Membership registration for GS22 is now open</pre>
-                           <div v-if="userInfo.con_status ">
-                              <p>You HAVE a membership for {{currentCon.name}} {{currentCon.con_num}}</p>
-                              <p v-if="userInfo.badge_name">you have a membership for  {{currentCon.name}} {{currentCon.con_num}}</p>
-                           </div>
-                           <div v-else >
-                           
-                              <router-link class="link" :to="'/membership'" >Membership info for {{currentCon.name}} {{currentCon.con_num}} </router-link>
-                        
-                           </div> 
-
-
+            
+            
 
                <pre>Event Registration / submit events</pre>               
                            

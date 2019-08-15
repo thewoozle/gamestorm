@@ -8,13 +8,28 @@
 					<div class="slide_in reg_report" :class="showRegReport? 'show' : ''">
                   <button class="close_button fal fa-times" type="button" @click.prevent="showRegReport? showRegReport = false : showRegReport=true" ></button>
 					
-               <pre>REG REPORT</pre>
+               <pre>REG REPORTS</pre>
                
                
             <div class="">
                <span>FILTER BY STATE</span>
                <div v-for="state in memberFilter('state')" >{{state.name}} - {{state.num}}</div>
             </div>
+            
+            <p>----------------------------------------------------------------------------------------------</p>
+            
+            
+            <div class="">
+               <span>FILTER BY PRICE POINT</span>
+               
+               <p v-for="(item, key) in regReport.price_points" >${{key}} - {{item}}</p>
+               <p>Average Membership Purchase: {{average_membership_price(regReport.price_points)}}</p>
+            </div>
+            
+            
+            
+            
+            
             
                <p>----------------------------------------------------------------------------------------------</p>
                <p>REG  REPORT</p>
@@ -138,6 +153,7 @@
 			
 			methods: {
 				
+            // FILTER BY STATE
             memberFilter: function(filter)  {
                var   vm = this,
                      inState = false,
@@ -147,7 +163,7 @@
                      //check to see if state is in array and wither ++ or append
                      
                      states.forEach((state)=>{
-                        console.log(member.state);
+                        //console.log(member.state);
                         if(state.name == member.state) {
                            
                            state.num ++;
@@ -155,15 +171,25 @@
                         }
                      });   
                      inState? '' : states.push({"name": member.state, 'num' : 1});
-                         
-                           
-                           
                      inState = false;
                   }   
                });
-               console.log(states);
                return states;
+            },
+            
+            average_membership_price(pricePoints) {
+               var   vm = this,
+                     numMemberships = 0,
+                     totalPrice     = 0,
+                     avgPrice       = 0;
+               Object.entries(pricePoints).forEach((item)=> {  
+                  numMemberships += item[1];
+                  totalPrice += (parseInt(item[0]) * parseInt(item[1]));
+               });
+               
+               return ('$'+(totalPrice / numMemberships).toFixed(2));
             }
+            
             
 			},
          
