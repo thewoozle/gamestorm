@@ -57,10 +57,12 @@
       schedulingAreas: {},
       schedulingPermissions: {},
 		showMenu       : false,
+      shoppingCart   : {},
       siteContent    : siteContent, 
 		siteSettings   : {},
 		staffPositions : {},
       statesList     : statesList,
+      storeItems     : {},
       timeblocks     : [],
 		user           : {},
       userEvents     : null,
@@ -373,7 +375,16 @@
       },
 		
       
-      // GET LINK CODE  
+      /* ----------------------------------------------------------
+                     GET STORE ITEMS
+         ----------------------------------------------------------  */
+      get_store_items({commit}) {
+         var vm = this;
+         Axios.get(apiDomain+'_get_store_items').then((response)=>{
+            commit('set_store_items', response.data.storeItems);
+         });
+      },
+      
       /* ----------------------------------------------------------
                      GET LINK CODE
          ----------------------------------------------------------  */
@@ -399,9 +410,7 @@
             commit('set_linked_accounts', response.data.accounts);
          });
          
-      }, 
-      
-      
+      },  
       
       
       /* ----------------------------------------------------------
@@ -434,8 +443,12 @@
                headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
             }).then((response)=>{
             commit('set_link_code', null);
-            });
-         
+            });         
+      },
+      
+      update_linked_account({commit}, info) {
+         commit('set_linked_account', info.account);
+         commit('set_shopping_cart_update', info.account);
       },
       
       
@@ -500,7 +513,7 @@
 				Axios.post(apiDomain+'_submit_member', memberData, {headers : 
             {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}}).then((response) => {		
             
-					commit ('set_member', {updatedMember: response.data.response.member.member});
+					commit ('set_member', {updatedMember: response.data.response.member.member});               
                dispatch('get_reg_report');
 					resolve(response.data.response);
                if(window.sessionStorage) {
@@ -621,6 +634,26 @@
 				console.log(err.statusText);
 			});
 		},
+      
+      
+      
+      
+      
+		
+		/* -----------------------------------------------------------
+                     SHOPPING CART DATA 
+         ----------------------------------------------------------- */
+         
+         update_shopping_cart({commit}, item) {
+               var vm = this;
+               commit('set_shopping_cart_update', item);
+         
+         },
+         
+         
+         
+         
+      
       
 		
 		/* -----------------------------------------------------------
@@ -998,6 +1031,18 @@
       set_link_code: (state, code) => {
          Vue.set(state,'linkCode', code);
       },
+      // SET LINKED ACCOUNT 
+      set_linked_account: (state, account) => {   
+         Object.entries(state.linkedAccounts).forEach((entry) => {
+            if(entry[1].uuid == account.uuid) {  
+               if(account.purchase) {
+                   entry[1].purchase = false;
+               } else {
+                  entry[1].purchase = true;
+               }
+            }             
+         });
+      },
       
       // SET LINKED ACCOUNTS 
       set_linked_accounts: (state, accounts) =>{
@@ -1155,6 +1200,51 @@
       set_user_events: (state, userEvents) => {
          Vue.set(state, 'userEvents', userEvents);
       },
+      
+      
+      /* -------------------------------------------------------
+               SHOPPING / STORE EVENTS
+         -------------------------------------------------------  */
+         
+      set_store_items: (state, items)=> {
+         Vue.set(state, 'storeItems', items);         
+      }, 
+
+      
+      set_shopping_cart_update: (state, item) => {
+         let foundItem = false;
+         
+         state.shoppingCart.items? '' : Vue.set(state.shoppingCart, 'items', []);
+         
+         Object.entries(state.shoppingCart.items).forEach((cartItem) => {     
+            if(item.type == 'membership') {  
+            console.log(cartItem[1].uuid);
+               if(cartItem[1].uuid) {
+                  if(cartItem[1].uuid == item.uuid) {
+                     foundItem = true;
+                     switch(item.purchase) {
+                        case true:
+                           state.shoppingCart.items[cartItem[0]] = item;
+                           break;
+                           
+                        case false:
+                           delete state.shoppingCart.items[cartItem[0]];
+                           break;
+                           
+                            
+                     }
+                  } 
+               }
+               
+            } else if(item.type == 'merch') {
+               console.log('no merch function in update-cart function');
+            }
+            
+         });
+         foundItem? '' : state.shoppingCart.items.push(item);
+         state.shoppingCart.items = state.shoppingCart.items.filter(v => v);
+         //console.log(JSON.stringify(state.shoppingCart));
+      },
 	}
 	
 	const getters = {
@@ -1179,6 +1269,7 @@
 		departments		: state => state.departments,
 		paymentMethods : state => state.paymentMethods,
 		staffPositions	: state => state.staffPositions,
+      linkedAccounts : state => state.linkedAccounts,
 		
 		// EVENTS getters 
 		allEvents		: state => state.allEvents,
@@ -1197,6 +1288,8 @@
       
       // ADMIN GETTERS
       allArticles    : state=> state.allArticles,
+      
+      shoppingCart   : state=> state.shoppingCart,
 	}
 	
 	export default new Vuex.Store ({

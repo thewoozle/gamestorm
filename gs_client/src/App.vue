@@ -1369,7 +1369,7 @@
 			opacity: 0;	
 			padding: 2rem;
 			width: 100%;
-			background: rgba(138,6,6,.5);
+			background: rgba(131,119,82,.35);
          color: #fff;
 			display: flex;
 			justify-content: center;

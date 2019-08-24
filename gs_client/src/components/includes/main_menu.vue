@@ -8,7 +8,7 @@
 					<div class="nav_section">
 						<div class="nav_link_wrapper" >					
 							
-							<router-link :to="'/'" class="nav_link nav_link_tile convention_link" >
+							<router-link :to="'/'" class="nav_link nav_link_tile convention_link" @click="scroll_to_top()" >
 								<span class="image_wrapper">
 									<img class="image" src="/static/images/GameStormGarage_i.jpg"/>
 								</span>
@@ -19,13 +19,13 @@
 								<router-link :to="'/'" class="nav_link">Home Page</router-link>
 								
 											
-								<router-link :to="'/account'" class="nav_link" v-if="user.uuid" >My Account</router-link>
-								<router-link :to="'/my_convention'" class="nav_link" >My Convention</router-link>
+								<router-link :to="'/account'" class="nav_link" v-if="user.uuid" @click="scroll_to_top()" >My Account</router-link>
+								<router-link :to="'/my_convention'" class="nav_link" @click="scroll_to_top()" >My Convention</router-link>
 								
-								<router-link  :to="'/signin?action=register'" class="nav_link" v-if="!user.uuid">New Account</router-link>	
+								<router-link  :to="'/signin?action=register'" class="nav_link" v-if="!user.uuid" @click="scroll_to_top()">New Account</router-link>	
 								
-								<router-link :to="'/shop'" class="nav_link disabled"  >Merch</router-link>
-								<router-link :to="'/connect'" class="nav_link disabled"  >Connect</router-link>
+								<router-link :to="'/shop'" class="nav_link disabled"  @click="scroll_to_top()" >Merch</router-link>
+								<router-link :to="'/connect'" class="nav_link disabled"  @click="scroll_to_top()" >Connect</router-link>
 								
 							</div>					
 						</div>				
@@ -33,20 +33,20 @@
 					
 					<div class="nav_section">
 						<div class="nav_link_wrapper" >
-							<router-link class="nav_link nav_link_tile convention_link" :to="'/convention'">
+							<router-link class="nav_link nav_link_tile convention_link" @click="scroll_to_top()" :to="'/convention'">
 								<span class="image_wrapper">
 									<img class="image" src="/static/images/gs_19_dealers_room-i.jpg"/>
 								</span>
 								<span class="text_wrapper"><span class="text">Convention</span></span>
 							</router-link>
 							<div class="nav_sublinks">
-								<router-link class="nav_link" :to="'/gallery'">Gallery</router-link>								
-								<router-link class="nav_link disabled" :to="'/venue'">Venue</router-link>
-								<router-link class="nav_link " :to="'/membership'" >Convention Membership</router-link>
-								<router-link class="nav_link disabled" :to="'/dealers'">Dealers</router-link>
-								<router-link class="nav_link disabled" :to="'/orpg'" title="Adventures League, Pathfinder Society, Cult of Chaos, Shadowrun Organized Play" >Organized RolePlaying</router-link>
-								<router-link class="nav_link disabled" :to="'/gamelab'" >GameLab</router-link>
-								<router-link class="nav_link disabled" :to="'/paw'" >Play &amp; Win</router-link>
+								<router-link class="nav_link" :to="'/gallery'" @click="scroll_to_top()">Gallery</router-link>								
+								<router-link class="nav_link disabled" :to="'/venue'" @click="scroll_to_top()">Venue</router-link>
+								<router-link class="nav_link " :to="'/membership'"  @click="scroll_to_top()">Convention Membership</router-link>
+								<router-link class="nav_link disabled" :to="'/dealers'" @click="scroll_to_top()">Dealers</router-link>
+								<router-link class="nav_link disabled" :to="'/orpg'" @click="scroll_to_top()" title="Adventures League, Pathfinder Society, Cult of Chaos, Shadowrun Organized Play" >Organized RolePlaying</router-link>
+								<router-link class="nav_link disabled" :to="'/gamelab'"  @click="scroll_to_top()">GameLab</router-link>
+								<router-link class="nav_link disabled" :to="'/paw'" @click="scroll_to_top()" >Play &amp; Win</router-link>
 							</div>					
 						</div>				
 					</div>	
@@ -54,16 +54,16 @@
                
 					<div class="nav_section">
 						<div class="nav_link_wrapper" >
-							<router-link class="nav_link nav_link_tile" :to="'/events'">
+							<router-link class="nav_link nav_link_tile" @click="scroll_to_top()" :to="'/events'">
 								<span class="image_wrapper">
 									<img class="image" src="/static/images/GameStormGarage_i.jpg"/>
 								</span>
 								<span class="text_wrapper"><span class="text">Events</span></span>
 							</router-link>
 							<div class="nav_sublinks">
-								<router-link  :to="'/events'" class="nav_link">Event List</router-link>
-								<router-link  :to="'/events'" class="nav_link">Submit an Event</router-link>
-								<router-link  :to="'/events'" class="nav_link">My Events</router-link>
+								<router-link  :to="'/events'" class="nav_link" @click="scroll_to_top()">Event List</router-link>
+								<router-link  :to="'/events'" class="nav_link" @click="scroll_to_top()">Submit an Event</router-link>
+								<router-link  :to="'/events'" class="nav_link" @click="scroll_to_top()">My Events</router-link>
 							</div>					
 						</div>				
 					</div>	
@@ -79,10 +79,10 @@
 								<span class="text_wrapper"><span class="text">Info</span></span>
 							</router-link>
 							<div class="nav_sublinks">
-								<router-link class="nav_link" :to="'/'">Press</router-link>
-								<router-link class="nav_link" :to="'/'">News center</router-link>
-								<router-link class="nav_link" :to="'/policies'" >Policies</router-link>
-								<router-link class="nav_link" :to="'/'" >Benifits of Volunteering</router-link>
+								<router-link class="nav_link" :to="'/'" @click="scroll_to_top()">Press</router-link>
+								<router-link class="nav_link" :to="'/'" @click="scroll_to_top()">News center</router-link>
+								<router-link class="nav_link" :to="'/policies'" @click="scroll_to_top()" >Policies</router-link>
+								<router-link class="nav_link" :to="'/'"  @click="scroll_to_top()">Benifits of Volunteering</router-link>
 							</div>					
 						</div>				
 					</div>
@@ -90,7 +90,7 @@
 					
 					<div class="nav_section">
 						<div class="nav_link_wrapper" >
-							<router-link :to="'/connect'"class="nav_link nav_link_tile">
+							<router-link :to="'/connect'"class="nav_link nav_link_tile" @click="scroll_to_top()">
 								<span class="image_wrapper">
 									<img class="image" src="/static/images/GameStormGarage_i.jpg"/>
 								</span>

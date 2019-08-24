@@ -859,10 +859,15 @@
 						} else {
 							if (vm.formErrors.length <1) {
                         console.log(response.member);
+                        console.log(response.message);
                         vm.regSettings.reg_mode > 0? vm.print_badge(response.member.member)  : '';
 								vm.member = {};
 								vm.searchQuery = '';
-                        vm.memberSort = 'last_name';
+                        vm.memberSort = 'last_name';   
+                        vm.formMessage = response.message;     
+                        setTimeout(function() {
+                           vm.formMessage = null;
+                        },2000);
 							}
                      
                      
@@ -1479,6 +1484,14 @@
 			padding: 0 .5rem; 
 		}
 		
+      .reg_form .popup_message {
+         position: fixed;
+            top: 0;
+         font-size: 1.5rem;
+         letter-spacing: .05em;
+         padding: 5rem 0;
+         font-weight: bold;
+      }
 		
 	
 	

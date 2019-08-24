@@ -144,14 +144,22 @@
                                  <div class="account_header">
                                     <span class="title name">Name</span>
                                     <span class="title type">Convention Membership for {{currentCon.short_name}}</span>
+                                    <span class="title purchase">Purchase Membership</span>
                                  </div>
+                                 
                                  <div class="account" v-for="account in linkedAccounts">
                                     <span class="element name" v-text="account.first_name+' '+account.last_name"></span>
-                                    <span class="element type"><span class="icon fad fa-thumbs-up"></span><span class="text" v-text="account.membership_description? account.membership_description : 'no membership'"></span></span>
+                                    <span class="element type"><span class="icon" v-bind:class="account.membership_description? 'fad fa-thumbs-up' : 'fal fa-ban'">
+                                       </span><span class="text" v-text="account.membership_description? account.membership_description : 'no membership'"></span>
+                                    </span>
+                                    <span class="element purchase">
+                                       <span class="purchase_membership fal" v-if="!account.membership_description" :class="account.purchase? 'fa-check-square' : 'fa-square' " @click.prevent="set_membership_purchase(account)" ></span>
+                                    </span>
                                  </div>
-                              </div>
-                              
+                              </div>                              
                            </div>
+                           
+                           <router-link class="button" :to="'/membership'"  @click="scroll_to_top()" v-if="membershipPurchases" >Buy memberships</router-link>
                            
                            <div v-else class="link_code" >
                               <p>enter a link-code from another account: <input type="text" v-model="addLinkCode"/></p>
@@ -233,6 +241,7 @@
             return{
                accountSection    : 'intro',
                addLinkCode       : null,
+               membershipPurchases: false,
             }
          },
          
@@ -245,8 +254,7 @@
             'changepassword'  : changepassword,
          },
          
-         computed: {
-            
+         computed: {            
             ...mapState({
                   currentCon     : 'currentCon',
                   linkCode       : 'linkCode',
@@ -257,6 +265,7 @@
                user              : 'user',
                userInfo          : 'userInfo',
             }),
+            
          },
          
          created() {
@@ -329,8 +338,19 @@
                     vm.$forceUpdate();
                   });
                }
-               
-               
+            },
+            
+            set_membership_purchase(account) {
+               var vm = this;
+               account.type = 'membership';
+               account.category = '';
+               vm.$store.dispatch('update_linked_account', {account: account, category: ''}).then(()=>{
+                  vm.$forceUpdate();
+                  vm.membershipPurchases = false;
+                  Object.entries(vm.linkedAccounts).forEach((account) => {
+                     account[1].purchase? vm.membershipPurchases = true : vm.membershipPurchases = false;
+                  });
+               });              
             },
          }
       }
@@ -589,6 +609,13 @@
       width: 3rem;
       justify-content: center;
    }
+   .section.account_section .linked_accounts .purchase_membership {
+      cursor: pointer;
+   }
+   
+   
+   
+   
    .section.account_section .linked_accounts {
       
    }

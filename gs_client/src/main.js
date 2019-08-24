@@ -25,21 +25,26 @@
 		methods: {
          
          
-				/*	----------------------------------------------------------- 
-								CHECK LOGGED IN	
-					-----------------------------------------------------------	*/
-				check_logged_in() {
-					var vm = this;
-					if (Vue.ls.get('user') && Vue.ls.get('user').length > 0) {
-               console.log(Vue.ls.get('user').length);
-						vm.$store.dispatch('update_user', Vue.ls.get('user') );						
-					} else {
-						if (vm.$route.name != 'mainpage') {
-							vm.$router.replace({name: 'mainpage'});
-						}
-					}					
+         /*	----------------------------------------------------------- 
+                     CHECK LOGGED IN	
+            -----------------------------------------------------------	*/
+         check_logged_in() {
+            var vm = this;
+            if (Vue.ls.get('user') && Vue.ls.get('user').length > 0) {
+            console.log(Vue.ls.get('user').length);
+               vm.$store.dispatch('update_user', Vue.ls.get('user') );						
+            } else {
+               if (vm.$route.name != 'mainpage') {
+                  vm.$router.replace({name: 'mainpage'});
+               }
+            }					
 				},	
             
+            
+            scroll_to_top() {
+                window.scrollTo(0,0);
+           },
+           
 			handle_data_view(e) {
 				e.target.classList.contains('show')? e.target.classList.remove('show') : e.target.classList.add('show');
 			},
@@ -122,6 +127,10 @@
          
          before_date(targetDate) {
             return moment(moment()).isBefore(moment(targetDate));
+         },
+         
+         after_date(targetDate) {
+            return moment(moment()).isAfter(moment(targetDate));
          },
          
          
