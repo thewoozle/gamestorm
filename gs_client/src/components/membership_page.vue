@@ -24,7 +24,7 @@
                      <span class="text" v-text="item.description"></span>
                      <span class="price" v-text="'$'+item.price+'.00'"></span>
                      <div class="option_purchase">
-                        <button class="option_add fal fa-plus-square" @click.prevent="update_items({type: 'membership',account: '', category: item.category, description: 'Children, 5 and under', price: 0})" ></button>
+                        <button class="option_add fal fa-plus-square" @click.prevent="update_items({type: 'membership',account: '', item: item})" ></button>
                         <span class="option_amount" v-text="number_of_items(item.category)"></span>
                      </div>
                   </div> 
@@ -33,7 +33,7 @@
                      <span class="text" >{{item.description}} <span class="detail">(discounted price, only available through {{day_date(item.end_date)}})</span></span>
                      <span class="price" v-text="'$'+item.price+'.00'"></span>
                      <div class="option_purchase">
-                        <button class="option_add fal fa-plus-square" @click.prevent="update_items({type: 'membership',account: '', category: item.category, description: 'Children, 5 and under', price: 0})" ></button>
+                        <button class="option_add fal fa-plus-square" @click.prevent="update_items({type: 'membership', account: '', item: item})" ></button>
                         <span class="option_amount" v-text="number_of_items(item.category)"></span>
                      </div>
                   </div> 
@@ -47,7 +47,7 @@
                      <span class="price" v-text="'$'+item.price+'.00'"></span>
                      
                      <div class="option_purchase disabled">
-                        <button disabled class="option_add  fal fa-plus-square " @click.prevent="update_items({type: 'membership',account: '', category: item.category, description: 'Children, 5 and under', price: 0})" ></button>
+                        <button disabled class="option_add  fal fa-plus-square " @click.prevent="update_items({type: 'membership',account: '', item: item})" ></button>
                         <span class="option_amount" v-text="number_of_items(item.category)"></span>
                      </div>
                   </div>
@@ -79,10 +79,23 @@
                   
                   
                   <div class="column">
-                  <pre>show memberships purchased</pre>
-                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                  {{shoppingCart}}
-                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                  
+                     <div class="shopping_cart">
+                        <span class="title">Shopping Cart</span>
+                        <div class="cart_item" v-for="cart_item in shoppingCart.items">
+                           <div class="cart_item_element type" v-if="cart_item.item">
+                              <span class="description" v-text="cart_item.item? cart_item.item.long_description : null"></span>
+                              <span class="price" v-text="cart_item.item? '$'+cart_item.item.price+'.00' : null"></span>
+                           </div>
+                           <div class="cart_item_element member" v-if="cart_item.uuid">
+                              <span class="name" v-text="cart_item.first_name+' '+cart_item.last_name"></span>
+                           </div>
+                           <div class="buttons">
+                              <button class="control_button fal fa-edit" @click.prevent="edit_cart_item(cart_item.item.item_order_number)" ></button>
+                              <button class="control_button fal fa-ban" @click.prevent="remove_cart_item(cart_item)" ></button>
+                           </div>                           
+                        </div>
+                     </div>
                   
                   </div>
                </div>               
@@ -186,10 +199,11 @@
                vm.$store.dispatch('update_shopping_cart', data).then(()=>{
                   vm.$forceUpdate();
                   vm.membershipPurchases = false;
-                  console.log(vm.linkedAccounts);
+                  if(vm.linkedAccounts) {
                   Object.entries(vm.linkedAccounts).forEach((account) => {
                      account[1].purchase? vm.membershipPurchases = true : vm.membershipPurchases = false;
                   });
+                  }
                });              
                
             },
@@ -240,9 +254,21 @@
                return truth;
                
             },
-				
-			}
-			
+            
+            edit_cart_item(itemNumber) {},
+            
+            // REMOVE CART ITEM
+            remove_cart_item(item) {
+               var   vm = this;
+               
+               if(confirm('are you sure you want to remove this item?')) {
+                  item.purchase = false;
+                  vm.$store.dispatch('update_shopping_cart',item).then(()=>{
+                    vm.$forceUpdate();
+                  });
+               }
+            },
+			}			
 		}
 	</script>
 	
@@ -347,6 +373,61 @@
       padding: 0 2rem;
       font-style: italic;
       color: var(--altColor);
+   }
+   
+   /* cart */
+   .membership_purchase .shopping_cart {
+      display: flex;
+      flex-direction: column;      
+      width: 100%;
+      max-width: 30rem;
+      margin: 0 auto;
+   }
+   .membership_purchase .shopping_cart .title {
+      display: flex;
+      width: 50%;
+      justify-content: flex-end;
+      padding: .25rem 1rem;
+      background: #133b4c;
+      color: var(--altColor);
+   }
+   .membership_purchase .shopping_cart .cart_item {
+      display: flex;
+      flex-direction: column;
+      justify-items: center;
+      position: relative;
+      width: 100%;
+      min-height: 4rem;
+   }
+   .membership_purchase .shopping_cart .cart_item + .cart_item {
+      margin-top: 1rem;
+      border-top: solid 1px var(--borderColor);
+      padding-top: 1rem;
+   }
+   
+   
+   .membership_purchase .shopping_cart .cart_item_element {
+      display: flex;
+      width: calc(100% - 7rem);
+   }
+   .membership_purchase .shopping_cart .cart_item .description {
+      display: flex;
+      flex-wrap: wrap;
+      width: 20rem;
+   }
+   .membership_purchase .shopping_cart .price {
+      display: flex;
+      width: 7rem;
+      justify-content: flex-end;
+      padding: 0 .5rem;
+   }
+   
+   .membership_purchase .shopping_cart .cart_item .buttons {
+      display: flex;
+      justify-content: space-between;
+      position: absolute;
+      right: 0;
+      width: 7rem;
    }
    
 	

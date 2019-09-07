@@ -646,6 +646,7 @@
          
          update_shopping_cart({commit}, item) {
                var vm = this;
+               if(!item.uuid) {item.uuid = '';}
                commit('set_shopping_cart_update', item);
          
          },
@@ -1216,32 +1217,50 @@
          
          state.shoppingCart.items? '' : Vue.set(state.shoppingCart, 'items', []);
          
-         Object.entries(state.shoppingCart.items).forEach((cartItem) => {     
+         Object.entries(state.shoppingCart.items).forEach((cartItem) => {
+            // if(!cartItem[1].cart_item_number) {
+               // cartItem[1].cart_item_number = 
+            // }
+            
+            
+            
             if(item.type == 'membership') {  
-            console.log(cartItem[1].uuid);
-               if(cartItem[1].uuid) {
-                  if(cartItem[1].uuid == item.uuid) {
+                  if(cartItem[1].item_order_number == item.item_order_number) {
                      foundItem = true;
                      switch(item.purchase) {
                         case true:
-                           state.shoppingCart.items[cartItem[0]] = item;
+                           state.shoppingCart.items[cartItem[0]] = item.item;
                            break;
                            
                         case false:
                            delete state.shoppingCart.items[cartItem[0]];
                            break;
-                           
-                            
                      }
                   } 
-               }
+               
                
             } else if(item.type == 'merch') {
                console.log('no merch function in update-cart function');
+            }            
+         });
+         
+         if(!foundItem) {
+            var   randChars = 'ABCDEFGHJKMNPQRSTUVWXYZ0123456789',
+                  randString = '';
+            for(var i = 0; i<= 5; i++) {
+               randString += randChars.charAt(Math.floor(Math.random() * randChars.length));               
             }
             
-         });
-         foundItem? '' : state.shoppingCart.items.push(item);
+            delete item.start_date;
+            delete item.id;
+            delete item.end_date;
+            delete item.created_at;
+            delete item.store_active;
+            item.item_order_number = state.currentCon.tag_name+'-'+ randString;
+            
+            state.shoppingCart.items.push(item);
+         }
+         
          state.shoppingCart.items = state.shoppingCart.items.filter(v => v);
          //console.log(JSON.stringify(state.shoppingCart));
       },
