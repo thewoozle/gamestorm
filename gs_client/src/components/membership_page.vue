@@ -7,98 +7,119 @@
             <section class="section membership_intro ">
                <div class="section_content">
                   <p>Four day membership for GameStorm 22.  This membership will grant you access to the entire convention on March 28th thru March 31st.</p>
+                  
+                        <pre> not logged-in? show login button 
+                              list membership options with +/- counters (update entries for each as added or removed)
+                              
+                              div for each entry showing type and name with expand control for details and icon for doneness
+                              - if logged-in, have checkbox for auto-fill and show dropdown for linked accounts not purchased. 
+                              
+                              if not logged-in, on entry, check email against database. 
+                         </pre>
+                         
                </div>               
             </section>
             
             
+            <section class="section membership_purchasing">   
             
-            <section class="section membership_pricing ">
-               <span class="section_title"><span class="text">Pricing</span></span>
-               <p>The Adult and Young-Adult (15-17) membership price is discounted for pre-registered memberships, depending on how early a membership is purchased. 
-                  Child memberships (6-14) are not discounted. There is no cap on the number 
-                  of memberships so it will always be possible to purchase memberships at the door.</p>
-               
-               <div class="price_options"> 
-               
-                  <div class="price_option" v-for="item in storeItems" v-if="show_store_item(item, 'none')">
-                     <span class="text" v-text="item.description"></span>
-                     <span class="price" v-text="'$'+item.price+'.00'"></span>
-                     <div class="option_purchase">
-                        <button class="option_add fal fa-plus-square" @click.prevent="update_items({type: 'membership',account: '', item: item})" ></button>
-                        <span class="option_amount" v-text="number_of_items(item.category)"></span>
-                     </div>
-                  </div> 
+                  <span class="section_title"><span class="text" v-text="'Purchase Memberships for '+currentCon.name+' '+currentCon.con_num"></span></span>
                   
-                  <div class="price_option" v-for="item in storeItems" v-if="show_store_item(item, 'discount')">
-                     <span class="text" >{{item.description}} <span class="detail">(discounted price, only available through {{day_date(item.end_date)}})</span></span>
-                     <span class="price" v-text="'$'+item.price+'.00'"></span>
-                     <div class="option_purchase">
-                        <button class="option_add fal fa-plus-square" @click.prevent="update_items({type: 'membership', account: '', item: item})" ></button>
-                        <span class="option_amount" v-text="number_of_items(item.category)"></span>
-                     </div>
-                  </div> 
-                  
-                  
-                  <span class="price_title"><span class="text">Single Day Prices</span></span>
-                  <p>Single-day memberships are only available at the convention. </p>
-                  
-                  <div class="price_option" v-for="item in storeItems" v-if="show_store_item(item, 'day')">
-                     <span class="text" v-text="item.description"></span>
-                     <span class="price" v-text="'$'+item.price+'.00'"></span>
+               <div class="componant membership_pricing ">
+                  <span class="title">Pricing</span>
+                  <div class="content">
+                     <p>The Adult and Young-Adult (15-17) membership price is discounted for pre-registered memberships, depending on how early a membership is purchased. 
+                        Child memberships (6-14) are not discounted. There is no cap on the number 
+                        of memberships so it will always be possible to purchase memberships at the door.</p>
                      
-                     <div class="option_purchase disabled">
-                        <button disabled class="option_add  fal fa-plus-square " @click.prevent="update_items({type: 'membership',account: '', item: item})" ></button>
-                        <span class="option_amount" v-text="number_of_items(item.category)"></span>
-                     </div>
-                  </div>
-               
-               
-               
-               
-               </div>
-            </section>   
-            
-            
-            
-            
-            
-            <section class="section membership_purchase">
-               <span class="section_title"><span class="text">Purchase Memberships</span></span>
-               
-               <div class="section_content">
-                  <div class="column">
-                     <pre> not logged-in? show login button 
-                           list membership options with +/- counters (update entries for each as added or removed)
-                           
-                           div for each entry showing type and name with expand control for details and icon for doneness
-                           - if logged-in, have checkbox for auto-fill and show dropdown for linked accounts not purchased. 
-                           
-                           if not logged-in, on entry, check email against database. 
-                      </pre>
-                  </div>
-                  
-                  
-                  <div class="column">
-                  
-                     <div class="shopping_cart">
-                        <span class="title">Shopping Cart</span>
-                        <div class="cart_item" v-for="cart_item in shoppingCart.items">
-                           <div class="cart_item_element type" v-if="cart_item.item">
-                              <span class="description" v-text="cart_item.item? cart_item.item.long_description : null"></span>
-                              <span class="price" v-text="cart_item.item? '$'+cart_item.item.price+'.00' : null"></span>
+                     <div class="price_options"> 
+                     
+                        <div class="price_option" v-for="item in storeItems" v-if="show_store_item(item, 'none')">
+                           <span class="text" v-text="item.description"></span>
+                           <span class="price" v-text="'$'+item.price+'.00'"></span>
+                           <div class="option_purchase">
+                              <button class="option_add fal fa-plus-square" @click.prevent="update_items({type: 'membership',account: '', item: item})" ></button>
+                              <span class="option_amount" v-text="number_of_items(item.category)"></span>
                            </div>
-                           <div class="cart_item_element member" v-if="cart_item.uuid">
-                              <span class="name" v-text="cart_item.first_name+' '+cart_item.last_name"></span>
+                        </div> 
+                        
+                        <div class="price_option" v-for="item in storeItems" v-if="show_store_item(item, 'discount')">
+                           <span class="text" >{{item.description}} <span class="detail">(discounted price, only available through {{day_date(item.end_date)}})</span></span>
+                           <span class="price" v-text="'$'+item.price+'.00'"></span>
+                           <div class="option_purchase">
+                              <button class="option_add fal fa-plus-square" @click.prevent="update_items({type: 'membership', account: '', item: item})" ></button>
+                              <span class="option_amount" v-text="number_of_items(item.category)"></span>
                            </div>
-                           <div class="buttons">
-                              <button class="control_button fal fa-edit" @click.prevent="edit_cart_item(cart_item.item.item_order_number)" ></button>
-                              <button class="control_button fal fa-ban" @click.prevent="remove_cart_item(cart_item)" ></button>
-                           </div>                           
+                        </div> 
+                        
+                        
+                        <span class="price_title"><span class="text">Single Day Prices</span></span>
+                        <p>Single-day memberships are only available at the convention. </p>
+                        
+                        <div class="price_option" v-for="item in storeItems" v-if="show_store_item(item, 'day')">
+                           <span class="text" v-text="item.description"></span>
+                           <span class="price" v-text="'$'+item.price+'.00'"></span>
+                           
+                           <div class="option_purchase disabled">
+                              <button disabled class="option_add  fal fa-plus-square " title="remove this item" @click.prevent="update_items({type: 'membership',account: '', item: item})" ></button>
+                              <span class="option_amount" v-text="number_of_items(item.category)"></span>
+                           </div>
                         </div>
                      </div>
-                  
                   </div>
-               </div>               
+               </div>   
+               
+            
+            
+            
+            
+               <div class="componant membership_purchase">
+                  
+                  <div class="content ">
+                     
+                        <div class="shopping_cart" >
+                           <span class="title">Shopping Cart</span>
+                           <div class="content"  v-if="shoppingCart.items">
+                              <div class="cart_item" v-for="cartItem in shoppingCart.items">
+                                 <div class="cart_item_element type" v-if="cartItem.item">
+                                    <span class="description" v-text="cartItem.item? cartItem.item.long_description : null"></span>
+                                    <span class="price" v-text="cartItem.item? '$'+cartItem.item.price+'.00' : null"></span>
+                                 </div>
+                                 
+                                 <div class="cart_item_element member" v-if="cartItem.account.uuid">
+                                    <span class="name" v-text="cartItem.account.first_name+' '+cartItem.account.last_name"></span>
+                                    age: {{cartItem.account.age}}
+                                 </div>   
+                                 
+                                 <div class="cart_item_element member" v-else >
+                                    <pre>
+                                       linked members:
+                                          name, age use-button
+                                          name, age use-button
+                                          
+                                       New member:
+                                          popup form with new account form
+                                          <new_member_form/>
+                                    </pre>
+                                    <select class="select member_select">
+                                       <option v-for="account in linkedAccounts" v-text="account.first_name+' '+account.last_name"></option>
+                                    </select>
+                                 
+                                 </div>
+                                 <div class="buttons">
+                                    <button class="control_button fal fa-ban" @click.prevent="remove_cart_item(cartItem)" ></button>
+                                 </div>
+                              </div>
+                           
+                              <div class="controls">
+                                 <button class="button" >Checkout</button>
+                              </div>
+                           </div>
+                           <p v-else>no items in cart</p>
+                        </div>
+                     
+                  </div>    
+               </div>
             </section>
             
             
@@ -131,6 +152,9 @@
                   </pre>
                   
          </div>
+         
+
+
       
       </div>
 	
@@ -141,6 +165,7 @@
 	<script>
 		import {apiDomain} from '../config';
 		import { mapState, mapGetters} from 'vuex';
+		import new_member_form from '@/components/includes/new_member_form'	
 		export default{
 			name: 'membership_page',
 			
@@ -157,6 +182,7 @@
 			},
 			
 			components: {
+            'new_member_form': new_member_form,
 				
 			},
 			
@@ -165,11 +191,11 @@
 			...mapState({
                currentCon  : 'currentCon',
                storeItems  : 'storeItems',
+               linkedAccounts: 'linkedAccounts',
             }),
             
             ... mapGetters({
-               shoppingCart: 'shoppingCart',        
-               linkedAccounts: 'linkedAccounts',
+               shoppingCart: 'shoppingCart', 
             }),
             
 			},
@@ -177,6 +203,8 @@
 			created() {
 				var vm = this;
             vm.get_store_items();
+            console.log(Object.keys(vm.linkedAccounts).length);
+            if(Object.keys(vm.linkedAccounts).length == 0) { vm.get_linked_accounts();}
 			},
 			
 			
@@ -190,9 +218,19 @@
                
                vm.$store.dispatch('get_store_items').then(()=>{
                  vm.$forceUpdate();
-               });
-               
+               });               
             },
+            
+            get_linked_accounts() {
+               var vm  = this;
+               if(vm.user) {
+                  vm.$store.dispatch('get_linked_accounts', vm.user.uuid).then(()=>{
+                    vm.$forceUpdate();
+                  });
+               }
+            },
+            
+            
             
             update_items(data) {
                var vm = this;
@@ -209,19 +247,22 @@
             },
             
             number_of_items(category) {
+               
                var   vm = this,
                      numberOfItems = 0;
                if(vm.shoppingCart.items) {
                   Object.entries(vm.shoppingCart.items).forEach((item) => {
-                     item[1].category == category? numberOfItems ++ : '';
-                     
-                  });                  
+                     if(item[1].item.category) {
+                        item[1].item.category == category? numberOfItems ++ : '';
+                     }                     
+                  });
                }
                return numberOfItems;
             },
             
             
             show_store_item(item, condition) {
+               
                var vm = this;
                let truth = false;
                
@@ -275,6 +316,56 @@
 	
 	<style>
    
+   .section.membership_purchasing {
+      flex-wrap: wrap;
+      justify-content: center;
+   }
+   .membership_purchasing .section_title {
+      justify-content: center;
+   }
+   .membership_purchasing .componant {
+      display: flex;
+      flex-wrap: wrap;
+      min-width: 25rem;
+      margin-top: 1rem;
+      padding: 0 2.5vw;
+   }
+   .membership_purchasing .componant.membership_pricing {
+      width: 60%;
+   }
+   .membership_purchasing .componant.membership_purchase {
+      width: 40%;
+   }
+   
+   .membership_purchasing .componant .title {
+      display: flex;
+      width: 50%;
+      justify-content: flex-end;
+      padding: .25rem 1rem;
+      background: #133b4c;
+      color: var(--altColor);
+   }
+   .membership_purchasing .componant .content {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+      min-height: 100%;
+      padding-top: 1rem;
+   }
+   .membership_purchasing .componant .content p {
+      display: flex;
+      width: 100%;
+      font-weight: 100;
+      line-height: 1.1em;
+      padding: .5rem 0 ;
+   }
+   
+   .membership_purchasing .componant .content .controls {
+      align-self: flex-end;
+      width: 100%;
+      justify-content: space-around;
+   }
+   
    .price_options {
       display: flex;
       flex-wrap: wrap;
@@ -301,9 +392,10 @@
    }
    .price_options .price_option .option_purchase {
       display: flex;
-      justify-content: space-between;
+         justify-content: space-between;
+         align-items: center;
       font-size: 1.25rem;      
-      width: 3rem;
+      width: 3.25rem;
    }
    
    .price_options .price_option .option_add {
@@ -382,14 +474,6 @@
       width: 100%;
       max-width: 30rem;
       margin: 0 auto;
-   }
-   .membership_purchase .shopping_cart .title {
-      display: flex;
-      width: 50%;
-      justify-content: flex-end;
-      padding: .25rem 1rem;
-      background: #133b4c;
-      color: var(--altColor);
    }
    .membership_purchase .shopping_cart .cart_item {
       display: flex;

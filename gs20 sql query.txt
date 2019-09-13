@@ -49,8 +49,26 @@
    SELECT * FROM `gs_21_membership` g
    INNER JOIN `users` u ON g.con_uuid = u.uuid
    WHERE g.con_status = 14
-
    
+
+   - Guest GM eligability  - GAMECONAPP
+   SELECT `event_name`, `duration_in_minutes`, `event_id`, `first_name`, `last_name`, `email`,`uuid` FROM `gameconapp_event` e  
+   inner Join `gameconapp_connection` c on c.event_id = e.id 
+   inner join `gameconapp_gcuser` u on  u.wp_user_id = c.user_id
+   where e.convention_id = '5' and c.role = 'GM' 
+   order by `last_name`
+   
+   - total hours
+   select u.first_name, u.last_name,round(sum(duration_in_minutes / 60 ),0) as `total hours`, u.uuid, u.email  from gameconapp_event e 
+   inner join `gameconapp_connection` c on c.event_id = e.id 
+   inner join `gameconapp_gcuser` u on u.wp_user_id = c.user_id 
+   where e.convention_id = 5 and c.role = 'GM'
+   group by u.wp_user_id
+   order by `total hours` DESC,  u.last_name, u.wp_user_id
+   
+   
+   
+   - GS21 events
   SELECT  e.event_id, e.event_name, t.track_name, x.type_name, e.short_description, e.event_description, e.event_url, e.event_duration, e.seats, e.experience_level, e.gm_player, e.gm_designer, e.event_notes, u.first_name, u.last_name, u.email FROM `events` e
    inner join `gs_21_events` g on g.con_event_id = e.event_id
    inner Join `gs_21_participants` p on p.event_id = e.event_id

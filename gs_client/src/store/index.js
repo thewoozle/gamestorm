@@ -447,8 +447,9 @@
       },
       
       update_linked_account({commit}, info) {
+         
          commit('set_linked_account', info.account);
-         commit('set_shopping_cart_update', info.account);
+         commit('set_shopping_cart_update', info);
       },
       
       
@@ -1214,6 +1215,16 @@
       
       set_shopping_cart_update: (state, item) => {
          let foundItem = false;
+                  
+         if(!item.item) {
+            item.item={type: 'membership',category: item.category};
+            Object.entries(state.storeItems).forEach((storeItem)=>{
+               if(item.category == storeItem[1].category) {
+                  item.item.price = storeItem[1].price;
+               }
+            });   
+         }
+         
          
          state.shoppingCart.items? '' : Vue.set(state.shoppingCart, 'items', []);
          
@@ -1221,7 +1232,7 @@
             // if(!cartItem[1].cart_item_number) {
                // cartItem[1].cart_item_number = 
             // }
-            
+            //console.log(item);
             
             
             if(item.type == 'membership') {  
@@ -1263,6 +1274,7 @@
          
          state.shoppingCart.items = state.shoppingCart.items.filter(v => v);
          //console.log(JSON.stringify(state.shoppingCart));
+         state.shoppingCart.items.length <=0? delete state.shoppingCart.items : '';
       },
 	}
 	

@@ -139,16 +139,18 @@
                               <p>Your curent code is: <span class="code" >{{linkCode}}</span><span class="small_print">( The letters "I", "L", and "O" are not used ) </span></p>
                               
                               <div class="linked_accounts">
-                                 <span class="title">Accounts</span>
+                                 <span class="accounts_title">Accounts</span>
                                  
                                  <div class="account_header">
                                     <span class="title name">Name</span>
-                                    <span class="title type">Convention Membership for {{currentCon.short_name}}</span>
+                                    <span class="title age" >Age</span>
+                                    <span class="title type" v-text="currentCon.name+' '+currentCon.con_num"></span>
                                     <span class="title purchase">Purchase Membership</span>
                                  </div>
                                  
                                  <div class="account" v-for="account in linkedAccounts">
                                     <span class="element name" v-text="account.first_name+' '+account.last_name"></span>
+                                    <span class="element age" v-text="account.age > 0 && account.age <18? account.age : ''"></span>
                                     <span class="element type"><span class="icon" v-bind:class="account.membership_description? 'fad fa-thumbs-up' : 'fal fa-ban'">
                                        </span><span class="text" v-text="account.membership_description? account.membership_description : 'no membership'"></span>
                                     </span>
@@ -272,7 +274,7 @@
             var vm = this;
             vm.get_user_info();
             vm.get_link_code();
-            vm.get_linked_accounts();
+            if(Object.keys(vm.linkedAccounts).length == 0) { vm.get_linked_accounts();}
          },
          
          methods: {
@@ -341,10 +343,19 @@
             },
             
             set_membership_purchase(account) {
-               var vm = this;
+               var   vm = this,
+                     category;
                account.type = 'membership';
-               account.category = '';
-               vm.$store.dispatch('update_linked_account', {account: account, category: ''}).then(()=>{
+               
+               if(account.age <= 5) {
+                  category = 'five_under';
+               } else if(account.age > 5 && account.age <= 14) {
+                  category = 'child';
+               } else {
+                  category = 'adult';
+               }
+               
+               vm.$store.dispatch('update_linked_account', {account: account, category: category}).then(()=>{
                   vm.$forceUpdate();
                   vm.membershipPurchases = false;
                   Object.entries(vm.linkedAccounts).forEach((account) => {
@@ -578,6 +589,11 @@
       justify-content: center;
       font-style: italic;
    }
+   .section.account_section .linked_accounts .accounts_title {
+      font-size: 1.35rem;
+      font-weight: 300;
+      letter-spacing: .05em;
+   }
    .section.account_section .linked_accounts .title {
       font-weight: bold;
    }
@@ -587,30 +603,50 @@
    .section.account_section .linked_accounts .account_header .title {
       display: flex;
       font-size: .85rem;
+      line-height: 1em;
+      padding: 0 .25rem;
       font-family: 'Source Sans Pro', Arial, sans-serif;
       justify-content: center;
+      text-align: center;
+      text-transform: uppercase;
    }
    .section.account_section .linked_accounts .account {
-      display: flex;      
+      display: flex;    
+      justify-content: space-between;
+      padding: .25rem;
+      margin: .35rem 0;
+      background: rgba(255,255,255,.05);
    }
    .section.account_section .linked_accounts .name {
-      width: 40%;
+      width: 10rem;
    }
+   .section.account_section .linked_accounts .age {
+      width: 2rem;
+   }
+   .section.account_section .linked_accounts .purchase,
    .section.account_section .linked_accounts .type {
-      width: 60%;
+      width: 6rem;
+      margin-left: .5rem;
    }
    .section.account_section .linked_accounts .account .name, 
    .section.account_section .linked_accounts .account .type {
       display: flex;
-      padding-left: 1rem;
+      flex-wrap: wrap;
    }
    .section.account_section .linked_accounts .account .type .icon {
       display: flex;
       width: 3rem;
       justify-content: center;
    }
+   .section.account_section .linked_accounts .element .text {
+      display: flex;
+      width: 100%;
+      font-size: .65rem;
+      line-height: 1em;
+   }
    .section.account_section .linked_accounts .purchase_membership {
       cursor: pointer;
+      justify-content: center;
    }
    
    
