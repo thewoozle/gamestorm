@@ -446,8 +446,7 @@
             });         
       },
       
-      update_linked_account({commit}, info) {
-         
+      update_linked_account({commit}, info) {         
          commit('set_linked_account', info.account);
          commit('set_shopping_cart_update', info);
       },
@@ -646,10 +645,9 @@
          ----------------------------------------------------------- */
          
          update_shopping_cart({commit}, item) {
-               var vm = this;
-               if(!item.uuid) {item.uuid = '';}
-               commit('set_shopping_cart_update', item);
-         
+            var vm = this;
+            if(!item.uuid) {item.uuid = '';} 
+            commit('set_shopping_cart_update', item);
          },
          
          
@@ -709,13 +707,14 @@
 		},
       
       // CHECK EMAIL
-      check_email({commit},email) {
-         if(email.indexOf('@') >-1) {
-            return new Promise((resolve,reject) => {
-               Axios.get(apiDomain+'_check_email', {params: {email : email}}).then((response) => {
-                  resolve(response);
-               });
+      check_email({commit}, emailData) {
+         
+         if(emailData.email.indexOf('@') >-1) {
+
+            Axios.get(apiDomain+'_check_email', {params: {email : emailData.email}}).then((response) => {
+               commit('set_check_email', {orderNumber: emailData.orderNumber, users:response.data.users});
             });
+               
          }
       },
       
@@ -1096,6 +1095,24 @@
          Vue.set(state, 'memberPercent', percent);
          
 		},
+      
+      
+      // CHECK SET EMAILS
+      set_check_email(state, emailData) {
+         var vm = this;
+         let items = state.shoppingCart.items;
+         Object.entries(emailData.users).forEach((user) => {
+            user[1].last_initial = user[1].last_name.substring(0,1).toUpperCase();
+            
+            Object.entries(items).forEach((item)=>{               
+               if(item[1].item_order_number == emailData.orderNumber) { 
+                  item[1].checkedEmail = emailData.users;
+                  item[1].submitErrors.email = 1;
+               };
+            });
+            Vue.set(state.shoppingCart, 'items', items);
+         });
+      },
 		
 		
 		// REMOVE MEMBER
@@ -1214,47 +1231,40 @@
 
       
       set_shopping_cart_update: (state, item) => {
-         let foundItem = false;
+         let   foundItem = false,
+               option = '';
                   
-         if(!item.item) {
-            item.item={type: 'membership',category: item.category};
-            Object.entries(state.storeItems).forEach((storeItem)=>{
-               if(item.category == storeItem[1].category) {
-                  item.item.price = storeItem[1].price;
-               }
-            });   
+         if(!item.item) {            
+            item.item={
+               type        : 'membership',
+               category    : item.category,
+               uuid        : item.uuid,
+            };
          }
          
          
          state.shoppingCart.items? '' : Vue.set(state.shoppingCart, 'items', []);
          
          Object.entries(state.shoppingCart.items).forEach((cartItem) => {
-            // if(!cartItem[1].cart_item_number) {
-               // cartItem[1].cart_item_number = 
-            // }
-            //console.log(item);
-            
-            
             if(item.type == 'membership') {  
-                  if(cartItem[1].item_order_number == item.item_order_number) {
-                     foundItem = true;
-                     switch(item.purchase) {
-                        case true:
-                           state.shoppingCart.items[cartItem[0]] = item.item;
-                           break;
-                           
-                        case false:
-                           delete state.shoppingCart.items[cartItem[0]];
-                           break;
-                     }
-                  } 
+               if(cartItem[1].item_order_number == item.item_order_number) {
+                  foundItem = true;
+                  switch(item.purchase) {
+                     case true:
+                        state.shoppingCart.items[cartItem[0]] = item.item;
+                        break;
+                        
+                     case false:
+                        delete state.shoppingCart.items[cartItem[0]];
+                        break;
+                  }
+               } 
                
                
             } else if(item.type == 'merch') {
                console.log('no merch function in update-cart function');
             }            
          });
-         
          if(!foundItem) {
             var   randChars = 'ABCDEFGHJKMNPQRSTUVWXYZ0123456789',
                   randString = '';
@@ -1268,9 +1278,13 @@
             delete item.created_at;
             delete item.store_active;
             item.item_order_number = state.currentCon.tag_name+'-'+ randString;
+                        
+            state.user.uuid? item.account_option = 'options' : item.account_option = '';
+            
+            item.submitErrors = {};
             
             state.shoppingCart.items.push(item);
-         }
+         } 
          
          state.shoppingCart.items = state.shoppingCart.items.filter(v => v);
          //console.log(JSON.stringify(state.shoppingCart));

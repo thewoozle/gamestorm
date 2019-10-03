@@ -32,7 +32,14 @@
 					
 					
 					<div class="control_element " v-else>
-						<button class="button" :class="{'active':showLoginDropdown}" type="button" @click.prevent="{showLoginDropdown? showLoginDropdown = false : showLoginDropdown = true; }" title="Sign-in to an existing account or create a new user-account">Sign In</button>
+                  <div class="sign-in_buttons">
+                     <button class="button" :class="{'active':showLoginDropdown}" 
+                        type="button" 
+                        @click.prevent="{showLoginDropdown? showLoginDropdown = false : showLoginDropdown = true; }" 
+                        title="Sign-in to an existing account or create a new user-account"
+                     >Sign In</button>
+                     <a class="link" @click.prevent="{showLoginDropdown = true; dropdownSection ='register' }" >Create account</a>
+                  </div>
 						
 						<div class="login_dropdown" :class="[{'show': showLoginDropdown}, {'register' : dropdownSection == 'register'}]">
                      <div class="form_message" :class="loginMessage? 'show' : ''" v-text="loginMessage"></div>	
@@ -86,14 +93,40 @@
 							
 				
 							<div class="dropdown_section register_section" :class="{'show': dropdownSection == 'register'}">
-                        <new_member_form />
+                     
+                        <div class="section_content register ">	
+                           <span class="section_title">Create a new Account</span>
+                           <p>A User Account is required to purchase a convention membership or schedule convention events. </p>
+                           <p>If you have attended a GameStorm convention, you may already have a User Account, using the email address that you provided at Registration. </p>
+                           
+                              <new_member_form :account={} v-on:newAccount = "submit_new_user" />
+                              
+                              <div class="form_row">
+                                 <label for="new_password" title="minimum 6 characters, no spaces or quotes">Password 
+                                    <button type="button" class="password_show fal" v-bind:class="showPassword ? 'fa-eye' : 'fa-eye-slash'" @click="showPassword ? showPassword = false : showPassword = true"></button>
+                                 </label>
+                                 <div class="input_wrappers">
+                                    <div class="input_wrapper">
+                                       <input id="new_password" v-bind:type="showPassword? 'text' : 'password'" class="input text_box new_password" name="new_password"  v-model="newPassword" required placeholder="Password" @keyup="validate_new_password(); submitErrors.email = null"/>
+                                       <i class="pass_icon" v-bind:class="validatePassword == true? 'fal fa-check-square' : 'fas fa-ban fail'" v-if="newPassword"></i>
+                                    </div>	
+                                    
+                                    <div class="input_wrapper">
+                                       <input id="compare_password" v-bind:type="showPassword? 'text' : 'password'" class="input text_box verify_password" name="compare_password" required v-model="confPassword" placeholder="Verify Password" @keyup="validate_new_password()"/>
+                                       <i class="pass_icon" v-bind:class="newPassword == confPassword? 'fal fa-check-square' : 'fas fa-ban fail'" v-if="newPassword"></i>
+                                    </div>
+                                    <span class="input_message" v-bind:class="submitErrors.password? 'show' : ''" v-text="submitErrors.password"></span> 
+                                 </div>	
+                              </div>
+                           
+                        </div>   
 							</div>
 							
 			
 							<div class="dropdown_section help_section" :class="{'show': dropdownSection == 'help'}">
 								<span class="section_title">Reset Password</span>
 								
-								<form method="post" action="" @submit.prevent="request_password_reset">							
+								<form method="post" action="" @submit.prevent="request_password_reset">
 									<div class="form_row">
 										<div class="form_element">
 											<label for="email">Email</label>
@@ -324,6 +357,68 @@
                });	
 						
 				},
+            
+               /* -----------------------------------------------------------
+                           SUBMIT NEW USER
+                  ----------------------------------------------------------- */
+               submit_new_user(e) {
+                  var vm = this;
+                  vm.account = e
+                  vm.account.password = vm.newPassword;
+                  vm.$store.dispatch('create_update_user_info', vm.account).then((response) => {
+                     
+                     console.log(response.errors);
+                     
+                     if(response == 'success') {
+                                             
+                        // show response message for four seconds
+                        vm.loginMessage = response;		
+                              
+                              
+                        vm.dropdownSection = 'login';
+                        vm.account = {};
+                        vm.account.state = '';
+                     } else {
+                        
+                           // show response message for four seconds
+                           vm.loginMessage = response;
+                     }
+                     
+                     setTimeout(function() {
+                        vm.loginMessage = null;
+                        vm.submitErrors= {};
+                     },4000);
+                     
+                  }, (err) => {
+                     console.log(err);
+                     vm.submitErrors = err;
+                     setTimeout(function() {
+                        vm.loginMessage = null;
+                        vm.submitErrors= {};
+                        vm.dropdownSection = 'login';
+                        vm.showPassword = 'password';
+                     },4000);
+                  });
+                  
+               },
+               
+               /* ---------------------------------------------------------------
+                        CREATE USER
+                  ---------------------------------------------------------------   */
+               create_user(e) {
+                  console.log(e.target);
+               },
+               
+               /* ---------------------------------------------------------------
+                        VALIDATE NEW PASSWORD
+                  ---------------------------------------------------------------   */
+               validate_new_password() {
+                  var vm = this;
+                  vm.newPassword = vm.newPassword.replace(/ |"|'|`/g, '');
+                  vm.confPassword = vm.confPassword.replace(/ |"|'|`/g, '');
+                  vm.newPassword.length >= 6? vm.validatePassword = true : vm.validatePassword = false;
+               },
+               
             
 			}
 			
@@ -576,6 +671,17 @@
 		width: 100%;
 		align-items: center;
 	}
+   
+	#page_header .control_element .sign-in_buttons {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+      height: 100%;      
+      padding: .25rem 0;
+   }
+   
+   
 	#page_header .control_element .button.active {
 		background: none;
 		text-shadow: -1px -1px 1px rgba(0,0,0,.15);

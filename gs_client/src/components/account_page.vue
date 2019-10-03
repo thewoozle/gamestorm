@@ -174,13 +174,7 @@
                               <button class="button" @click.prevent="create_link_code()">Create Code</button>
                               <button class="button" v-if="linkCode" @click.prevent="clear_link_code()">Clear link code</button>
                            </div>
-                        
-                        
                         </div>
-                        
-                     
-                     
-                     
                      </div>
                      
                      
@@ -355,7 +349,7 @@
                   category = 'adult';
                }
                
-               vm.$store.dispatch('update_linked_account', {account: account, category: category}).then(()=>{
+               vm.$store.dispatch('update_linked_account', {account: account, category: category, uuid : account.uuid}).then(()=>{
                   vm.$forceUpdate();
                   vm.membershipPurchases = false;
                   Object.entries(vm.linkedAccounts).forEach((account) => {

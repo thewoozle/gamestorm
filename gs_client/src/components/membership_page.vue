@@ -38,7 +38,7 @@
                            <span class="text" v-text="item.description"></span>
                            <span class="price" v-text="'$'+item.price+'.00'"></span>
                            <div class="option_purchase">
-                              <button class="option_add fal fa-plus-square" @click.prevent="update_items({type: 'membership',account: '', item: item})" ></button>
+                              <button class="option_add fal fa-plus-square" @click.prevent="update_items({type: 'membership',account: {}, item: item})" ></button>
                               <span class="option_amount" v-text="number_of_items(item.category)"></span>
                            </div>
                         </div> 
@@ -47,7 +47,7 @@
                            <span class="text" >{{item.description}} <span class="detail">(discounted price, only available through {{day_date(item.end_date)}})</span></span>
                            <span class="price" v-text="'$'+item.price+'.00'"></span>
                            <div class="option_purchase">
-                              <button class="option_add fal fa-plus-square" @click.prevent="update_items({type: 'membership', account: '', item: item})" ></button>
+                              <button class="option_add fal fa-plus-square" @click.prevent="update_items({type: 'membership', account: {}, item: item})" ></button>
                               <span class="option_amount" v-text="number_of_items(item.category)"></span>
                            </div>
                         </div> 
@@ -61,7 +61,7 @@
                            <span class="price" v-text="'$'+item.price+'.00'"></span>
                            
                            <div class="option_purchase disabled">
-                              <button disabled class="option_add  fal fa-plus-square " title="remove this item" @click.prevent="update_items({type: 'membership',account: '', item: item})" ></button>
+                              <button disabled class="option_add  fal fa-plus-square " title="remove this item" @click.prevent="update_items({type: 'membership',account: {}, item: item})" ></button>
                               <span class="option_amount" v-text="number_of_items(item.category)"></span>
                            </div>
                         </div>
@@ -80,36 +80,218 @@
                         <div class="shopping_cart" >
                            <span class="title">Shopping Cart</span>
                            <div class="content"  v-if="shoppingCart.items">
-                              <div class="cart_item" v-for="cartItem in shoppingCart.items">
-                                 <div class="cart_item_element type" v-if="cartItem.item">
-                                    <span class="description" v-text="cartItem.item? cartItem.item.long_description : null"></span>
-                                    <span class="price" v-text="cartItem.item? '$'+cartItem.item.price+'.00' : null"></span>
-                                 </div>
+                           
+                              <div class="cart_item" v-for="(cartItem,index) in shoppingCart.items">
+                                 <div class="row">
                                  
-                                 <div class="cart_item_element member" v-if="cartItem.account.uuid">
-                                    <span class="name" v-text="cartItem.account.first_name+' '+cartItem.account.last_name"></span>
-                                    age: {{cartItem.account.age}}
-                                 </div>   
-                                 
-                                 <div class="cart_item_element member" v-else >
-                                    <pre>
-                                       linked members:
-                                          name, age use-button
-                                          name, age use-button
+                                    <div class="header">
+                                       <span class="description" v-text="cartItem.item? cartItem.item.long_description : null"></span>
+                                       <span class="age" v-if="cartItem.account.age " v-text="'Age: '+cartItem.account.age"></span>
+                                    </div>                                 
+                                    
+                                    <div class="item_element member" >
+                                       <div class="cart_info info" >   
+                                          <div class="info_wrapper" v-if="cartItem.account.uuid">
+                                             <span class="element name"  v-if="cartItem.account.first_name && cartItem.account.last_name" v-text="cartItem.account.first_name+' '+cartItem.account.last_name"></span>
+                                             <span class="element email"  v-if="cartItem.account.email"v-text="cartItem.account.email"></span>
+                                             <div class="additional">
+                                                <span class="element phone"  v-if="cartItem.account.phone"v-text="cartItem.account.phone"></span>
+                                                <span class="element address"  v-if="cartItem.account.address"v-text="cartItem.account.address"></span>
+                                                <span class="element address2"  v-if="cartItem.account.address2" v-text="cartItem.account.address2"></span>                                       
+                                                <span class="element city_state_zip"  v-if="cartItem.account.city && cartItem.account.state && cartItem.account.zip "v-text="cartItem.account.city+', '+cartItem.account.state+' '+cartItem.account.zip"></span>
+                                             </div>
+                                             <span class="change_account control_link" @click.prevent="reset_account_choice(cartItem.item_order_number)">Change Account</span>
+                                          </div>
                                           
-                                       New member:
-                                          popup form with new account form
-                                          <new_member_form/>
-                                    </pre>
-                                    <select class="select member_select">
-                                       <option v-for="account in linkedAccounts" v-text="account.first_name+' '+account.last_name"></option>
-                                    </select>
-                                 
-                                 </div>
-                                 <div class="buttons">
-                                    <button class="control_button fal fa-ban" @click.prevent="remove_cart_item(cartItem)" ></button>
+                                          <div class="info_wrapper" v-else>
+                                             <div class="" v-if="user.uuid">
+                                                <span class="wrapper_title">select membership option</span>
+                                                
+                                                <div class="select_attendee">
+                                                   <select class="select member_select"  @change.prevent="select_account_option($event, cartItem) ">
+                                                      <option value="" style="display: none" >account...</option>
+                                                      <option :value="user.uuid" v-if="user.uuid" v-text="'Myself : '+user.first_name+' '+user.last_name"></option> 
+                                                      <option  v-for="account in linkedAccounts" :value="account.uuid" v-text="'linked account: '+account.first_name+' '+account.last_name" v-if="account.uuid != user.uuid"></option>
+                                                      <option value="" >Enter member info</option>
+                                                   </select>
+                                                </div>
+                                                
+                                             </div>
+                                             
+                                             <div class="" v-else >
+                                                <span class="wrapper_title">
+                                                   If you have an account, please log-in to purchase your membership and access any linked accounts. </br>
+                                                </span>                                                
+                                             </div>
+                                             
+                                             <button class="control_button edit_membership_control fal fa-edit" 
+                                                v-bind:class="showInfoForm == cartItem.item_order_number? 'show' : '' " 
+                                                @click.prevent="showInfoForm == cartItem.item_order_number? showInfoForm = '' : showInfoForm = cartItem.item_order_number" 
+                                             ></button>
+                                             
+                                          </div>
+                                       </div>
+                                    </div>
+                                       
+                                       
+                                       <div class="item_element price" v-if="cartItem.item">
+                                          <span class="value" v-text="cartItem.item? '$'+cartItem.item.price+'.00' : null"></span>
+                                          <span class="remove control_link" @click.prevent="remove_cart_item(cartItem)" title="Remove this item from the cart" >Remove</span>
+                                       </div>                                       
+                                    
+                                 </div>   
+                                    
+                                 <div class="info_form" v-bind:class="cartItem.account.uuid? '' : 'show'">
+                                    <div class="form_wrapper">
+                                    <p>Please enter this person's information</p>
+                                    
+                                    
+                                    
+                                    
+      <form class="cart_member_form"  @submit.prevent="submit_new_form"  >
+         <div class="form_wrapper" >      
+         
+            <div class="form_row email_check_row">
+               <label for="last_name">Email</label>
+               <div class="input_wrapper">
+                  <input class="input text_box" type="text" name="email" id="email"   v-model="cartItem.account.email" required @keyup="check_email(cartItem.item_order_number, cartItem.account.email); cartItem.submitErrors.email = null"/>
+               </div>
+               
+               <div v-if="cartItem.checkedEmail" class="email_check">
+                  <span class="icon fas fa-user-plus" :title="'This email address has '+cartItem.checkedEmail.length +' user accounts associated with it. You can use the SIGN-IN HELP link to set or reset the accounts password(s) or continue creating a new user account. '" >
+                  </span> 
+                  <p class="message">
+                     This email address has {{cartItem.checkedEmail.length}} user account{{cartItem.checkedEmail.length >1? 's' : ''}} associated with it. 
+                     You can use the SIGN-IN link to access your account or choose to purchase this membership for <span v-text="cartItem.checkedEmail.length >1? 'one of the members using this email address' : 'the member using this email address'">.
+                     You may also enter the information for a new member, sharing this email address. </span>
+                  </p>
+               </div>
+               
+               
+               
+               <div v-else="cartItem.submitErrors.email == 0" class="email_check">
+                  <span class="icon fal fa-thumbs-up" title="This email address is not in use" ></span> 
+               </div>
+               
+               
+               
+               <span class="input_message" v-bind:class="cartItem.submitErrors.email? 'show' : ''" v-text="cartItem.submitErrors.email"></span> 			
+            </div>
+            
+            
+            
+            
+            <div class="form_row">
+               <label for="first_name">First Name</label>
+               <div class="input_wrapper">
+                  <input class="input text_box" type="text" name="first_name" id="first_name"      @keyup="update_cart_account($event, cartItem.item_order_number)" />
+               </div>
+               <span class="input_message" v-bind:class="cartItem.submitErrors.first_name? 'show' : ''" v-text="cartItem.submitErrors.first_name"></span>
+            </div>
+            
+            <div class="form_row">
+               <label for="last_name">Last Name</label>
+               <div class="input_wrapper">
+                  <input class="input text_box" type="text" name="last_name" id="last_name"   @keyup="update_cart_account($event, cartItem.item_order_number)"/>
+               </div>
+               <span class="input_message" v-bind:class="cartItem.submitErrors.last_name? 'show' : ''" v-text="cartItem.submitErrors.last_name"></span> 					
+            </div>
+            
+            
+            <div class="form_row">
+               <label for="last_name">Badge Name (optional)</label>
+               <div class="input_wrapper">
+                  <input class="input text_box" type="text" name="badge_name" id="last_name"   @keyup="update_cart_account($event, cartItem.item_order_number)" title="badge Name defaults to your first name"/>
+               </div>
+               <span class="input_message" v-bind:class="cartItem.submitErrors.last_name? 'show' : ''" v-text="cartItem.submitErrors.last_name"></span> 					
+            </div>
+            
+            
+            
+            <div class="form_row">
+               <label for="last_name">Address</label>
+               <div class="input_wrapper">
+                  <input class="input text_box" type="text" name="address" id="address"   @keyup="update_cart_account($event, cartItem.item_order_number)"/>
+               </div>
+               <span class="input_message" v-bind:class="cartItem.submitErrors.address? 'show' : ''" v-text="cartItem.submitErrors.address"></span> 					
+            </div>
+            
+            
+            <div class="form_row">
+               <label for="last_name">Address 2</label>
+               <div class="input_wrapper">
+                  <input class="input text_box" type="text" name="address2" id="address2"   @keyup="update_cart_account($event, cartItem.item_order_number)"/>
+               </div>
+               <span class="input_message" v-bind:class="cartItem.submitErrors.address2? 'show' : ''" v-text="cartItem.submitErrors.address2"></span> 					
+            </div>
+            
+            
+            <div class="form_row">
+               <label for="last_name">City</label>
+               <div class="input_wrapper">
+                  <input class="input text_box" type="text" name="city" id="city"   @keyup="update_cart_account($event, cartItem.item_order_number)"/>
+               </div>
+               <span class="input_message" v-bind:class="cartItem.submitErrors.city? 'show' : ''" v-text="cartItem.submitErrors.city"></span> 					
+            </div>
+            
+            
+            <div class="form_row">
+               <div class="form_element">
+                  <div class="input_wrapper">
+                     <select class="select" name="state" id="state" @change="update_cart_account($event, cartItem.item_order_number)">
+                        <option value="" style="display: none" >State...</option>
+                        <option :value="state.state" v-for="state in statesList" >{{state.name}}</option>	
+                     </select>
+                     <label>State or Territory</label>
+                     <span class="form_error" v-if="cartItem.submitErrors.state" v-text="cartItem.submitErrors.state? 'State or Territory is required' : ''"></span>
+                  </div>   
+               </div> 
+               
+               <div class="form_element">
+                  <div class="input_wrapper" title="leave blank if over 18 at time of next convention">
+                  <datetime type="date" @set="update_cart_account($event, cartItem.item_order_number)"   ></datetime>
+                  
+                  </div>				
+                  <label for="country">Birthdate</label>
+                  <span class="input_message" v-bind:class="cartItem.submitErrors.birthDate? 'show' : ''" v-text="cartItem.submitErrors.birthDate"></span>
+               </div>
+            </div>	
+            
+            
+            <div class="form_row">
+               <div class="form_element">
+                  <label for="last_name">Postal Code</label>
+                  <div class="input_wrapper">
+                     <input class="input text_box" type="text" name="zip" id="zip"   @keyup="update_cart_account($event, cartItem.item_order_number)"/>
+                  </div>
+                  <span class="input_message" v-bind:class="cartItem.submitErrors.zip? 'show' : ''" v-text="cartItem.submitErrors.zip"></span> 	
+               
+               </div>      
+               <div class="form_element">
+                  <label for="last_name">Phone</label>
+                  <div class="input_wrapper">
+                     <input class="input text_box" type="text" name="phone" id="phone"   @keyup="update_cart_account($event, cartItem.item_order_number)" />
+                  </div>                                    
+               </div>
+            </div>
+            
+            <p>All information will be confidential and used only in relation to having website access and for convention membership. </p>
+            
+            <div class="form_row controls">
+               <button type="submit" class="button">Submit</button>			
+            </div>
+         </div>
+            
+      </form>
+      
+      
+      
+                                       
+                                    </div>   
                                  </div>
                               </div>
+                              
+                              <span class="total_price" v-if="totalCartPrice > 0" v-text="'$'+totalCartPrice+'.00'"></span>
                            
                               <div class="controls">
                                  <button class="button" >Checkout</button>
@@ -163,15 +345,22 @@
 	
 	
 	<script>
+		import Vue from 'vue'
 		import {apiDomain} from '../config';
 		import { mapState, mapGetters} from 'vuex';
-		import new_member_form from '@/components/includes/new_member_form'	
+      import { Datetime } from 'vue-datetime'
+      import 'vue-datetime/dist/vue-datetime.css'      
+      Vue.use(Datetime);
+      
 		export default{
 			name: 'membership_page',
 			
 			
 			data() {
 				return {
+               showInfoForm   : false,
+               testData       : {},
+               
             }
 			},
 			
@@ -181,10 +370,11 @@
 				
 			},
 			
-			components: {
-            'new_member_form': new_member_form,
+			
+            components: {
+               datetime: Datetime,
+            },
 				
-			},
 			
 			
 			computed: {
@@ -192,19 +382,30 @@
                currentCon  : 'currentCon',
                storeItems  : 'storeItems',
                linkedAccounts: 'linkedAccounts',
+               statesList		: 'statesList',     
+               user        : 'user',
             }),
             
             ... mapGetters({
                shoppingCart: 'shoppingCart', 
             }),
             
+            totalCartPrice() {
+               var   vm = this,
+                     total = null;
+               
+               Object.entries(vm.shoppingCart.items).forEach((item) => {
+                  item[1].item.price > 0? total += item[1].item.price : '';
+               });
+               return total;
+            },
 			},
 			
 			created() {
 				var vm = this;
-            vm.get_store_items();
-            console.log(Object.keys(vm.linkedAccounts).length);
-            if(Object.keys(vm.linkedAccounts).length == 0) { vm.get_linked_accounts();}
+            vm.get_store_items();            
+            vm.loadcheck_cart_items();
+            vm.get_linked_accounts();
 			},
 			
 			
@@ -223,9 +424,116 @@
             
             get_linked_accounts() {
                var vm  = this;
-               if(vm.user) {
+               if(vm.user) {                  
                   vm.$store.dispatch('get_linked_accounts', vm.user.uuid).then(()=>{
                     vm.$forceUpdate();
+                  });
+               }
+            },
+            
+            /* -----------------------------------------------------------
+                        CHECK EMAIL
+               ----------------------------------------------------------- */
+            check_email(orderNumber, email) {
+               var vm = this;
+               email = email.replace(/ /g, '');
+               
+                  vm.$store.dispatch('check_email',{orderNumber: orderNumber, email: email}).then((response) => {
+                     vm.$forceUpdate();
+                  }, (err) => {
+                        vm.submitErrors = err;
+                     vm.showLoginLoading = false;
+                  });
+                  
+            },
+            
+            
+            
+            /* -----------------------------------------------------------
+                        SELECT ACCOUNT OPTION
+                        show form and create new, blank account entry
+               ----------------------------------------------------------- */
+           select_account_option(event, item) {
+               var   vm = this,
+                     _cartItem = item;          
+               
+                if(event.target.value) { 
+                  vm.showInfoForm = false;
+                  
+                  // set cart item account as linked-member account from event.target.value 
+                  Object.entries(vm.linkedAccounts).forEach((account) =>{
+                     if(account[1].uuid == event.target.value) { _cartItem.account = account[1]; }
+                  });
+                  vm.$store.dispatch('update_shopping_cart', _cartItem).then(()=>{
+                     vm.showInfoForm = item.item_order_number;
+                  });
+                  
+                  // Object.entries(vm.shoppingCart.items).forEach((item) =>{
+                     // if(item[1].item_order_number == itemNumber) {
+                        // Object.entries(vm.linkedAccounts).forEach((account) =>{
+                           // console.log('update account');
+                           // _cartItem.type = 'membership',
+                           // _cartItem.account = account[1];
+                           // _cartItem.uuid = account[1].uuid;
+                           // //account[1].uuid == event.target.value? item[1].account = account[1]: '';
+                           // vm.$store.dispatch('update_shopping_cart', _cartItem).then(()=>{
+                           // });
+                           
+                        // });
+                     // }
+                  // });
+                  
+               } else { 
+               _cartItem.account = {uuid: ''};
+               _cartItem.uuid = '';
+               
+               console.log('show form');
+                  // vm.showInfoForm = itemNumber;
+               }; 
+            },
+            
+            
+            set_new_member(e) {
+               console.log(e);
+            },
+            
+            
+            // reset cart account choice
+            reset_account_choice(itemNumber) {
+               var   vm = this,
+                     _cartItem = {};
+               Object.entries(vm.shoppingCart.items).forEach((item) =>{                  
+                  if(item[1].item_order_number == itemNumber) {
+                     _cartItem = item[1];
+                     _cartItem.account = {uuid: ''};
+                     
+                     vm.$store.dispatch('update_shopping_cart', _cartItem).then(()=>{
+                     });
+                  }     
+                     
+               });
+            },
+            
+            
+            loadcheck_cart_items() {
+               var   vm = this;               
+               if(vm.shoppingCart.items) {
+                  var _cartItems = vm.shoppingCart.items;                   
+                  let foundItems = [];
+                  Object.entries(_cartItems).forEach((cartItem)=>{
+                     if(!cartItem.price) {
+                        // find storeItem by category and set item 
+                        Object.entries(vm.storeItems).forEach((storeItem) => {
+                           if(storeItem[1].category == cartItem[1].category) {
+                              foundItems.push(cartItem[1]);  
+                              let _cartItem = cartItem[1];
+                              _cartItem.type = 'membership';
+                              _cartItem.item = storeItem[1];
+                              vm.$store.dispatch('update_shopping_cart', _cartItem).then(()=>{
+                              });              
+                           }                        
+                        });
+                     }                     
                   });
                }
             },
@@ -246,8 +554,8 @@
                
             },
             
-            number_of_items(category) {
-               
+            
+            number_of_items(category) {               
                var   vm = this,
                      numberOfItems = 0;
                if(vm.shoppingCart.items) {
@@ -258,6 +566,29 @@
                   });
                }
                return numberOfItems;
+            },
+            
+            
+            update_cart_account(e, itemNumber) {
+               var   vm = this,
+                     _cartItem = {};
+                     
+               Object.entries(vm.shoppingCart.items).forEach((item) => {
+                  if(item[1].item_order_number == itemNumber) {
+                     _cartItem = item[1];
+                     
+                     // clear item form_error.element 
+                     
+                     if(e.target.value.length >1) {                     
+                        _cartItem.account[e.target.name] = e.target.value;
+                     } else {
+                        _cartItem.account[e.target.name] = '';
+                     }
+                        
+                     vm.$store.dispatch('update_shopping_cart', _cartItem).then(()=>{
+                     });
+                  }   
+               });
             },
             
             
@@ -292,9 +623,9 @@
                }
                
               // item.filter != 'discount' && item.filter != 'day'" v-if="after_date(priceBreak.startDate) && 
-               return truth;
-               
+               return truth;               
             },
+            
             
             edit_cart_item(itemNumber) {},
             
@@ -318,7 +649,7 @@
    
    .section.membership_purchasing {
       flex-wrap: wrap;
-      justify-content: center;
+      justify-content: space-between;
    }
    .membership_purchasing .section_title {
       justify-content: center;
@@ -328,13 +659,12 @@
       flex-wrap: wrap;
       min-width: 25rem;
       margin-top: 1rem;
-      padding: 0 2.5vw;
    }
    .membership_purchasing .componant.membership_pricing {
-      width: 60%;
+      width: 50%;
    }
    .membership_purchasing .componant.membership_purchase {
-      width: 40%;
+      width: 49%;
    }
    
    .membership_purchasing .componant .title {
@@ -472,7 +802,7 @@
       display: flex;
       flex-direction: column;      
       width: 100%;
-      max-width: 30rem;
+      max-width: 32rem;
       margin: 0 auto;
    }
    .membership_purchase .shopping_cart .cart_item {
@@ -480,7 +810,9 @@
       flex-direction: column;
       justify-items: center;
       position: relative;
+      background: rgba(255,255,255,.035);
       width: 100%;
+      padding: .5rem .75rem;
       min-height: 4rem;
    }
    .membership_purchase .shopping_cart .cart_item + .cart_item {
@@ -489,30 +821,180 @@
       padding-top: 1rem;
    }
    
-   
-   .membership_purchase .shopping_cart .cart_item_element {
+   .membership_purchase .cart_item .row {
       display: flex;
-      width: calc(100% - 7rem);
+      justify-content: space-between;
+      flex-wrap: wrap;
+   } 
+   
+   .membership_purchase .shopping_cart .cart_item .header {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
    }
+   .membership_purchase .shopping_cart .cart_item .header .description {
+      display: flex;
+      flex-wrap: wrap;
+      font-size: 1.15rem;
+      font-weight: 300;
+      margin: .5rem 0;
+      text-transform: uppercase;
+      border-bottom: solid 2px var(--borderColor);
+      line-height: 1.1em;
+      width: calc(100% - 4rem);
+   }
+   .membership_purchase .shopping_cart .cart_item .header .age {
+      display: flex;
+      justify-content: flex-end;
+      
+      
+      width: 4rem;
+   }
+   
+   
+   
+   
+   .membership_purchase .cart_item .row .control_link {
+      display: flex;
+      cursor: pointer;
+      font-size: .95rem;
+      margin-top: .5rem;
+      color: var(--titleColor);
+   }
+   .membership_purchase .cart_item .row .remove:hover {
+      color: var(--highlightColor);
+   }
+   .membership_purchase .cart_item .row .member {
+      padding: 0 0 0 .5rem;
+   } 
+   .membership_purchase .cart_item .row .member .additional {
+      display: flex;
+      flex-wrap: wrap;
+      max-height: 0;
+      transition: max-height .3s;
+      overflow: hidden;
+      width: 100%;      
+   }
+   .membership_purchase .cart_item .row .member .additional.show {
+      max-height: 6rem;
+   }
+   .membership_purchase .cart_item .row .wrapper_title {
+      font-weight: 300;
+      max-height: 3rem;
+      padding: .5rem 0;
+      overflow: hidden;
+      transition: max-height .3s, padding .3s;
+   } 
+   .membership_purchase .cart_item .row .wrapper_title.hide {
+      max-height: 0;
+      padding: 0;
+   } 
+   
+   .membership_purchase .cart_item .row .control_button {
+   }
+   
+   .membership_purchase .shopping_cart .item_element {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+   }
+   .membership_purchase .shopping_cart .item_element.member {
+      width: 70%;
+   }
+   .membership_purchase .shopping_cart .item_element.price {
+      width: 30%;
+      padding: 1rem;
+   }
+   .membership_purchase .shopping_cart .item_element.price .value,
+   .membership_purchase .shopping_cart .item_element.price .remove {
+      display: flex;
+      width: 100%;
+      justify-content: flex-end;
+   }
+   
+   
+   
+   
+   
+   
+   .membership_purchase .shopping_cart .item_element .cart_info .age {
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+   }
+   .membership_purchase .shopping_cart .item_element .cart_info .age .label {
+      color: inherit;
+      width: auto;
+   }
+   
    .membership_purchase .shopping_cart .cart_item .description {
       display: flex;
       flex-wrap: wrap;
-      width: 20rem;
+      font-size: .9rem;
    }
    .membership_purchase .shopping_cart .price {
       display: flex;
       width: 7rem;
       justify-content: flex-end;
       padding: 0 .5rem;
+      font-size: 1.25rem;
    }
    
-   .membership_purchase .shopping_cart .cart_item .buttons {
+   
+   
+   .membership_purchase .shopping_cart .info_form {
       display: flex;
-      justify-content: space-between;
-      position: absolute;
-      right: 0;
-      width: 7rem;
+      width: 100%;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .4s;
    }
+   .membership_purchase .shopping_cart .info_form.show {
+      max-height: 25rem;
+      overflow: auto;
+   }
+   .membership_purchase .shopping_cart .info_form .form_wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .3s;
+   }
+   .membership_purchase .shopping_cart .info_form.show .form_wrapper {
+      max-height: 50rem;
+   }
+   
+   
+   .membership_purchase .shopping_cart .info_form .email_check {
+      display: flex;
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: 2rem;
+   }
+   .membership_purchase .shopping_cart .info_form .email_check .icon {
+      color: var(--warningColor);
+      cursor: pointer;
+      z-index: 10;
+   }
+   .membership_purchase .shopping_cart .info_form .email_check .message {
+      position: absolute;
+      top: 0;
+      right: -30rem;
+      width: 30rem;
+      font-size: .85rem;
+      background: #4f0202;
+      color: var(--highlightColor);
+      padding: .15rem .5rem;
+      display: flex;
+      justify-content: flex-start;
+      transition: right .5s;
+   }   
+   .membership_purchase .shopping_cart .info_form .email_check .icon:hover ~.message {
+      right: 3rem;
+   }
+   
    
 	
 	</style>

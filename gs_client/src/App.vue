@@ -1680,6 +1680,7 @@
 			jsutify-content: center;
 		}
 		.text_box,
+		input[type="number"],
 		input[type="text"],
 		.select,
 		.textarea {
