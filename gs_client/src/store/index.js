@@ -15,7 +15,16 @@
 	Vue.use(Router);
 	Vue.use(Vuex);
 	Vue.use(VueAxios, Axios);
-	
+   
+   const newCart = {
+      'amount' : 0,
+      'transaction' : '',
+      'items': [
+     
+      ]
+   } 
+      
+      
 	const state = {
 		account        : {},
       adminPermissions: {},
@@ -57,7 +66,7 @@
       schedulingAreas: {},
       schedulingPermissions: {},
 		showMenu       : false,
-      shoppingCart   : {},
+      shoppingCart   : newCart,
       siteContent    : siteContent, 
 		siteSettings   : {},
 		staffPositions : {},
@@ -385,6 +394,16 @@
          });
       },
       
+      get_cart_account({commit}, uuid) {
+         return new Promise ((resolve, reject) => { 
+            Axios.post(apiDomain+'_get_cart_account', {'uuid' : uuid}, {
+                  headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+               }).then((response)=>{
+               resolve(response.data.user);
+            });
+         });
+      },
+      
       /* ----------------------------------------------------------
                      GET LINK CODE
          ----------------------------------------------------------  */
@@ -626,8 +645,9 @@
 		// GET REGISTRATION REPORT
 		get_reg_report({commit}, selectedCon) {
          selectedCon? '' : selectedCon = state.currentCon.tag_name;
-			Axios.post(apiDomain+'_get_reg_report', {'selectedCon': selectedCon}, {headers : 
-            {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}}).then((response) => {
+			Axios.post(apiDomain+'_get_reg_report', {'selectedCon': selectedCon}, {
+            headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+         }).then((response) => {
 				commit('set_reg_report',{ regReport: response.data.regReport });   
             commit('set_reg_reports', {regReports: response.data});
 			},(err) => {
@@ -651,6 +671,15 @@
          },
          
          
+         submit_checkout({commit}, shoppingCart) {
+         Axios.post(apiDomain+'_submit_checkout', {cart: shoppingCart}, { 
+               headers: {'Content-Type': 'application/x-www-form-urlencoded;charset-UTF-8'}
+            }).then((response)=> {
+                  console.log(response.data);
+            }, (err) =>{
+                  console.log(err.statusText);
+            });
+         },
          
          
       
@@ -707,16 +736,17 @@
 		},
       
       // CHECK EMAIL
-      check_email({commit}, emailData) {
-         
+      check_email({commit}, emailData) {         
          if(emailData.email.indexOf('@') >-1) {
-
-            Axios.get(apiDomain+'_check_email', {params: {email : emailData.email}}).then((response) => {
-               commit('set_check_email', {orderNumber: emailData.orderNumber, users:response.data.users});
+            return new Promise((resolve,reject) => {
+               Axios.get(apiDomain+'_check_email', {params: {email : emailData.email}}).then((response) => {
+                  commit('set_check_email', {orderNumber: emailData.orderNumber, users:response.data.users});
+                  resolve(response);
+               });
             });
-               
          }
       },
+      
       
       update_schedulers({commit}, scheduler) {         
          var vm = this,
@@ -1099,19 +1129,27 @@
       
       // CHECK SET EMAILS
       set_check_email(state, emailData) {
-         var vm = this;
-         let items = state.shoppingCart.items;
-         Object.entries(emailData.users).forEach((user) => {
-            user[1].last_initial = user[1].last_name.substring(0,1).toUpperCase();
-            
-            Object.entries(items).forEach((item)=>{               
-               if(item[1].item_order_number == emailData.orderNumber) { 
-                  item[1].checkedEmail = emailData.users;
-                  item[1].submitErrors.email = 1;
-               };
-            });
-            Vue.set(state.shoppingCart, 'items', items);
+         var   vm = this;
+         let   items = state.shoppingCart.items;
+          
+         Object.entries(items).forEach((item) => {
+            if(item[1].item_order_number == emailData.orderNumber) {
+               if(emailData.users[0]) {
+                  Object.entries(emailData.users).forEach((user) => {
+                     user[1].last_initial = user[1].last_name.substring(0,1).toUpperCase();
+               
+
+                     item[1].checkedEmail = emailData.users;
+                     item[1].submitErrors.email = '1';
+                  });
+               } else {
+                  item[1].checkedEmail = null;
+                  item[1].submitErrors.email = '0';
+               }
+            }
          });
+         
+         Vue.set(state.shoppingCart, 'items', items);
       },
 		
 		
@@ -1229,66 +1267,148 @@
          Vue.set(state, 'storeItems', items);         
       }, 
 
+
       
       set_shopping_cart_update: (state, item) => {
-         let   foundItem = false,
-               option = '';
+         // check to see if existing item or new item and update cart accordingly
+         let cartAmount = 0;
+         
+         if(item.item_order_number) {
+            // update
+            
+         } else if (item.purchase == 'false') { 
+            // remove
+            console.log('REMOVE ITEM');
+            
+         } else {
+            //create
+            let   cartItem = {
+              'type' : '',
+               'category':'',
+               'filter':'',
+               'description':'',
+               'long_description':'',
+               'price':0,
+               'account': {
+                  'uuid':'',
+                  'first_name':'',
+                  'last_name':'',
+                  'email':'',
+                  'phone':'',
+                  'address':'',
+                  'address2':'',
+                  'state':'',
+                  'city':'',
+                  'zip':'',
+                  'membership_description': '',
+                  'age':''
+               },
+               'item_order_number':'',
+               'account_option':'',
+               'submitErrors':{}
+            },
+            randChars = 'ABCDEFGHJKMNPQRSTUVWXYZ0123456789_.&%-',
+            randString = '';
                   
-         if(!item.item) {            
-            item.item={
-               type        : 'membership',
-               category    : item.category,
-               uuid        : item.uuid,
-            };
-         }
-         
-         
-         state.shoppingCart.items? '' : Vue.set(state.shoppingCart, 'items', []);
-         
-         Object.entries(state.shoppingCart.items).forEach((cartItem) => {
-            if(item.type == 'membership') {  
-               if(cartItem[1].item_order_number == item.item_order_number) {
-                  foundItem = true;
-                  switch(item.purchase) {
-                     case true:
-                        state.shoppingCart.items[cartItem[0]] = item.item;
-                        break;
-                        
-                     case false:
-                        delete state.shoppingCart.items[cartItem[0]];
-                        break;
-                  }
-               } 
-               
-               
-            } else if(item.type == 'merch') {
-               console.log('no merch function in update-cart function');
-            }            
-         });
-         if(!foundItem) {
-            var   randChars = 'ABCDEFGHJKMNPQRSTUVWXYZ0123456789',
-                  randString = '';
+                  
             for(var i = 0; i<= 5; i++) {
                randString += randChars.charAt(Math.floor(Math.random() * randChars.length));               
             }
-            
-            delete item.start_date;
-            delete item.id;
-            delete item.end_date;
-            delete item.created_at;
-            delete item.store_active;
-            item.item_order_number = state.currentCon.tag_name+'-'+ randString;
                         
-            state.user.uuid? item.account_option = 'options' : item.account_option = '';
+            cartItem.type              = item.item.type;
+            cartItem.category          = item.item.category;
+            cartItem.filter            = item.item.filter;
+            cartItem.desription        = item.item.description;
+            cartItem.price             = item.item.price;
+            cartItem.item_order_number = state.currentCon.tag_name+'-'+ randString;
+            cartItem.account           = item.account;
             
-            item.submitErrors = {};
-            
-            state.shoppingCart.items.push(item);
-         } 
+            state.shoppingCart.items.push(cartItem);
+         }
          
+         
+         
+         
+         
+         
+         
+         
+         
+         // RECALC CART AMOUNT
+         Object.entries(state.shoppingCart.items).forEach((cartItem) =>{
+            cartAmount = parseInt(cartAmount) + cartItem[1].price;            
+         });
+         state.shoppingCart.amount = cartAmount;
+         
+         
+         
+         // clean-up empty items
          state.shoppingCart.items = state.shoppingCart.items.filter(v => v);
-         //console.log(JSON.stringify(state.shoppingCart));
          state.shoppingCart.items.length <=0? delete state.shoppingCart.items : '';
+         
+         
+         
+         
+         //console.log(JSON.stringify(state.shoppingCart));
+         
+         
+         
+         
+         // let   foundItem = false,
+               // option = '';
+                  
+         // if(!item.item) {
+            // item.item= newCartItem;
+            // item.item.type    = 'membership';
+            // item.item.category= item.category;
+         // }
+         
+         // state.shoppingCart.items? '' : Vue.set(state.shoppingCart, 'items', []);
+         
+         // Object.entries(state.shoppingCart.items).forEach((cartItem) => {
+            // if(item.type == 'membership') {  
+               // if(cartItem[1].item_order_number == item.item_order_number) {
+                  // foundItem = true;
+                  // switch(item.purchase) {
+                     // case true:
+                        // state.shoppingCart.items[cartItem[0]] = item.item;
+                        // break;
+                        
+                     // case false:
+                        // delete state.shoppingCart.items[cartItem[0]];
+                        // break;
+                  // }
+               // } 
+               
+               
+            // } else if(item.type == 'merch') {
+               // console.log('no merch function in update-cart function');
+            // }            
+         // });
+         // if(!foundItem) {
+            // var   randChars = 'ABCDEFGHJKMNPQRSTUVWXYZ0123456789',
+                  // randString = '';
+            // for(var i = 0; i<= 5; i++) {
+               // randString += randChars.charAt(Math.floor(Math.random() * randChars.length));               
+            // }
+            
+            // delete item.start_date;
+            // delete item.id;
+            // delete item.end_date;
+            // delete item.created_at;
+            // delete item.store_active;
+            // item.item_order_number = state.currentCon.tag_name+'-'+ randString;
+                        
+            // state.user.uuid? item.account_option = 'options' : item.account_option = '';
+            
+            // item.submitErrors = {};
+            
+            // state.shoppingCart.items.push(item);
+         // } 
+         
+        
+         
+         
       },
 	}
 	

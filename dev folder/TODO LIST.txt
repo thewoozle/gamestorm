@@ -1,6 +1,8 @@
   
       
       WIP
+         checkout cart
+         - remove item, update item, pretify cart display
       
       TODO
 
@@ -8,7 +10,7 @@
          add info and connect views
          
       LOGIN
-         change login to set time in local storage and check against that, asking to log-in
+         don't show password on login
          
       PURCHASE MEMBERSHIPS
          [

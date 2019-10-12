@@ -38,7 +38,7 @@
                            <span class="text" v-text="item.description"></span>
                            <span class="price" v-text="'$'+item.price+'.00'"></span>
                            <div class="option_purchase">
-                              <button class="option_add fal fa-plus-square" @click.prevent="update_items({type: 'membership',account: {}, item: item})" ></button>
+                              <button class="option_add fal fa-plus-square" @click.prevent="update_items({account: {}, item: item})" ></button>
                               <span class="option_amount" v-text="number_of_items(item.category)"></span>
                            </div>
                         </div> 
@@ -47,7 +47,7 @@
                            <span class="text" >{{item.description}} <span class="detail">(discounted price, only available through {{day_date(item.end_date)}})</span></span>
                            <span class="price" v-text="'$'+item.price+'.00'"></span>
                            <div class="option_purchase">
-                              <button class="option_add fal fa-plus-square" @click.prevent="update_items({type: 'membership', account: {}, item: item})" ></button>
+                              <button class="option_add fal fa-plus-square" @click.prevent="update_items({account: {}, item: item})" ></button>
                               <span class="option_amount" v-text="number_of_items(item.category)"></span>
                            </div>
                         </div> 
@@ -61,7 +61,7 @@
                            <span class="price" v-text="'$'+item.price+'.00'"></span>
                            
                            <div class="option_purchase disabled">
-                              <button disabled class="option_add  fal fa-plus-square " title="remove this item" @click.prevent="update_items({type: 'membership',account: {}, item: item})" ></button>
+                              <button disabled class="option_add  fal fa-plus-square " title="remove this item" @click.prevent="update_items({account: {}, item: item})" ></button>
                               <span class="option_amount" v-text="number_of_items(item.category)"></span>
                            </div>
                         </div>
@@ -148,34 +148,33 @@
                                     
                                     
                                     
-      <form class="cart_member_form"  @submit.prevent="submit_new_form"  >
+      <form class="cart_member_form"    >
          <div class="form_wrapper" >      
          
             <div class="form_row email_check_row">
                <label for="last_name">Email</label>
                <div class="input_wrapper">
-                  <input class="input text_box" type="text" name="email" id="email"   v-model="cartItem.account.email" required @keyup="check_email(cartItem.item_order_number, cartItem.account.email); cartItem.submitErrors.email = null"/>
+                  <input class="input text_box" type="text" name="email" id="email"   v-model="cartItem.account.email" required @keyup="check_email(cartItem.item_order_number, cartItem.account.email);"/>
                </div>
                
-               <div v-if="cartItem.checkedEmail" class="email_check">
-                  <span class="icon fas fa-user-plus" :title="'This email address has '+cartItem.checkedEmail.length +' user accounts associated with it. You can use the SIGN-IN HELP link to set or reset the accounts password(s) or continue creating a new user account. '" >
+               <div v-if="cartItem.checkedEmail " class="email_check fail">
+                  <span class="icon fas fa-user-plus"  :title="'This email address already in use'" >
                   </span> 
                   <p class="message">
                      This email address has {{cartItem.checkedEmail.length}} user account{{cartItem.checkedEmail.length >1? 's' : ''}} associated with it. 
-                     You can use the SIGN-IN link to access your account or choose to purchase this membership for <span v-text="cartItem.checkedEmail.length >1? 'one of the members using this email address' : 'the member using this email address'">.
+                     You can use the SIGN-IN link to access your account and link their accounts to yours for your membership purchase. You may also choose to purchase this membership for 
+                     <span v-text="cartItem.checkedEmail.length >1? 'one of the members using this email address' : 'the member using this email address'"></span> from this list: 
+                     <select class="select" @change.prevent="select_account_option($event, cartItem) ">
+                        <option value="" style="display: none;">select...</option>
+                        <option v-bind:value="email.uuid" v-for="email in cartItem.checkedEmail">{{email.first_name +' '+email.last_initial}} {{email.age != null? 'age: '+email.age : ''}}</option>
+                     </select> 
                      You may also enter the information for a new member, sharing this email address. </span>
                   </p>
                </div>
                
-               
-               
-               <div v-else="cartItem.submitErrors.email == 0" class="email_check">
-                  <span class="icon fal fa-thumbs-up" title="This email address is not in use" ></span> 
-               </div>
-               
-               
-               
-               <span class="input_message" v-bind:class="cartItem.submitErrors.email? 'show' : ''" v-text="cartItem.submitErrors.email"></span> 			
+               <div v-else  class="email_check ">
+                  <span v-if="cartItem.submitErrors.email == '0'" class="icon fal fa-thumbs-up" title="This email address is not in use" ></span> 
+               </div>               
             </div>
             
             
@@ -277,9 +276,6 @@
             
             <p>All information will be confidential and used only in relation to having website access and for convention membership. </p>
             
-            <div class="form_row controls">
-               <button type="submit" class="button">Submit</button>			
-            </div>
          </div>
             
       </form>
@@ -291,10 +287,10 @@
                                  </div>
                               </div>
                               
-                              <span class="total_price" v-if="totalCartPrice > 0" v-text="'$'+totalCartPrice+'.00'"></span>
+                              <span class="total_price"  v-text="'$'+shoppingCart.amount+'.00'"></span>
                            
                               <div class="controls">
-                                 <button class="button" >Checkout</button>
+                                 <button class="button" @click.prevent="submit_checkout()" >Checkout</button>
                               </div>
                            </div>
                            <p v-else>no items in cart</p>
@@ -390,15 +386,6 @@
                shoppingCart: 'shoppingCart', 
             }),
             
-            totalCartPrice() {
-               var   vm = this,
-                     total = null;
-               
-               Object.entries(vm.shoppingCart.items).forEach((item) => {
-                  item[1].item.price > 0? total += item[1].item.price : '';
-               });
-               return total;
-            },
 			},
 			
 			created() {
@@ -459,30 +446,24 @@
                
                 if(event.target.value) { 
                   vm.showInfoForm = false;
-                  
-                  // set cart item account as linked-member account from event.target.value 
-                  Object.entries(vm.linkedAccounts).forEach((account) =>{
-                     if(account[1].uuid == event.target.value) { _cartItem.account = account[1]; }
-                  });
+                  // if a linked account
+                  if(vm.linkedAccounts) { 
+                     // set cart item account as linked-member account from event.target.value 
+                     Object.entries(vm.linkedAccounts).forEach((account) =>{
+                        if(account[1].uuid == event.target.value) { _cartItem.account = account[1]; }
+                     });
+                  // if NOT a linked account   
+                  } else {
+                     let uuid = event.target.value;
+                     
+                     // get account by uuid
+                     vm.$store.dispatch('get_cart_account', event.target.value).then((response)=>{
+                        _cartItem.account = response;
+                     });      
+                  } 
                   vm.$store.dispatch('update_shopping_cart', _cartItem).then(()=>{
                      vm.showInfoForm = item.item_order_number;
-                  });
-                  
-                  // Object.entries(vm.shoppingCart.items).forEach((item) =>{
-                     // if(item[1].item_order_number == itemNumber) {
-                        // Object.entries(vm.linkedAccounts).forEach((account) =>{
-                           // console.log('update account');
-                           // _cartItem.type = 'membership',
-                           // _cartItem.account = account[1];
-                           // _cartItem.uuid = account[1].uuid;
-                           // //account[1].uuid == event.target.value? item[1].account = account[1]: '';
-                           // vm.$store.dispatch('update_shopping_cart', _cartItem).then(()=>{
-                           // });
-                           
-                        // });
-                     // }
-                  // });
-                  
+                  });   
                } else { 
                _cartItem.account = {uuid: ''};
                _cartItem.uuid = '';
@@ -560,8 +541,8 @@
                      numberOfItems = 0;
                if(vm.shoppingCart.items) {
                   Object.entries(vm.shoppingCart.items).forEach((item) => {
-                     if(item[1].item.category) {
-                        item[1].item.category == category? numberOfItems ++ : '';
+                     if(item[1].category) {
+                        item[1].category == category? numberOfItems ++ : '';
                      }                     
                   });
                }
@@ -629,6 +610,7 @@
             
             edit_cart_item(itemNumber) {},
             
+            
             // REMOVE CART ITEM
             remove_cart_item(item) {
                var   vm = this;
@@ -640,6 +622,21 @@
                   });
                }
             },
+            
+            
+            // SUBMIT CHECKOUT
+            submit_checkout() {
+               var vm = this;
+               
+               Object.entries(vm.shoppingCart.items).forEach((item) =>{    
+                  if(vm.shoppingCart) {
+                     vm.$store.dispatch('submit_checkout', vm.shoppingCart).then((response)=>{
+                        
+                     });
+                  }
+               }); 
+               
+            }
 			}			
 		}
 	</script>
@@ -962,6 +959,7 @@
    }
    .membership_purchase .shopping_cart .info_form.show .form_wrapper {
       max-height: 50rem;
+      padding-top: 1rem;
    }
    
    
@@ -969,31 +967,46 @@
       display: flex;
       position: absolute;
       top: 0;
-      right: 0;
+      right: .75rem;
+      color: var(--passColor);
       height: 100%;
       width: 2rem;
    }
-   .membership_purchase .shopping_cart .info_form .email_check .icon {
+   .membership_purchase .shopping_cart .info_form .email_check.fail {
       color: var(--warningColor);
+   }
+   .membership_purchase .shopping_cart .info_form .email_check .icon {
+      color: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
       z-index: 10;
+      width: 100%;
+      transition: color .5s;
    }
    .membership_purchase .shopping_cart .info_form .email_check .message {
+      display: inline-block;
       position: absolute;
-      top: 0;
-      right: -30rem;
-      width: 30rem;
-      font-size: .85rem;
-      background: #4f0202;
-      color: var(--highlightColor);
-      padding: .15rem .5rem;
-      display: flex;
-      justify-content: flex-start;
+         top: -1rem;
+         right: -35rem;
+      width: 29rem;
+      font-size: 1.1;
+      font-weight: 400;
+      background: var(--altBackground2);
+      color: var(--textColor4);
+      padding: .75rem .5rem;
       transition: right .5s;
    }   
-   .membership_purchase .shopping_cart .info_form .email_check .icon:hover ~.message {
-      right: 3rem;
+   .membership_purchase .shopping_cart .info_form .email_check:hover .message {
+      right: 0;
+   }   
+   .membership_purchase .shopping_cart .info_form .email_check_row {
+      position: relative;
+      z-index: 10;
    }
+   
+   
    
    
 	

@@ -7,4 +7,18 @@
       xampp/htodcs/gamestorm/gs_client - npm run dev 
       
       
+   paypal account sandbox:
+   
+   https://medium.com/justlaravel/how-to-integrate-paypal-payment-gateway-in-laravel-695063599449
+   https://github.com/paypal/PayPal-PHP-SDK/wiki/Making-First-Call
+   
+   
+   mmcguire testing: 
+      email: sb-sc3cp341722@business.example.com
+      pass: 1f%B"f1O
       
+      clientID:
+      ATufJRcU7JeB6B0IDxKEIAPT2H15TWJU4XkgD1oNJP--tnn5IGlB4DFKhq7_8awDylXKYZUOIXKwuQOX
+      
+      secret: 
+      EGr4_z7ipEO8k_7oL6_fxXrwmY-B6zR6eJ9Zu523X-SGsfvEJu0XHRzpezOgX9P3AcsLBoSkzaqlaEi-
