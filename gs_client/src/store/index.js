@@ -9,7 +9,7 @@
 	import {apiDomain} from '../config'
 	
 	import { siteContent } from './site_content'
-   import {statesList, eventDuration, experienceLevels } from './lists'
+   import { statesList, eventDuration, experienceLevels } from './lists'
    import { devNotes } from './dev_notes'
 	
 	Vue.use(Router);
@@ -23,6 +23,8 @@
      
       ]
    } 
+   
+   
       
       
 	const state = {
@@ -47,6 +49,7 @@
       eventTypes     : {},
       experienceLevels: experienceLevels,
 		galleryData    : {},
+      guestGmList    : [],
       linkCode       : null,
       linkedAccounts : {},
 		liveEvents     : {},
@@ -472,6 +475,16 @@
       
       
 		/* -----------------------------------------------------------
+                  CLEAR SUBMIT ERROR in cart 
+         ----------------------------------------------------------- */
+         clear_submit_error({commit}, data) {
+            commit('clear_submit_error', data);
+         },
+         
+         
+         
+      
+		/* -----------------------------------------------------------
                   GALLERY DATA 
          ----------------------------------------------------------- */
 		get_gallery_data({commit}, selectedCon) {
@@ -656,6 +669,13 @@
 		},
       
       
+		/*-----------------------------------------------------------
+                  SEND GUEST GM INVITES
+      ----------------------------------------------------------- */
+      send_guest_gm_invites({commit}, gmList) {
+         Axios.post(apiDomain+'_guest_gm_emails').then((response) => {            
+         });
+      },
       
       
       
@@ -671,14 +691,60 @@
          },
          
          
-         submit_checkout({commit}, shoppingCart) {
-         Axios.post(apiDomain+'_submit_checkout', {cart: shoppingCart}, { 
-               headers: {'Content-Type': 'application/x-www-form-urlencoded;charset-UTF-8'}
-            }).then((response)=> {
-                  console.log(response.data);
-            }, (err) =>{
-                  console.log(err.statusText);
+         
+         submit_checkout({commit}) {
+            var   vm = this,
+                  cartSuccess = true;
+            return new Promise((resolve, reject)=>{
+               // validate cart information and return 
+               if(state.shoppingCart.items) {
+                  
+                  Object.entries(state.shoppingCart.items).forEach((item) => {
+                     var success = true;
+                  //each item, validate account, category, age, 
+                  // if pass, set 'pass' otherwise, set 'fail'
+                  
+                     if(!item[1].account.uuid) {
+                        success = false;
+                        item[1].submitErrors['account'] = 'Please select an account or fill-out the member information form';
+                     } 
+                     
+                     if(!success) { 
+                        cartSuccess = false;
+                        
+                        commit('set_shopping_cart_update', item[1]);
+                     }
+                  });
+                  
+                  
+                  // if everything is good, resolve 'success' and proceed to checkout
+                  if(cartSuccess) {
+                     resolve('success');                  
+                  
+                  } else {
+                     // if cartSucess == false, show errors
+                    reject('fail');
+                  }
+                  
+               } else {
+                  // if cartSucess == false, show errors
+                 reject('fail');
+               }
+               
             });
+            
+            
+            
+            
+            
+            
+            // Axios.post(apiDomain+'_submit_checkout', {cart: state.shoppingCart}, { 
+               // headers: {'Content-Type': 'application/x-www-form-urlencoded;charset-UTF-8'}
+            // }).then((response)=> {
+                  // console.log(response.data);
+            // }, (err) =>{
+                  // console.log(err.statusText);
+            // });
          },
          
          
@@ -1268,20 +1334,47 @@
       }, 
 
 
+      clear_submit_error: (state, data) => {         
+         Object.entries(state.shoppingCart.items).forEach((item) => {
+            if(item[1].item_order_number == data.item_order_number) {
+               delete item[1].submitErrors[data.field];
+            }
+         });         
+      },
+      
       
       set_shopping_cart_update: (state, item) => {
          // check to see if existing item or new item and update cart accordingly
-         let cartAmount = 0;
-         
-         if(item.item_order_number) {
-            // update
+         let   cartAmount = 0,
+               removeIndex = null;
+               
+         if(item.purchase == false) {
+            // REMOVE
+            if(state.shoppingCart.items) {
+               Object.entries(state.shoppingCart.items).forEach((cartItem)=>{               
+                  if(cartItem[1].item_order_number== item.item_order_number) {
+                     removeIndex = cartItem[0]
+                  }
+               });
+               
+               delete state.shoppingCart.items[removeIndex]
+               state.shoppingCart.items = state.shoppingCart.items.filter(v => v);
+               state.shoppingCart.items.length <=0? delete state.shoppingCart.items : '';
             
-         } else if (item.purchase == 'false') { 
-            // remove
-            console.log('REMOVE ITEM');
+            }
+         } else if (item.item_order_number) { 
+            // UPDATE
+            console.log("UPDATE", item);
+            Object.entries(state.shoppingCart.items).forEach((cartItem)=>{
+               if(cartItem[1].item_order_number== item.item_order_number) {                  
+                  cartItem[1] = item;
+               }
+            });
             
          } else {
             //create
+            if(!state.shoppingCart.items) {state.shoppingCart.items = []; }
+            
             let   cartItem = {
               'type' : '',
                'category':'',
@@ -1308,21 +1401,19 @@
                'submitErrors':{}
             },
             randChars = 'ABCDEFGHJKMNPQRSTUVWXYZ0123456789_.&%-',
-            randString = '';
-                  
-                  
+            randString = '';                  
             for(var i = 0; i<= 5; i++) {
                randString += randChars.charAt(Math.floor(Math.random() * randChars.length));               
             }
                         
-            cartItem.type              = item.item.type;
-            cartItem.category          = item.item.category;
-            cartItem.filter            = item.item.filter;
-            cartItem.desription        = item.item.description;
-            cartItem.price             = item.item.price;
+            cartItem.type              = item.type;
+            cartItem.category          = item.category;
+            cartItem.filter            = item.filter;
+            cartItem.desription        = item.description;
+            cartItem.price             = item.price;
             cartItem.item_order_number = state.currentCon.tag_name+'-'+ randString;
-            cartItem.account           = item.account;
-            
+            //cartItem.account           = item.item.account;
+            if(!state.shoppingCart.items) {state.shoppingCart.items={}; }
             state.shoppingCart.items.push(cartItem);
          }
          
@@ -1330,14 +1421,15 @@
          
          
          
-         
-         
-         
-         
          // RECALC CART AMOUNT
-         Object.entries(state.shoppingCart.items).forEach((cartItem) =>{
-            cartAmount = parseInt(cartAmount) + cartItem[1].price;            
-         });
+         if(state.shoppingCart.items) {
+            Object.entries(state.shoppingCart.items).forEach((cartItem) =>{
+               cartAmount = parseInt(cartAmount) + cartItem[1].price;            
+            });
+            
+         } else {
+            state.shoppingCart.items = [];
+         }
          state.shoppingCart.amount = cartAmount;
          
          

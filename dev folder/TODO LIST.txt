@@ -2,7 +2,7 @@
       
       WIP
          checkout cart
-         - remove item, update item, pretify cart display
+         - update item, pretify cart display
       
       TODO
 

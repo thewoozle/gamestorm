@@ -60,11 +60,15 @@
                
                
 					<!-- GUEST GM LIST SLIDE-IN -->
-					<div class="slide_in transaction_history" :class="showGuestGms? 'show' : ''">
+					<div class="slide_in guest_gms" :class="showGuestGms? 'show' : ''">
 						<button class="close_button fal fa-times" type="button" @click.prevent="showGuestGms? showGuestGms = false : showGuestGms = true" ></button>
                
-               GUEST GMS LIST<br />
-               select list of guest gms with slider and search, with list below
+                  <span class="title guest_gm_title">Members with Guest GM credit</span>
+                  <div class="guest_gm_list">
+                     <span class="guest_gm" v-for="gm in guest_gm_list" v-text="gm.first_name+' '+gm.last_name"></span>
+                  </div>
+                  
+                  <button class="button" @click.prevent="$store.dispatch('send_guest_gm_invites')">send email blast</button>
                
                </div>
 					
@@ -407,7 +411,7 @@
 				
 				<section class="section reg_list" >			
 					<div class="section_content ">
-                  <span class="update_status" v-text="memberPercent+'%'"></span>
+                  <span class="update_status" :class="memberPercent>=100? 'done' : ''" v-text="memberPercent+'%'"></span>
 						<span class="loading"  :class="memberPercent<100? 'show' : ''">Loading... </span>
 					
 						<div class="search_panel">
@@ -540,6 +544,16 @@
 					}
 					
 				},
+            
+            guest_gm_list: function() {
+               var   vm = this,
+                     list = [];
+                     
+               Object.entries(vm.members).forEach((member) => {
+                  member[1].membership_credit? list.push(member[1]) : '';
+               });
+               return list;
+            },
 				
 				
 				
@@ -951,6 +965,27 @@
 				right: 0;
 			margin: -1px;	
 		}
+      
+      
+		.section.reg_panel .guest_gms {
+         
+      }
+		.section.reg_panel .guest_gms .guest_gm_list{
+         display: flex;
+         width: 100%;
+         padding: .5rem .5rem .5rem 1.5rem;
+         border-radius: .25rem;
+         border: solid 1px rgba(255,255,255,.15);
+         background: rgba(255,255,255,.05);
+         flex-direction: column;
+      }
+		.section.reg_panel .guest_gms .guest_gm {
+         display: flex;
+         width: 100%;
+         font-size: .75rem;
+      }
+      
+      
 		
 		.section.reg_panel .transactions {
 			display: flex;
@@ -1265,12 +1300,26 @@
 			padding: .25rem;
 			background: #2a2b2d;
 		}
+		.section + .section.reg_list {
+         margin-top: 0;         
+      }
 		.section.reg_list .section_content {
 			display:flex;
 			width: 100%;
+         max-height: 100%;
 			flex-direction: column;			
 		}
-		
+		.section.reg_list .update_status {
+         position: absolute;
+         top: -1rem;
+         left: 0;
+         font-size: .65rem;
+         opacity: .75;
+         transition: opacity .3s;
+      }
+		.section.reg_list .update_status.done {
+         opacity: .15;
+      }
 		.section.reg_list .loading {
 			display: flex;
 			align-items: center;
