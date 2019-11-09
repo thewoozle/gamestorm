@@ -25,6 +25,7 @@
 		methods: {
          
          
+         
          /*	----------------------------------------------------------- 
                      CHECK LOGGED IN	
             -----------------------------------------------------------	*/
@@ -49,6 +50,48 @@
 				e.target.classList.contains('show')? e.target.classList.remove('show') : e.target.classList.add('show');
 			},
          
+         
+         
+         /* -----------------------------------------------------------------------
+               SHOW STORE ITEMS
+            ----------------------------------------------------------------------- */
+         show_store_item(item, condition) {               
+            var vm = this;
+            let truth = false;               
+            // filter for 'day', 'discount', and dates               
+            switch (condition) {
+               case 'day':
+                  item.filter == 'day'? truth = true : '';
+                  break;
+                  
+               case 'discount':
+                  if(item.filter == 'discount' && vm.after_date(item.start_date) && vm.before_date(item.end_date) ) {
+                     truth = true;
+                  }
+                  break;
+               
+               case 'none':
+                  if(!item.filter) {
+                     if(item.start_date || item.end_date) {
+                        if(vm.after_date(item.start_date) && before_date(priceBreak.stopDate)) {
+                           truth = true;
+                        }
+                     } else {
+                        truth = true;
+                     }
+                  }
+            }
+            
+           // item.filter != 'discount' && item.filter != 'day'" v-if="after_date(priceBreak.startDate) && 
+            return truth;
+         },
+            
+            
+            
+            
+         /* -----------------------------------------------------------------------
+               DATE FUNCTIONS
+            ----------------------------------------------------------------------- */
 			event_date(date) {
             // Thursday, Mar 12th
             let formattedDate = '';
@@ -133,6 +176,16 @@
             return moment(moment()).isAfter(moment(targetDate));
          },
          
+         /* -----------------------------------------------------------------
+                  VALIDATE EMAIL
+            ----------------------------------------------------------------- */
+         validate_email(email) {
+            var pass = false;
+            if(email) {            
+               if(email.indexOf("@") >0 && email.indexOf(".") >0) { pass = true; }               
+            }
+            return pass;
+         },
          
          event_duration(startTime, endTime) {
             var returnTime, hours, minutes;

@@ -162,7 +162,7 @@
 			position: fixed;
 			top: 0;
 			left: -22rem;
-			z-index: 100;
+			z-index: 80;
 			width: 100%;
 			max-width: 22rem;
 			max-height: 100vh;

@@ -11,6 +11,7 @@
 	import { siteContent } from './site_content'
    import { statesList, eventDuration, experienceLevels } from './lists'
    import { devNotes } from './dev_notes'
+   import { testData } from './test_data'
 	
 	Vue.use(Router);
 	Vue.use(Vuex);
@@ -80,6 +81,8 @@
       userEvents     : null,
       userInfo       : {},
 		venues         : {},
+      
+      testData       : testData,
 	}
 	
 	const actions = {
@@ -468,9 +471,9 @@
             });         
       },
       
-      update_linked_account({commit}, info) {         
-         commit('set_linked_account', info.account);
-         commit('set_shopping_cart_update', info);
+      update_linked_account({commit}, item) {         
+         //commit('set_linked_account', info.account);
+         commit('set_shopping_cart_update', item);
       },
       
       
@@ -692,7 +695,7 @@
          
          
          
-         submit_checkout({commit}) {
+         submit_shopping_cart({commit}) {
             var   vm = this,
                   cartSuccess = true;
             return new Promise((resolve, reject)=>{
@@ -703,11 +706,21 @@
                      var success = true;
                   //each item, validate account, category, age, 
                   // if pass, set 'pass' otherwise, set 'fail'
-                  
-                     if(!item[1].account.uuid) {
+                     if(!item[1].account.last_name ||!item[1].account.email ) {
                         success = false;
-                        item[1].submitErrors['account'] = 'Please select an account or fill-out the member information form';
-                     } 
+                        item[1].submitErrors.account = 'Please select an account or fill-out the member information form';
+                     } else {
+                        delete item[1].submitErrors.account;
+                     }
+                     
+                     item[1].account.first_name.length >=2? delete item[1].submitErrors.first_name : item[1].submitErrors.first_name = 'first name required';
+                     item[1].account.last_name.length >=2? delete item[1].submitErrors.last_name : item[1].submitErrors.last_name = 'last name required';
+                     item[1].account.email.indexOf("@") >0 && item[1].account.email.indexOf(".") >0 ? delete item[1].submitErrors.email : item[1].submitErrors.email = 'email address required';
+                     item[1].account.address.length >=2? delete item[1].submitErrors.address : item[1].submitErrors.address = 'address required';
+                     item[1].account.state.length >=2? delete item[1].submitErrors.state : item[1].submitErrors.state = 'state required';
+                     item[1].account.city.length >=2? delete item[1].submitErrors.city : item[1].submitErrors.city = 'city required';
+                     item[1].account.zip.length >=2? delete item[1].submitErrors.zip : item[1].submitErrors.zip = 'postal code required';
+                     
                      
                      if(!success) { 
                         cartSuccess = false;
@@ -1210,7 +1223,7 @@
                   });
                } else {
                   item[1].checkedEmail = null;
-                  item[1].submitErrors.email = '0';
+                  delete item[1].submitErrors.email;
                }
             }
          });
@@ -1326,14 +1339,16 @@
       
       
       /* -------------------------------------------------------
-               SHOPPING / STORE EVENTS
-         -------------------------------------------------------  */
-         
+               SET STORE ITEMS
+         -------------------------------------------------------  */         
       set_store_items: (state, items)=> {
          Vue.set(state, 'storeItems', items);         
       }, 
 
 
+      /* -------------------------------------------------------
+               CLEAR SUBMIT ERROR
+         -------------------------------------------------------  */
       clear_submit_error: (state, data) => {         
          Object.entries(state.shoppingCart.items).forEach((item) => {
             if(item[1].item_order_number == data.item_order_number) {
@@ -1343,7 +1358,12 @@
       },
       
       
+      
+      /* -------------------------------------------------------
+               SET SHOPPING CART UPDATE
+         -------------------------------------------------------  */
       set_shopping_cart_update: (state, item) => {
+         console.log(item);
          // check to see if existing item or new item and update cart accordingly
          let   cartAmount = 0,
                removeIndex = null;
@@ -1362,59 +1382,65 @@
                state.shoppingCart.items.length <=0? delete state.shoppingCart.items : '';
             
             }
-         } else if (item.item_order_number) { 
+            
+         } else if (item.item_order_number ) { 
             // UPDATE
-            console.log("UPDATE", item);
             Object.entries(state.shoppingCart.items).forEach((cartItem)=>{
                if(cartItem[1].item_order_number== item.item_order_number) {                  
                   cartItem[1] = item;
                }
             });
             
+            
          } else {
             //create
-            if(!state.shoppingCart.items) {state.shoppingCart.items = []; }
+            var hasCartItem = false;
+            if(!state.shoppingCart.items) { state.shoppingCart.items = []; }
             
-            let   cartItem = {
-              'type' : '',
-               'category':'',
-               'filter':'',
-               'description':'',
-               'long_description':'',
-               'price':0,
-               'account': {
-                  'uuid':'',
-                  'first_name':'',
-                  'last_name':'',
-                  'email':'',
-                  'phone':'',
-                  'address':'',
-                  'address2':'',
-                  'state':'',
-                  'city':'',
-                  'zip':'',
-                  'membership_description': '',
-                  'age':''
-               },
-               'item_order_number':'',
-               'account_option':'',
-               'submitErrors':{}
-            },
-            randChars = 'ABCDEFGHJKMNPQRSTUVWXYZ0123456789_.&%-',
-            randString = '';                  
-            for(var i = 0; i<= 5; i++) {
-               randString += randChars.charAt(Math.floor(Math.random() * randChars.length));               
-            }
-                        
-            cartItem.type              = item.type;
-            cartItem.category          = item.category;
-            cartItem.filter            = item.filter;
-            cartItem.desription        = item.description;
-            cartItem.price             = item.price;
-            cartItem.item_order_number = state.currentCon.tag_name+'-'+ randString;
-            //cartItem.account           = item.item.account;
-            if(!state.shoppingCart.items) {state.shoppingCart.items={}; }
-            state.shoppingCart.items.push(cartItem);
+            Object.entries(state.shoppingCart.items).forEach((cartItem)=>{
+               if(item.account.uuid&& cartItem[1].account.uuid == item.account.uuid) {hasCartItem = true;}
+            }); 
+                 
+         
+            if(!hasCartItem) {
+               let   randChars = 'ABCDEFGHJKMNPQRSTUVWXYZ0123456789_.&%-',
+                     randString = '',
+                     cartItem = item;
+               
+               for(var i = 0; i<= 5; i++) {
+                  randString += randChars.charAt(Math.floor(Math.random() * randChars.length));               
+               }
+               cartItem.item_order_number = state.currentCon.tag_name+'-'+ randString;
+               cartItem.submitErrors = {};
+               cartItem.price = item.item.price;
+               
+               // cartItem = {
+                 // 'type'       : item.item.type,
+                  // 'category'  : item.item.category,
+                  // 'filter'    : item.item.filter,
+                  // 'description': item.item.description,
+                  // 'long_description':'',
+                  // 'price'     : item.item.price,
+                  // 'item_order_number':  state.currentCon.tag_name+'-'+ randString,
+                  // 'account_option':'',
+                  // 'submitErrors':{},               
+                  // 'account'   : {
+                     // 'uuid'      :'',
+                     // 'first_name':'',
+                     // 'last_name' :'',
+                     // 'email'     :'',
+                     // 'phone'     :'',
+                     // 'address'   :'',
+                     // 'address2'  :'',
+                     // 'state'     :'',
+                     // 'city'      :'',
+                     // 'zip'       :'',
+                     // 'membership_description': '',
+                     // 'age'       :''
+                  // }
+               // }
+               state.shoppingCart.items.push(cartItem);
+            }  
          }
          
          
@@ -1433,77 +1459,17 @@
          state.shoppingCart.amount = cartAmount;
          
          
-         
          // clean-up empty items
          state.shoppingCart.items = state.shoppingCart.items.filter(v => v);
          state.shoppingCart.items.length <=0? delete state.shoppingCart.items : '';
          
-         
-         
-         
-         //console.log(JSON.stringify(state.shoppingCart));
-         
-         
-         
-         
-         // let   foundItem = false,
-               // option = '';
-                  
-         // if(!item.item) {
-            // item.item= newCartItem;
-            // item.item.type    = 'membership';
-            // item.item.category= item.category;
-         // }
-         
-         // state.shoppingCart.items? '' : Vue.set(state.shoppingCart, 'items', []);
-         
-         // Object.entries(state.shoppingCart.items).forEach((cartItem) => {
-            // if(item.type == 'membership') {  
-               // if(cartItem[1].item_order_number == item.item_order_number) {
-                  // foundItem = true;
-                  // switch(item.purchase) {
-                     // case true:
-                        // state.shoppingCart.items[cartItem[0]] = item.item;
-                        // break;
-                        
-                     // case false:
-                        // delete state.shoppingCart.items[cartItem[0]];
-                        // break;
-                  // }
-               // } 
-               
-               
-            // } else if(item.type == 'merch') {
-               // console.log('no merch function in update-cart function');
-            // }            
-         // });
-         // if(!foundItem) {
-            // var   randChars = 'ABCDEFGHJKMNPQRSTUVWXYZ0123456789',
-                  // randString = '';
-            // for(var i = 0; i<= 5; i++) {
-               // randString += randChars.charAt(Math.floor(Math.random() * randChars.length));               
-            // }
-            
-            // delete item.start_date;
-            // delete item.id;
-            // delete item.end_date;
-            // delete item.created_at;
-            // delete item.store_active;
-            // item.item_order_number = state.currentCon.tag_name+'-'+ randString;
-                        
-            // state.user.uuid? item.account_option = 'options' : item.account_option = '';
-            
-            // item.submitErrors = {};
-            
-            // state.shoppingCart.items.push(item);
-         // } 
-         
-        
-         
-         
       },
 	}
 	
+   
+   
+   
+   
 	const getters = {
 		conventions		: state => state.conventions,
 		articles 		: state => state.articles,

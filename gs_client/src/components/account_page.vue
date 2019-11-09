@@ -1,6 +1,6 @@
 
 	<template>
-		<div class="component">
+		<div class="component" id="account_page">
          <div class="sections">	
                <section class="section account_section">
                   <div class="section_content main "  >	
@@ -155,10 +155,16 @@
                                        </span><span class="text" v-text="account.membership_description? account.membership_description : 'no membership'"></span>
                                     </span>
                                     <span class="element purchase">
-                                       <span class="purchase_membership fal" v-if="!account.membership_description" :class="account.purchase? 'fa-check-square' : 'fa-square' " @click.prevent="set_membership_purchase(account)" ></span>
+                                       <!--<span class="purchase_membership fal" v-if="!account.membership_description" :class="account.purchase? 'fa-check-square' : 'fa-square' " @click.prevent="set_membership_purchase(account)" ></span>-->
+                                       <select class="select" v-if="!account.membership_description" @change.prevent="set_membership_purchase($event, account.uuid)" >
+                                             <option value="" style="display: none" >membership type...</option>
+                                             <option value="" v-for="item in storeItems" v-if="show_store_item(item, 'none')" v-text="item.description + ' '+ '$'+item.price+'.00'" v-bind:value="item.id"></option>                                             
+                                             <option value="" v-for="item in storeItems" v-if="show_store_item(item, 'discount')" v-text="item.description + ' '+ '$'+item.price+'.00'" v-bind:value="item.id"></option>
+                                             <option value="" v-for="item in storeItems" v-if="show_store_item(item, 'day')" v-text="item.description + ' '+ '$'+item.price+'.00'" v-bind:value="item.id"></option>
+                                       </select>
                                     </span>
                                  </div>
-                              </div>                              
+                              </div>
                            </div>
                            
                            <router-link class="button" :to="'/membership'"  @click="scroll_to_top()" v-if="membershipPurchases" >Buy memberships</router-link>
@@ -252,9 +258,10 @@
          
          computed: {            
             ...mapState({
-                  currentCon     : 'currentCon',
-                  linkCode       : 'linkCode',
-                  linkedAccounts : 'linkedAccounts',
+               currentCon     : 'currentCon',
+               linkCode       : 'linkCode',
+               linkedAccounts : 'linkedAccounts',
+               storeItems  : 'storeItems',
             }),
          
             ...mapGetters({
@@ -266,23 +273,29 @@
          
          created() {
             var vm = this;
-            vm.get_user_info();
-            vm.get_link_code();
-            if(Object.keys(vm.linkedAccounts).length == 0) { vm.get_linked_accounts();}
+            if(vm.user.uuid) {
+               vm.$store.dispatch('get_user_info', {'uuid' : vm.user.uuid, 'selectedCon' : vm.currentCon.tag_name}).then(()=>{
+               });
+            
+               vm.$store.dispatch('get_link_code', vm.user.uuid).then(()=>{
+                 vm.$forceUpdate();
+               });
+            
+               if(Object.keys(vm.linkedAccounts).length == 0) { 
+                  vm.$store.dispatch('get_linked_accounts', vm.user.uuid).then(()=>{
+                    vm.$forceUpdate();
+                  });
+               
+                  vm.$store.dispatch('get_store_items').then(()=>{
+                     vm.$forceUpdate();
+                  });
+               }
+            } else {
+                  vm.$router.push('/');
+            }
          },
          
          methods: {
-            get_user_info() {
-               var vm = this;
-               if(vm.user.uuid) {
-                  vm.$store.dispatch('get_user_info', {'uuid' : vm.user.uuid, 'selectedCon' : vm.currentCon.tag_name}).then(()=>{
-                  });
-               } else {
-                  vm.$router.push('/');
-                  
-               }
-            },
-            
             
             /* -------------------------------------------------------------
                      LINKED ACCOUNT HANDLING
@@ -318,44 +331,32 @@
                });
             },
             
-            get_link_code() {
-               var vm  = this;
-               if(vm.user) {
-                  vm.$store.dispatch('get_link_code', vm.user.uuid).then(()=>{
-                    vm.$forceUpdate();
-                  });
-               }
-            },
+           
             
-            get_linked_accounts() {
-               var vm  = this;
-               if(vm.user) {
-                  vm.$store.dispatch('get_linked_accounts', vm.user.uuid).then(()=>{
-                    vm.$forceUpdate();
-                  });
-               }
-            },
             
-            set_membership_purchase(account) {
+            
+            set_membership_purchase(event, uuid) {
                var   vm = this,
-                     category;
-               account.type = 'membership';
+                     item = {};
+               console.log(event.target.value+' - ' + uuid);      
                
-               if(account.age <= 5) {
-                  category = 'five_under';
-               } else if(account.age > 5 && account.age <= 14) {
-                  category = 'child';
-               } else {
-                  category = 'adult';
-               }
+               Object.entries(vm.storeItems).forEach((storeItem) => {
+                  if(storeItem[1].id == event.target.value) {item = storeItem[1]; }
+               });
+               Object.entries(vm.linkedAccounts).forEach((account) => {
+                  //account[1].purchase? vm.membershipPurchases = true : vm.membershipPurchases = false;
+                  if(account[1].uuid == uuid) { item.account = account[1] } 
+               });
                
-               vm.$store.dispatch('update_linked_account', {account: account, category: category, uuid : account.uuid}).then(()=>{
+               
+               vm.$store.dispatch('update_linked_account', item, uuid).then(() => {
                   vm.$forceUpdate();
-                  vm.membershipPurchases = false;
-                  Object.entries(vm.linkedAccounts).forEach((account) => {
-                     account[1].purchase? vm.membershipPurchases = true : vm.membershipPurchases = false;
-                  });
-               });              
+                  // vm.membershipPurchases = false;
+                  // Object.entries(vm.linkedAccounts).forEach((account) => {
+                     // account[1].purchase? vm.membershipPurchases = true : vm.membershipPurchases = false;
+                  // });
+               });
+               vm.membershipPurchases = true;
             },
          }
       }

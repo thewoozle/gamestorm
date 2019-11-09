@@ -38,7 +38,7 @@
                            <span class="text" v-text="item.description"></span>
                            <span class="price" v-text="'$'+item.price+'.00'"></span>
                            <div class="option_purchase">
-                              <button class="option_add fal fa-plus-square" @click.prevent="update_items({account: {}, item: item})" ></button>
+                              <button class="cart_control fal fa-plus-square" @click.prevent="update_items({account: {}, item: item})" ></button>
                               <span class="option_amount" v-text="number_of_items(item.category)"></span>
                            </div>
                         </div> 
@@ -47,7 +47,7 @@
                            <span class="text" >{{item.description}} <span class="detail">(discounted price, only available through {{day_date(item.end_date)}})</span></span>
                            <span class="price" v-text="'$'+item.price+'.00'"></span>
                            <div class="option_purchase">
-                              <button class="option_add fal fa-plus-square" @click.prevent="update_items({account: {}, item: item})" ></button>
+                              <button class="cart_control fal fa-plus-square" @click.prevent="update_items({account: {}, item: item})" ></button>
                               <span class="option_amount" v-text="number_of_items(item.category)"></span>
                            </div>
                         </div> 
@@ -61,7 +61,7 @@
                            <span class="price" v-text="'$'+item.price+'.00'"></span>
                            
                            <div class="option_purchase disabled">
-                              <button disabled class="option_add  fal fa-plus-square " title="remove this item" @click.prevent="update_items({account: {}, item: item})" ></button>
+                              <button disabled class="cart_control  fal fa-plus-square " title="remove this item" @click.prevent="update_items({account: {}, item: item})" ></button>
                               <span class="option_amount" v-text="number_of_items(item.category)"></span>
                            </div>
                         </div>
@@ -82,62 +82,65 @@
                            <div class="content"  v-if="shoppingCart.items">
                            
                               <div class="cart_item" v-for="(cartItem,index) in shoppingCart.items">
+                              
                                  <div class="row">
                                  
                                     <div class="header">
                                        <span class="description" v-text="cartItem.item? cartItem.item.long_description : null"></span>
                                        <span class="age" v-if="cartItem.account.age " v-text="'Age: '+cartItem.account.age"></span>
-                                    </div>                                 
+                                    </div>  
                                     
-                                    <div class="item_element member" >
-                                       <div class="cart_info info" >   
-                                          <div class="info_wrapper" v-if="cartItem.account.uuid">
-                                             <span class="element name"  v-if="cartItem.account.first_name && cartItem.account.last_name" v-text="cartItem.account.first_name+' '+cartItem.account.last_name"></span>
-                                             <span class="element email"  v-if="cartItem.account.email"v-text="cartItem.account.email"></span>
-                                             <div class="additional">
-                                                <span class="element phone"  v-if="cartItem.account.phone"v-text="cartItem.account.phone"></span>
-                                                <span class="element address"  v-if="cartItem.account.address"v-text="cartItem.account.address"></span>
-                                                <span class="element address2"  v-if="cartItem.account.address2" v-text="cartItem.account.address2"></span>                                       
-                                                <span class="element city_state_zip"  v-if="cartItem.account.city && cartItem.account.state && cartItem.account.zip "v-text="cartItem.account.city+', '+cartItem.account.state+' '+cartItem.account.zip"></span>
+                                    <div class="element_wrapper">                                    
+                                       <div class="item_element member" >
+                                          <div class="cart_info info" >   
+                                             <div class="info_wrapper" v-if="cartItem.account.uuid">
+                                                <span class="element name"  v-if="cartItem.account.first_name && cartItem.account.last_name" v-text="cartItem.account.first_name+' '+cartItem.account.last_name"></span>
+                                                <span class="element email"  v-if="cartItem.account.email"v-text="cartItem.account.email"></span>
+                                                <span class="element account_details" v-if="cartItem.account.uuid"v-text="cartItem.account.city+ ', '+ cartItem.account.state"></span>
+                                                <div class="additional">
+                                                   <span class="element phone"  v-if="cartItem.account.phone"v-text="cartItem.account.phone"></span>
+                                                   <span class="element address"  v-if="cartItem.account.address"v-text="cartItem.account.address"></span>
+                                                   <span class="element address2"  v-if="cartItem.account.address2" v-text="cartItem.account.address2"></span>                                       
+                                                   <span class="element city_state_zip"  v-if="cartItem.account.city && cartItem.account.state && cartItem.account.zip "v-text="cartItem.account.city+', '+cartItem.account.state+' '+cartItem.account.zip"></span>
+                                                </div>
+                                                <span class="change_account control_link" @click.prevent="reset_account_choice(cartItem.item_order_number)">Change Account</span>
                                              </div>
-                                             <span class="change_account control_link" @click.prevent="reset_account_choice(cartItem.item_order_number)">Change Account</span>
-                                          </div>
-                                          
-                                          <div class="info_wrapper" v-else>
-                                             <div class="" v-if="user.uuid">
-                                                <span class="wrapper_title">select membership option</span>
-                                                
-                                                <div class="select_attendee">
-                                                   <select class="select member_select"  @change.prevent="select_account_option($event, cartItem) ">
-                                                      <option value="" style="display: none" >account...</option>
-                                                      <option :value="user.uuid" v-if="user.uuid" v-text="'Myself : '+user.first_name+' '+user.last_name"></option> 
-                                                      <option  v-for="account in linkedAccounts" :value="account.uuid" v-text="'linked account: '+account.first_name+' '+account.last_name" v-if="account.uuid != user.uuid"></option>
-                                                      <option value="" >Enter member info</option>
-                                                   </select>
+                                             
+                                             <div class="info_wrapper" v-else>
+                                                <div class="" v-if="user.uuid">
+                                                   <span class="wrapper_title">select membership option</span>
+                                                   
+                                                   <div class="select_attendee">
+                                                      <select class="select member_select"  @change.prevent="select_account_option($event, cartItem) ">
+                                                         <option value="" style="display: none" >account...</option>
+                                                         <option :value="user.uuid" v-if="user.uuid" v-text="'Myself : '+user.first_name+' '+user.last_name"></option> 
+                                                         <option  v-for="account in linkedAccounts" :value="account.uuid" v-text="'linked account: '+account.first_name+' '+account.last_name" v-if="account.uuid != user.uuid"></option>
+                                                         <option value="" >Enter member info</option>
+                                                      </select>
+                                                   </div>
+                                                   
                                                 </div>
                                                 
+                                                <div class="" v-else >
+                                                   <span class="wrapper_title">
+                                                      If you have an account, please log-in to purchase your membership and access any linked accounts. </br>
+                                                   </span>                                                
+                                                </div>
+                                                
+                                                <button class="control_button edit_membership_control fal fa-edit" 
+                                                   v-bind:class="showInfoForm == cartItem.item_order_number? 'show' : '' " 
+                                                   @click.prevent="showInfoForm == cartItem.item_order_number? showInfoForm = '' : showInfoForm = cartItem.item_order_number" 
+                                                ></button>
+                                                
                                              </div>
-                                             
-                                             <div class="" v-else >
-                                                <span class="wrapper_title">
-                                                   If you have an account, please log-in to purchase your membership and access any linked accounts. </br>
-                                                </span>                                                
-                                             </div>
-                                             
-                                             <button class="control_button edit_membership_control fal fa-edit" 
-                                                v-bind:class="showInfoForm == cartItem.item_order_number? 'show' : '' " 
-                                                @click.prevent="showInfoForm == cartItem.item_order_number? showInfoForm = '' : showInfoForm = cartItem.item_order_number" 
-                                             ></button>
-                                             
                                           </div>
                                        </div>
+                                       
+                                       <div class="item_element price" v-if="cartItem">
+                                          <span class="value" v-text="cartItem.item? '$'+cartItem.price+'.00' : null"></span>
+                                          <span class="remove control_link" @click.prevent="remove_cart_item(cartItem)" title="Remove this item from the cart" >Remove</span>
+                                       </div>
                                     </div>
-                                    
-                                    <div class="item_element price" v-if="cartItem">
-                                       <span class="value" v-text="cartItem.item? '$'+cartItem.price+'.00' : null"></span>
-                                       <span class="remove control_link" @click.prevent="remove_cart_item(cartItem)" title="Remove this item from the cart" >Remove</span>
-                                    </div>                                       
-                                    
                                  </div>   
                                     
                                  <div class="info_form" v-bind:class="cartItem.account.uuid? '' : 'show'">
@@ -146,168 +149,167 @@
                                     <div class="" v-if="cartItem.submitErrors" >
                                        <span class="" v-if="cartItem.submitErrors.account" v-text="cartItem.submitErrors.account"></span>
                                     </div>
-                                    
-      <form class="cart_member_form">
-         <div class="form_wrapper" >      
-         
-            <div class="form_row email_check_row">
-               <label for="last_name">Email</label>
-               <div class="input_wrapper">
-                  <input class="input text_box" type="text" name="email" id="email" 
-                     v-model="cartItem.account.email"
-                     @keyup="check_email(cartItem.item_order_number, cartItem.account.email);"
-                     @change="update_items(cartItem)"
-                  />
-               </div>
+                 
+                 
+                                       <form class="cart_member_form">
+                                          <div class="form_wrapper" >      
+                                          
+                                             
+                                             <div class="form_row email_check_row">
+                                                <label for="last_name">Email</label>
+                                                <div class="input_wrapper">
+                                                   <input class="input text_box" type="text" name="email" id="email" 
+                                                      v-model="cartItem.account.email"
+                                                      @keyup="check_email(cartItem.item_order_number, cartItem.account.email); clear_submit_error(cartItem.item_order_number, 'email')" 
+                                                      @change="update_items(cartItem)" 
+                                                   />
+                                                </div>
+                                                
+                                                <div v-if="cartItem.checkedEmail " class="email_check fail">
+                                                   <span class="icon fas fa-user-plus"  :title="'This email address already in use'" >
+                                                   </span> 
+                                                   <p class="message">
+                                                      This email address has {{cartItem.checkedEmail.length}} user account{{cartItem.checkedEmail.length >1? 's' : ''}} associated with it. 
+                                                      You can use the SIGN-IN link to access your account and link their accounts to yours for your membership purchase. You may also choose to purchase this membership for 
+                                                      <span v-text="cartItem.checkedEmail.length >1? 'one of the members using this email address' : 'the member using this email address'"></span> from this list: 
+                                                      <select class="select" @change.prevent="select_account_option($event, cartItem) ">
+                                                         <option value="" style="display: none;">select...</option>
+                                                         <option v-bind:value="email.uuid" v-for="email in cartItem.checkedEmail">{{email.first_name +' '+email.last_initial}} {{email.age != null? 'age: '+email.age : ''}}</option>
+                                                      </select> 
+                                                      You may also enter the information for a new member, sharing this email address. </span>
+                                                   </p>
+                                                </div>
+                                                
+                                                <div v-else  class="email_check ">
+                                                   <span v-if="validate_email(cartItem.account.email) && cartItem.submitErrors.email != '1'" class="icon fal fa-thumbs-up" title="This email address is not in use" ></span> 
+                                                </div> 
+                                                <span class="input_message" v-bind:class="cartItem.submitErrors.email? 'show' : ''" v-text="cartItem.submitErrors.email"></span>              
+                                             </div>
                
-               <div v-if="cartItem.checkedEmail " class="email_check fail">
-                  <span class="icon fas fa-user-plus"  :title="'This email address already in use'" >
-                  </span> 
-                  <p class="message">
-                     This email address has {{cartItem.checkedEmail.length}} user account{{cartItem.checkedEmail.length >1? 's' : ''}} associated with it. 
-                     You can use the SIGN-IN link to access your account and link their accounts to yours for your membership purchase. You may also choose to purchase this membership for 
-                     <span v-text="cartItem.checkedEmail.length >1? 'one of the members using this email address' : 'the member using this email address'"></span> from this list: 
-                     <select class="select" @change.prevent="select_account_option($event, cartItem) ">
-                        <option value="" style="display: none;">select...</option>
-                        <option v-bind:value="email.uuid" v-for="email in cartItem.checkedEmail">{{email.first_name +' '+email.last_initial}} {{email.age != null? 'age: '+email.age : ''}}</option>
-                     </select> 
-                     You may also enter the information for a new member, sharing this email address. </span>
-                  </p>
-               </div>
-               
-               <div v-else  class="email_check ">
-                  <span v-if="cartItem.submitErrors.email == '0'" class="icon fal fa-thumbs-up" title="This email address is not in use" ></span> 
-               </div>               
-            </div>
-            
-            
-            
-            
-            <div class="form_row">
-               <label for="first_name">First Name</label>
-               <div class="input_wrapper">
-                  <input class="input text_box" type="text" name="first_name" id="first_name" 
-                     v-model="cartItem.account.first_name"  
-                     @change="update_items(cartItem)" @keyup="clear_submit_error(cartItem.item_order_number, 'first_name')" 
-                  />
-               </div>
-               <span class="input_message" v-bind:class="cartItem.submitErrors.first_name? 'show' : ''" v-text="cartItem.submitErrors.first_name"></span>
-            </div>
-            
-            <div class="form_row">
-               <label for="last_name">Last Name</label>
-               <div class="input_wrapper">
-                  <input class="input text_box" type="text" name="last_name" id="last_name"  v-model="cartItem.account.last_name" 
-                     @change="update_items(cartItem)" @keyup="clear_submit_error(cartItem.item_order_number, 'last_name')" 
-                  />
-               </div>
-               <span class="input_message" v-bind:class="cartItem.submitErrors.last_name? 'show' : ''" v-text="cartItem.submitErrors.last_name"></span> 					
-            </div>
-            
-            
-            <div class="form_row">
-               <label for="last_name">Badge Name (optional)</label>
-               <div class="input_wrapper">
-                  <input class="input text_box" type="text" name="badge_name" id="last_name"  v-model="cartItem.account.badge_name" title="badge Name defaults to your first name" 
-                     @change="update_items(cartItem)" @keyup="clear_submit_error(cartItem.item_order_number, 'badge_name')" 
-                  />
-               </div>
-               <span class="input_message" v-bind:class="cartItem.submitErrors.last_name? 'show' : ''" v-text="cartItem.submitErrors.last_name"></span> 					
-            </div>
-            
-            
-            
-            <div class="form_row">
-               <label for="last_name">Address</label>
-               <div class="input_wrapper">
-                  <input class="input text_box" type="text" name="address" id="address"  v-model="cartItem.account.address" 
-                     @change="update_items(cartItem)" @keyup="clear_submit_error(cartItem.item_order_number, 'address')" 
-                  />
-               </div>
-               <span class="input_message" v-bind:class="cartItem.submitErrors.address? 'show' : ''" v-text="cartItem.submitErrors.address"></span> 					
-            </div>
-            
-            
-            <div class="form_row">
-               <label for="last_name">Address 2</label>
-               <div class="input_wrapper">
-                  <input class="input text_box" type="text" name="address2" id="address2"  v-model="cartItem.account.address2"   
-                     @change="update_items(cartItem)" @keyup="clear_submit_error(cartItem.item_order_number, 'address2')" 
-                  />
-               </div>
-               <span class="input_message" v-bind:class="cartItem.submitErrors.address2? 'show' : ''" v-text="cartItem.submitErrors.address2"></span> 					
-            </div>
-            
-            
-            <div class="form_row">
-               <label for="last_name">City</label>
-               <div class="input_wrapper">
-                  <input class="input text_box" type="text" name="city" id="city"  v-model="cartItem.account.city" 
-                     @change="update_items(cartItem)" 
-                     @keyup="clear_submit_error(cartItem.item_order_number, 'city')" 
-                  />
-               </div>
-               <span class="input_message" v-bind:class="cartItem.submitErrors.city? 'show' : ''" v-text="cartItem.submitErrors.city"></span> 					
-            </div>
-            
-            
-            <div class="form_row">
-               <div class="form_element">
-                  <div class="input_wrapper">
-                     <select class="select" name="state" id="state"  v-model="cartItem.account.state" 
-                        @change="update_items(cartItem)" @keyup="clear_submit_error(cartItem.item_order_number, 'state')" 
-                     >
-                        <option value="" style="display: none" >State...</option>
-                        <option :value="state.state" v-for="state in statesList" >{{state.name}}</option>	
-                     </select>
-                     <label>State or Territory</label>
-                     <span class="form_error" v-if="cartItem.submitErrors.state" v-text="cartItem.submitErrors.state? 'State or Territory is required' : ''"></span>
-                  </div>   
-               </div> 
-               
-               <div class="form_element">
-                  <div class="input_wrapper" title="leave blank if over 18 at time of next convention">
-                  <datetime type="date" @set="update_cart_account($event, cartItem.item_order_number)"   ></datetime>
-                  <input type=""  v-model="cartItem.account.birthdate" name="birthdate"  />
-                  </div>				
-                  <label for="country">Birthdate</label>
-                  <span class="input_message" v-bind:class="cartItem.submitErrors.birthDate? 'show' : ''" v-text="cartItem.submitErrors.birthDate"></span>
-               </div>
-            </div>	
-            
-            
-            <div class="form_row">
-               <div class="form_element">
-                  <label for="last_name">Postal Code</label>
-                  <div class="input_wrapper">
-                     <input class="input text_box" type="text" name="zip" id="zip"  
-                        v-model="cartItem.account.zip" 
-                        @change="update_items(cartItem)" 
-                        @keyup="clear_submit_error(cartItem.item_order_number, 'zip')" 
-                  />
-                  </div>
-                  <span class="input_message" v-bind:class="cartItem.submitErrors.zip? 'show' : ''" v-text="cartItem.submitErrors.zip"></span> 	
-               
-               </div>      
-               <div class="form_element">
-                  <label for="last_name">Phone</label>
-                  <div class="input_wrapper">
-                     <input class="input text_box" type="text" name="phone" id="phone"   
-                        v-model="cartItem.account.phone" 
-                        @change="update_items(cartItem)" 
-                        @keyup="clear_submit_error(cartItem.item_order_number, 'phone')" 
-                      />
-                  </div>                                    
-               </div>
-            </div>
-            
-            <p>All information will be confidential and used only in relation to having website access and for convention membership. </p>
-            
-         </div>
-            
-      </form>
-      
-      
+                                             
+                                             <div class="form_row">
+                                                <label for="first_name">First Name</label>
+                                                <div class="input_wrapper">
+                                                   <input class="input text_box" type="text" name="first_name" id="first_name" 
+                                                      v-model="cartItem.account.first_name"  
+                                                      @change="update_items(cartItem)" @keyup="clear_submit_error(cartItem.item_order_number, 'first_name')" 
+                                                   />
+                                                </div>
+                                                <span class="input_message" v-bind:class="cartItem.submitErrors.first_name? 'show' : ''" v-text="cartItem.submitErrors.first_name"></span>
+                                             </div>
+                                             
+                                             <div class="form_row">
+                                                <label for="last_name">Last Name</label>
+                                                <div class="input_wrapper">
+                                                   <input class="input text_box" type="text" name="last_name" id="last_name"  v-model="cartItem.account.last_name" 
+                                                      @change="update_items(cartItem)" @keyup="clear_submit_error(cartItem.item_order_number, 'last_name')" 
+                                                   />
+                                                </div>
+                                                <span class="input_message" v-bind:class="cartItem.submitErrors.last_name? 'show' : ''" v-text="cartItem.submitErrors.last_name"></span> 					
+                                             </div>
+                                             
+                                             
+                                             <div class="form_row">
+                                                <label for="last_name">Badge Name </label>
+                                                <div class="input_wrapper">
+                                                   <input class="input text_box" type="text" name="badge_name" id="last_name"  v-model="cartItem.account.badge_name" title="OPTIONAL, badge Name defaults to your first name" 
+                                                      @change="update_items(cartItem)" @keyup="clear_submit_error(cartItem.item_order_number, 'badge_name')" 
+                                                   />
+                                                </div>
+                                                <span class="input_message" v-bind:class="cartItem.submitErrors.last_name? 'show' : ''" v-text="cartItem.submitErrors.last_name"></span> 					
+                                             </div>
+                                             
+                                             
+                                             
+                                             <div class="form_row">
+                                                <label for="last_name">Address</label>
+                                                <div class="input_wrapper">
+                                                   <input class="input text_box" type="text" name="address" id="address"  v-model="cartItem.account.address" 
+                                                      @change="update_items(cartItem)" @keyup="clear_submit_error(cartItem.item_order_number, 'address')" 
+                                                   />
+                                                </div>
+                                                <span class="input_message" v-bind:class="cartItem.submitErrors.address? 'show' : ''" v-text="cartItem.submitErrors.address"></span> 					
+                                             </div>
+                                             
+                                             
+                                             <div class="form_row">
+                                                <label for="last_name">Address 2</label>
+                                                <div class="input_wrapper">
+                                                   <input class="input text_box" type="text" name="address2" id="address2"  v-model="cartItem.account.address2"   
+                                                      @change="update_items(cartItem)" @keyup="clear_submit_error(cartItem.item_order_number, 'address2')" 
+                                                   />
+                                                </div>
+                                                <span class="input_message" v-bind:class="cartItem.submitErrors.address2? 'show' : ''" v-text="cartItem.submitErrors.address2"></span> 					
+                                             </div>
+                                             
+                                             
+                                             <div class="form_row">
+                                                <label for="last_name">City</label>
+                                                <div class="input_wrapper">
+                                                   <input class="input text_box" type="text" name="city" id="city"  v-model="cartItem.account.city" 
+                                                      @change="update_items(cartItem)" 
+                                                      @keyup="clear_submit_error(cartItem.item_order_number, 'city')" 
+                                                   />
+                                                </div>
+                                                <span class="input_message" v-bind:class="cartItem.submitErrors.city? 'show' : ''" v-text="cartItem.submitErrors.city"></span> 					
+                                             </div>
+                                             
+                                             
+                                             <div class="form_row">
+                                                <div class="form_element">
+                                                   <div class="input_wrapper">
+                                                      <select class="select" name="state" id="state"  v-model="cartItem.account.state" 
+                                                         @change="update_items(cartItem)" @keyup="clear_submit_error(cartItem.item_order_number, 'state')" 
+                                                      >
+                                                         <option value="" style="display: none" >State...</option>
+                                                         <option :value="state.state" v-for="state in statesList" >{{state.name}}</option>	
+                                                      </select>
+                                                      <label>State or Territory</label>
+                                                      <span class="form_error" v-if="cartItem.submitErrors.state" v-text="cartItem.submitErrors.state? 'State or Territory is required' : ''"></span>
+                                                   </div>   
+                                                </div> 
+                                                
+                                                <div class="form_element">
+                                                   <div class="input_wrapper" title="leave blank if over 18 at time of next convention">
+                                                   <datetime type="date" @set="update_cart_account($event, cartItem.item_order_number)"   ></datetime>
+                                                   <input type=""  v-model="cartItem.account.birthdate" name="birthdate"  />
+                                                   </div>				
+                                                   <label for="country">Birthdate</label>
+                                                   <span class="input_message" v-bind:class="cartItem.submitErrors.birthDate? 'show' : ''" v-text="cartItem.submitErrors.birthDate"></span>
+                                                </div>
+                                             </div>	
+                                             
+                                             
+                                             <div class="form_row">
+                                                <div class="form_element">
+                                                   <label for="last_name">Postal Code</label>
+                                                   <div class="input_wrapper">
+                                                      <input class="input text_box" type="text" name="zip" id="zip"  
+                                                         v-model="cartItem.account.zip" 
+                                                         @change="update_items(cartItem)" 
+                                                         @keyup="clear_submit_error(cartItem.item_order_number, 'zip')" 
+                                                   />
+                                                   </div>
+                                                   <span class="input_message" v-bind:class="cartItem.submitErrors.zip? 'show' : ''" v-text="cartItem.submitErrors.zip"></span> 	
+                                                
+                                                </div>      
+                                                <div class="form_element">
+                                                   <label for="last_name">Phone</label>
+                                                   <div class="input_wrapper">
+                                                      <input class="input text_box" type="text" name="phone" id="phone"   
+                                                         v-model="cartItem.account.phone" 
+                                                         @change="update_items(cartItem)" 
+                                                         @keyup="clear_submit_error(cartItem.item_order_number, 'phone')" 
+                                                       />
+                                                   </div>                                    
+                                                </div>
+                                             </div>
+                                             
+                                             <p>All information will be confidential and used only in relation to having website access and for convention membership. </p>
+                                             
+                                          </div>
+                                             
+                                       </form>
       
                                        
                                     </div>   
@@ -317,13 +319,20 @@
                               <span class="total_price"  v-text="'$'+shoppingCart.amount+'.00'"></span>
                            
                               <div class="controls">
-                                 <button class="button" @click.prevent="submit_checkout()" >Checkout</button>
+                                 <button class="button" @click.prevent="submit_shopping_cart()" >Checkout</button>
                               </div>
                            </div>
                            <p v-else>no items in cart</p>
                         </div>
                      
                   </div>    
+               </div>
+               
+               <div class="cart_checkout" :class="showCheckout? 'show' : ''">
+                     <button type="button" class="close_button fal fa-times" @click.prevent="showCheckout ? showCheckout = false : showCheckout = true"></button>
+                  <div class="checkout_wrapper">
+                     <purchase_form />
+                  </div>
                </div>
             </section>
             
@@ -370,6 +379,7 @@
 	<script>
 		import Vue from 'vue'
 		import {apiDomain} from '../config';
+		import purchaseForm from '@/components/includes/purchase_form'
 		import { mapState, mapGetters} from 'vuex';
       import { Datetime } from 'vue-datetime'
       import 'vue-datetime/dist/vue-datetime.css'      
@@ -382,8 +392,7 @@
 			data() {
 				return {
                showInfoForm   : false,
-               testData       : {},
-               
+               showCheckout   : false,
             }
 			},
 			
@@ -395,7 +404,8 @@
 			
 			
             components: {
-               datetime: Datetime,
+               datetime    : Datetime,
+               purchase_form: purchaseForm
             },
 				
 			
@@ -405,8 +415,9 @@
                currentCon  : 'currentCon',
                storeItems  : 'storeItems',
                linkedAccounts: 'linkedAccounts',
-               statesList		: 'statesList',     
+               statesList		: 'statesList',
                user        : 'user',
+               testData    : 'testData',
             }),
             
             ... mapGetters({
@@ -417,9 +428,17 @@
 			
 			created() {
 				var vm = this;
-            vm.get_store_items();            
-            vm.loadcheck_cart_items();
-            vm.get_linked_accounts();
+            vm.$store.dispatch('get_store_items').then(()=>{
+               vm.$forceUpdate();
+            });
+            
+            //vm.loadcheck_cart_items();
+            
+            if(vm.user) {                  
+               vm.$store.dispatch('get_linked_accounts', vm.user.uuid).then(()=>{
+                 vm.$forceUpdate();
+               });
+            }
 			},
 			
 			
@@ -428,23 +447,7 @@
 			
 			
 			methods: {
-            get_store_items() {
-               var vm  = this;
-               
-               vm.$store.dispatch('get_store_items').then(()=>{
-                 vm.$forceUpdate();
-               });               
-            },
-            
-            get_linked_accounts() {
-               var vm  = this;
-               if(vm.user) {                  
-                  vm.$store.dispatch('get_linked_accounts', vm.user.uuid).then(()=>{
-                    vm.$forceUpdate();
-                  });
-               }
-            },
-            
+           
             /* -----------------------------------------------------------
                         CHECK EMAIL
                ----------------------------------------------------------- */
@@ -473,24 +476,15 @@
                
                 if(event.target.value) { 
                   vm.showInfoForm = false;
-                  // if a linked account
-                  if(vm.linkedAccounts) { 
-                     // set cart item account as linked-member account from event.target.value 
-                     Object.entries(vm.linkedAccounts).forEach((account) =>{
-                        if(account[1].uuid == event.target.value) { _cartItem.account = account[1]; }
-                     });
-                  // if NOT a linked account   
-                  } else {
-                     let uuid = event.target.value;
-                     
-                     // get account by uuid
-                     vm.$store.dispatch('get_cart_account', event.target.value).then((response)=>{
-                        _cartItem.account = response;
-                     });      
-                  } 
-                  vm.$store.dispatch('update_shopping_cart', _cartItem).then(()=>{
-                     vm.showInfoForm = item.item_order_number;
-                  });   
+                  
+                  vm.$store.dispatch('get_cart_account', event.target.value).then((response) => {
+                     _cartItem.account = response;
+                     console.log(_cartItem);
+                     vm.$store.dispatch('update_shopping_cart', _cartItem).then(()=>{
+                        vm.showInfoForm = item.item_order_number;
+                     }); 
+                  });      
+                  
                } else { 
                _cartItem.account = {uuid: ''};
                _cartItem.uuid = '';
@@ -513,7 +507,20 @@
                Object.entries(vm.shoppingCart.items).forEach((item) =>{                  
                   if(item[1].item_order_number == itemNumber) {
                      _cartItem = item[1];
-                     _cartItem.account = {uuid: ''};
+                     _cartItem.account = {                        
+                        'uuid'      :'',
+                        'first_name':'',
+                        'last_name' :'',
+                        'email'     :'',
+                        'phone'     :'',
+                        'address'   :'',
+                        'address2'  :'',
+                        'state'     :'',
+                        'city'      :'',
+                        'zip'       :'',
+                        'membership_description': '',
+                        'age'       :''
+                        };
                      
                      vm.$store.dispatch('update_shopping_cart', _cartItem).then(()=>{
                      });
@@ -523,28 +530,28 @@
             },
             
             
-            loadcheck_cart_items() {
-               var   vm = this;               
-               if(vm.shoppingCart.items) {
-                  var _cartItems = vm.shoppingCart.items;                   
-                  let foundItems = [];
-                  Object.entries(_cartItems).forEach((cartItem)=>{
-                     if(!cartItem.price) {
-                        // find storeItem by category and set item 
-                        Object.entries(vm.storeItems).forEach((storeItem) => {
-                           if(storeItem[1].category == cartItem[1].category) {
-                              foundItems.push(cartItem[1]);  
-                              let _cartItem = cartItem[1];
-                              _cartItem.type = 'membership';
-                              _cartItem.item = storeItem[1];
-                              vm.$store.dispatch('update_shopping_cart', _cartItem).then(()=>{
-                              });              
-                           }                        
-                        });
-                     }                     
-                  });
-               }
-            },
+            // loadcheck_cart_items() {
+               // var   vm = this;               
+               // if(vm.shoppingCart.items) {
+                  // var _cartItems = vm.shoppingCart.items;                   
+                  // let foundItems = [];
+                  // Object.entries(_cartItems).forEach((cartItem)=>{
+                     // if(!cartItem.price) {
+                        // // find storeItem by category and set item 
+                        // Object.entries(vm.storeItems).forEach((storeItem) => {
+                           // if(storeItem[1].category == cartItem[1].category) {
+                              // foundItems.push(cartItem[1]);  
+                              // let _cartItem = cartItem[1];
+                              // _cartItem.type = 'membership';
+                              // _cartItem.item = storeItem[1];
+                              // vm.$store.dispatch('update_shopping_cart', _cartItem).then(()=>{
+                              // });              
+                           // }                        
+                        // });
+                     // }                     
+                  // });
+               // }
+            // },
             
             
             
@@ -559,8 +566,7 @@
                      account[1].purchase? vm.membershipPurchases = true : vm.membershipPurchases = false;
                   });
                   }
-               });              
-               
+               });               
             },
             
             
@@ -611,42 +617,7 @@
                // });
             // },
             
-            
-            show_store_item(item, condition) {
-               
-               var vm = this;
-               let truth = false;
-               
-               // filter for 'day', 'discount', and dates
-               
-               switch (condition) {
-                  case 'day':
-                     item.filter == 'day'? truth = true : '';
-                     break;
-                     
-                  case 'discount':
-                     if(item.filter == 'discount' && vm.after_date(item.start_date) && vm.before_date(item.end_date) ) {
-                        truth = true;
-                     }
-                     break;
-                  
-                  case 'none':
-                     if(!item.filter) {
-                        if(item.start_date || item.end_date) {
-                           if(vm.after_date(item.start_date) && before_date(priceBreak.stopDate)) {
-                              truth = true;
-                           }
-                        } else {                       
-                           truth = true;
-                        }
-                     }
-               }
-               
-              // item.filter != 'discount' && item.filter != 'day'" v-if="after_date(priceBreak.startDate) && 
-               return truth;               
-            },
-            
-            
+                        
             edit_cart_item(itemNumber) {},
             
             
@@ -663,14 +634,17 @@
             
             
             // SUBMIT CHECKOUT
-            submit_checkout() {
+            submit_shopping_cart() {
                var vm = this;
                 
                if(vm.shoppingCart.items) {
-                     vm.$store.dispatch('submit_checkout').then((response)=>{
+                     vm.$store.dispatch('submit_shopping_cart').then((response) => {
+                        // show checkout panel with summary and payment info
                         console.log(response);
+                        vm.showCheckout = true;
                      });
-               }               
+               }   
+               vm.$forceUpdate();
             }
 			}			
 		}
@@ -680,8 +654,11 @@
 	<style>
    
    .section.membership_purchasing {
+      position: relative;
       flex-wrap: wrap;
+      padding-bottom: 2rem;
       justify-content: space-between;
+      overflow: hidden;
    }
    .membership_purchasing .section_title {
       justify-content: center;
@@ -760,7 +737,7 @@
       width: 3.25rem;
    }
    
-   .price_options .price_option .option_add {
+   .membershippage .cart_control {
       background: none;
       font-size: 1.5em;
       cursor: pointer;
@@ -897,7 +874,7 @@
       color: var(--highlightColor);
    }
    .membership_purchase .cart_item .row .member {
-      padding: 0 0 0 .5rem;
+      
    } 
    .membership_purchase .cart_item .row .member .additional {
       display: flex;
@@ -930,18 +907,48 @@
       flex-wrap: wrap;
       justify-content: space-between;
    }
+   
+   .membership_purchase .cart_item .row .element_wrapper {
+      display: flex;
+      justify-content: space-between;
+      padding: .35rem;
+      border-radius: .25rem;
+      width: 100%;
+      background: rgba(255,255,255,.05);
+   }
    .membership_purchase .shopping_cart .item_element.member {
       width: 70%;
    }
+   .membership_purchase .shopping_cart .item_element.member .info,
+   .membership_purchase .shopping_cart .item_element.member .info_wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+   }
+   .membership_purchase .shopping_cart .item_element.member .element {
+      display: flex;
+      flex-wrap: wrap;
+      line-height: 1.1em;
+      width: 50%;
+   }
+   .membership_purchase .shopping_cart .item_element.member .element {
+      
+   }
+   .membership_purchase .shopping_cart .item_element.member .account_details{
+      
+   }
    .membership_purchase .shopping_cart .item_element.price {
       width: 30%;
-      padding: 1rem;
+      align-items: center;
    }
    .membership_purchase .shopping_cart .item_element.price .value,
    .membership_purchase .shopping_cart .item_element.price .remove {
       display: flex;
       width: 100%;
       justify-content: flex-end;
+   }
+   .membership_purchase .shopping_cart .item_element.price .value {
+      font-size: 1.35em;
    }
    
    
@@ -982,7 +989,7 @@
       transition: max-height .4s;
    }
    .membership_purchase .shopping_cart .info_form.show {
-      max-height: 25rem;
+      max-height: 35rem;
       overflow: auto;
    }
    .membership_purchase .shopping_cart .info_form .form_wrapper {
@@ -1041,7 +1048,42 @@
       z-index: 10;
    }
    
-   
+   /* ----- CART CHECKOUT ----- */
+   .section.membership_purchasing .cart_checkout {
+      position: fixed;
+         top: 0;
+         right: -100%;
+         z-index: 90;
+      display: flex;      
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      padding: 2rem 1.5rem;
+      max-width:50rem;
+      background: var(--lightColor);      
+      transition: right .4s cubic-bezier(0.65, 0, 0.41, 0.99);
+      
+   }
+   .section.membership_purchasing .cart_checkout.show {
+      right: 0;
+   }
+   .section.membership_purchasing .cart_checkout .checkout_wrapper {
+      position: relative;
+      display: flex;
+      width: 100%;
+      height: 100%;
+      overflow:hidden;
+      overflow-Y: auto;
+   }
+   .section.membership_purchasing .cart_checkout .close_button {
+      position: absolute;
+         top: 0;
+         right: 0;
+         z-index: 10;
+      margin: .75rem;
+border-radius: .25rem;      
+   }
    
    
 	
