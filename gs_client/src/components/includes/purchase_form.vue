@@ -34,27 +34,46 @@
                <div class="detail_element create_account">
                   if user not logged-in, ask to log-in or create account using payment info or new info
                </div>
-               <div class="detail_element waivers">
-                  <span class="title">Waivers</span>
-                  <p class="form-row wavers-checkbox-class form-row-wide validate-required" id="conduct_wavers_field" data-priority=""><span class="woocommerce-input-wrapper"><label class="checkbox ">
-                     <input type="checkbox" class="input-checkbox " name="conduct_wavers" id="conduct_wavers" value="1"> 
-                     By purchasing this membership I acknowledge that I have read and agree to abide by the <a target="gswaiverpolicy" href="https://gamestorm.org/attend/policies/#cocpolicy">GameStorm Code of 
-                     Conduct</a>.&nbsp;<abbr class="required" title="required">*</abbr></label></span>
-                  </p>
+               
+               <div class="detail_element Code_of_conduct">
+                  <span class="title">Code of Conduct</span>
+                  <div class="content" >
+                     <span class="checkbox_wrapper">
+                        <span class="check_box fal" :class="acknowledgeCoc? 'fa-check-square' : 'fa-square'" @click.prevent="update_order_coc()"></span> 
+                     </span>
+                     <p>By purchasing this membership I acknowledge that I have read and agree to abide by the 
+                        <a target="gswaiverpolicy" href="https://gamestorm.org/attend/policies/#cocpolicy">GameStorm Code of Conduct</a>
+                     </p>
+                  </div>
+               </div>
+               
+               <div class="detail_element children">
+                  <span class="title">Minors</span>
+                  <div class="content" >                  
+                     <p>A completed waiver signed by a parent or legal guardian is required for all children age 17 and under. The waiver form must include contact information 
+                        for the parent or guardian, which will only be used in relation to care of the child. <br />
+                        Please see the complete policy for Minors in the GameStorm Code of Conduct. 
+                     </p>   
+                        <a target="gswaiverpolicy" href="https://gamestorm.org/attend/policies/#cocpolicy">GameStorm Code of Conduct</a>
+                     </p>
+                     <span class="links">
+                        <a class="internal-link" href="https://gamestorm.org/attend/policies/waiver-child-15-and-over/" title="Child Waiver: 15 and over">Child Waiver: 15 and over</a>
+                        <a class="internal-link" href="https://gamestorm.org/attend/policies/waiver-child-under-15/" title="Child Waiver: Under 15">Child Waiver: Under 15</a>
+                     </span>
+                  </div>
                </div>
                
                <div class="detail_element additional_info">
-                  
-               </div>
-               <div class="detail_element payment_form">
-                  <span class="woocommerce-input-wrapper">
-                     <textarea name="order_comments" class="input-text " id="order_comments" placeholder="Notes about your order, e.g. special notes for delivery." rows="2" cols="5"></textarea>
+                  <span class="title">Additional Information</span>                  
+                  <span class="input_wrapper">
+                     <textarea class="textarea"placeholder="Notes about your order, e.g. special notes for delivery." ></textarea>
                   </span>
                </div>
+               
             </div>
             
             <div class="controls">
-               < view cart >  < checkout with paypal >
+                < checkout with paypal >
             </div>
          </div>
       
@@ -70,7 +89,8 @@
          
          data() {
             return{
-                  cartItemType   : null,
+               cartItemType   : null,
+               acknowledgeCoc : false,   
             }
          },
          
@@ -103,6 +123,13 @@
                     vm.$forceUpdate();
                   });
                }
+            },
+            
+            // UPDATE ORDER CODE OF CONDUCTE
+            update_order_coc() {               
+               var vm = this;
+               vm.acknowledgeCoc? vm.acknowledgeCoc = false : vm.acknowledgeCoc = true;
+               vm.$store.dispatch('update_order_coc', vm.acknowledgeCoc).then(()=>{});               
             },
          }
       }
@@ -193,10 +220,34 @@
          display: flex;
          flex-direction: column;
       }
+      #payment_panel .payment_details .detail_element + .detail_element {
+         margin-top: 1.25rem;
+      }
       #payment_panel .payment_details .title {
          display: flex;
          width: 50%;
+         font-size: 1.1rem;
+         margin: .25rem 0;
+         color: var(--textColor3);
          justify-content: flex-end;
+      }
+      
+      #payment_panel .payment_details .Code_of_conduct .content {
+         display: flex;
+         align-items: center;
+      }
+      #payment_panel .payment_details .Code_of_conduct .checkbox_wrapper {
+         width: 6.5rem;         
+      }
+      #payment_panel .payment_details .Code_of_conduct  .check_box {
+         color: var(--borderColor2);
+      }
+      
+      
+      #payment_panel .payment_details .detail_element .textarea {
+         margin: 0;
+      }
+      #payment_panel .payment_details .detail_element {
       }
       
       

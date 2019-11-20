@@ -80,8 +80,8 @@
                <p style="color: white" v-for="person in regReports.gmInterest">{{person.email}}</p>
                
                <p>----------------------------------------------------------------------------------------------</p>
-               <p>VOLUNTEERS REPORT</p>
-               <p style="color: white" v-for="person in regReports.volunteers">{{person.first_name+' '+person.last_name}} - {{person.email}}</p>
+               <p>VOLUNTEERS INTEREST REPORT</p>
+               <p style="color: white" v-for="person in regReports.volunteers">{{person.email}}</p>
                
                
                

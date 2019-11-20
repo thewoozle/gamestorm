@@ -694,6 +694,11 @@
          },
          
          
+         // UPDATE ORDER CODE OF CONDUCT
+         update_order_coc({commit}, acknowledgement) {
+            console.log(acknowledgement);
+         },
+         
          
          submit_shopping_cart({commit}) {
             var   vm = this,
@@ -825,6 +830,7 @@
             });
          }
       },
+      
       
       
       update_schedulers({commit}, scheduler) {         
@@ -1363,7 +1369,6 @@
                SET SHOPPING CART UPDATE
          -------------------------------------------------------  */
       set_shopping_cart_update: (state, item) => {
-         console.log(item);
          // check to see if existing item or new item and update cart accordingly
          let   cartAmount = 0,
                removeIndex = null;
@@ -1412,33 +1417,7 @@
                }
                cartItem.item_order_number = state.currentCon.tag_name+'-'+ randString;
                cartItem.submitErrors = {};
-               cartItem.price = item.item.price;
                
-               // cartItem = {
-                 // 'type'       : item.item.type,
-                  // 'category'  : item.item.category,
-                  // 'filter'    : item.item.filter,
-                  // 'description': item.item.description,
-                  // 'long_description':'',
-                  // 'price'     : item.item.price,
-                  // 'item_order_number':  state.currentCon.tag_name+'-'+ randString,
-                  // 'account_option':'',
-                  // 'submitErrors':{},               
-                  // 'account'   : {
-                     // 'uuid'      :'',
-                     // 'first_name':'',
-                     // 'last_name' :'',
-                     // 'email'     :'',
-                     // 'phone'     :'',
-                     // 'address'   :'',
-                     // 'address2'  :'',
-                     // 'state'     :'',
-                     // 'city'      :'',
-                     // 'zip'       :'',
-                     // 'membership_description': '',
-                     // 'age'       :''
-                  // }
-               // }
                state.shoppingCart.items.push(cartItem);
             }  
          }
@@ -1448,16 +1427,15 @@
          
          
          // RECALC CART AMOUNT
-         if(state.shoppingCart.items) {
+         if(state.shoppingCart.items) {            
             Object.entries(state.shoppingCart.items).forEach((cartItem) =>{
-               cartAmount = parseInt(cartAmount) + cartItem[1].price;            
+               cartAmount = parseInt(cartAmount) + cartItem[1].item.price;            
             });
             
          } else {
             state.shoppingCart.items = [];
          }
          state.shoppingCart.amount = cartAmount;
-         
          
          // clean-up empty items
          state.shoppingCart.items = state.shoppingCart.items.filter(v => v);

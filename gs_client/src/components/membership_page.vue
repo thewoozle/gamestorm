@@ -137,7 +137,7 @@
                                        </div>
                                        
                                        <div class="item_element price" v-if="cartItem">
-                                          <span class="value" v-text="cartItem.item? '$'+cartItem.price+'.00' : null"></span>
+                                          <span class="value" v-text="cartItem.item? '$'+cartItem.item.price+'.00' : null"></span>
                                           <span class="remove control_link" @click.prevent="remove_cart_item(cartItem)" title="Remove this item from the cart" >Remove</span>
                                        </div>
                                     </div>
@@ -182,8 +182,7 @@
                                                 
                                                 <div v-else  class="email_check ">
                                                    <span v-if="validate_email(cartItem.account.email) && cartItem.submitErrors.email != '1'" class="icon fal fa-thumbs-up" title="This email address is not in use" ></span> 
-                                                </div> 
-                                                <span class="input_message" v-bind:class="cartItem.submitErrors.email? 'show' : ''" v-text="cartItem.submitErrors.email"></span>              
+                                                </div>       
                                              </div>
                
                                              
@@ -333,6 +332,7 @@
                   <div class="checkout_wrapper">
                      <purchase_form />
                   </div>
+                  <button type="button" class="button return_memberships" @click.prevent="showCheckout ? showCheckout = false : showCheckout = true">Return to membershps</button>
                </div>
             </section>
             
@@ -1076,13 +1076,26 @@
       overflow:hidden;
       overflow-Y: auto;
    }
+   
    .section.membership_purchasing .cart_checkout .close_button {
       position: absolute;
          top: 0;
          right: 0;
          z-index: 10;
       margin: .75rem;
-border-radius: .25rem;      
+      border-radius: .25rem;      
+   }
+   .section.membership_purchasing .cart_checkout .return_memberships {
+      position: absolute;
+         bottom: 0;
+         left: 0;
+         z-index: 10;
+      margin: .75rem;   
+      width: auto;
+      padding: .15rem .5rem;
+      text-shadow: none;
+      font-size: .75rem;
+      color: var(--button);
    }
    
    

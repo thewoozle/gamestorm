@@ -341,7 +341,10 @@
                console.log(event.target.value+' - ' + uuid);      
                
                Object.entries(vm.storeItems).forEach((storeItem) => {
-                  if(storeItem[1].id == event.target.value) {item = storeItem[1]; }
+                  if(storeItem[1].id == event.target.value) {
+                     item.item = storeItem[1]; 
+                     item.price = item.item.price;
+                  }
                });
                Object.entries(vm.linkedAccounts).forEach((account) => {
                   //account[1].purchase? vm.membershipPurchases = true : vm.membershipPurchases = false;
