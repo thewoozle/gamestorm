@@ -254,51 +254,88 @@
          
       },
       
+      
+      // CHECK LOGIN EMAIL 
+      check_login_email({commit}, email) {
+         // find all users with matching email address
+         var vm = this;
+         return new Promise((resolve, reject) => {
+            Axios.post(apiDomain+'_check_login_email', {email : email }, {
+               headers : {'Content-Type' : 'application/x-www-form-urlencoded; cjarset=UTF-8'}
+            }).then((response) => {
+               resolve(response.data);
+            });   
+         });
+         
+      },
+      
       // SUBMIT LOGIN
+      
       submit_login({commit}, loginInfo) {
-            var vm = this,
-               _formData = new FormData();
+         var vm = this;
+         // simple validation, post info and return/reject response
          
          return new Promise((resolve, reject) =>{
                
-            for(var key in loginInfo) {
-               _formData.append(key, loginInfo[key]);
-            }
-            
-            Axios.post(apiDomain+ '_login', _formData, {headers : 
+            Axios.post(apiDomain+ '_login', loginInfo, {headers : 
                {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
             }).then((response) => {
-                   
-               if (response.data.user) {
-                        var user = response.data.user,
-                            uuid = response.data.user.uuid;
+               var _response = response.data.response;
+               if (_response.user && _response.success =='pass') {
+                  
+                  commit('set_user', _response.user);
+                  
+                  if(window.sessionStorage) {  
+                     sessionStorage.user = JSON.stringify(_response.user); 
+                  
+                  // start one-hour-and-two-minutes timer then log-out
+                     setTimeout(function() {
+                        console.log('LOG OUT timer expired');
                         
-                        commit('set_user', user);
-                        if(window.sessionStorage) {  
-                           sessionStorage.user = JSON.stringify(user); 
+                        sessionStorage.user = '';
+                        commit('set_user', {});
+                        commit('set_user_events', '');
+                     //},(10*1000));
+                     }, (60*60*1000) *2);
+                  }
                         
-                        // start one-hour-and-two-minutes timer then log-out                        
-                           setTimeout(function() {
-                              console.log('LOG OUT timer expired');
-                              
-                              sessionStorage.user = '';
-                              commit('set_user', {});
-                              commit('set_user_events', '');
-                           //},(10*1000));
-                           }, (60*60*1000) *2);
-                        }
-                        
-               }
-               
-               resolve(response.data);         
+                  resolve(_response);
+               }  else {
+                  reject(_response);
+               } 
 
-            },(err) => {
-               console.log(err);
-               console.log(err.response.data.errors);
-               reject(err.response.data.errors );
+         },(err) => {
+            console.log(err);
+            console.log(err.response.data.errors);
+            reject(err.response.data.errors );
             });
          });         
       },
+      
+      // submit_login({commit}, loginInfo) {
+            // var vm = this,
+               // _formData = new FormData();
+         
+         // return new Promise((resolve, reject) =>{
+               
+            // for(var key in loginInfo) {
+               // _formData.append(key, loginInfo[key]);
+            // }
+            
+            // Axios.post(apiDomain+ '_login', _formData, {headers : 
+               // {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+            // }).then((response) => {
+                   
+               
+               // resolve(response.data);         
+
+            // },(err) => {
+               // console.log(err);
+               // console.log(err.response.data.errors);
+               // reject(err.response.data.errors );
+            // });
+         // });         
+      // },
       
       // RESET PASSWORD
       reset_password({commit}, email) {

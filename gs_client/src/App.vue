@@ -4,18 +4,24 @@
      
          <span id="loading" :class="showSpinner? 'show' : ''"><span class="spinner" ></span></span>
          
-         
          <div class="reset_password" v-if="urlParams.c">
             <div class="" v-if="$store.dispatch('validate_reset', {reset_code: urlParams.c})">
-               <span class="warning" v-if="!$route.query.c"> Warning, unknown user. Please request a new password reset link</span>
-               <button type="button" class="button close_button" @click="()=>{urlParams = {};}" >Close</button>
-               
+               <span class="warning" v-if="!urlParams.c"> Warning, unknown user. Please request a new password reset link</span>
+               <button type="button" class="button close_button fal fa-times" @click="()=>{urlParams = {};}" ></button>
+            
                <changepassword />  
             </div>
             <div class="reused_reset" v-else >
-            RESET CODE ALREADY USED
+               RESET CODE ALREADY USED
             </div>
          </div>
+                        
+         
+         <div class="login_page"  v-else-if="showOverlay == 'login'">
+            <login_page/>
+         </div>
+         
+         
          <div class="main_page" v-else>      
          
             <main_menu class="main_menu "  v-if="pageType == 'public' "/>
@@ -89,6 +95,8 @@
       
       import event_submission_form from '@/components/includes/event_submission_form'
       import user_events_list from '@/components/includes/user_events_list'
+      
+      import login_page from '@/components/login_page'
 		
 		Vue.use(Router)
 		export default {
@@ -103,6 +111,7 @@
             showDevNotes: false,
             urlParams   : {},
             showSpinner : true,
+            showOverlay : '',
 			}
 		},  
 		  
@@ -115,7 +124,8 @@
 			'page_footer'		: page_footer,
          'changepassword'  : changepassword,
          'event_submission_form': event_submission_form,
-         'user_events_list'   : user_events_list,
+         'user_events_list': user_events_list,
+         'login_page'      : login_page,
 		},
 		  computed: {
            ...mapState({
@@ -133,12 +143,19 @@
 		  
 			
 		  created() {
-            var vm = this,
-               _urlParams;
-            _urlParams = new URL(window.location.href).searchParams.has('c');
-            _urlParams? vm.urlParams.c = new URL(window.location.href).searchParams.get('c') : vm.urlParams = {}; 
-            vm.$store.dispatch('get_site_data').then(()=>{
-            });
+            var vm = this;
+            let _urlParams = new URL(window.location.href);
+            let resPassword = _urlParams.searchParams.has('c');
+            let login = _urlParams.searchParams.has('login');
+            console.log(resPassword);
+            if(login == true) {
+               vm.showOverlay = 'login';
+               vm.showSpinner = false;
+            } else if(resPassword == true) {
+               _urlParams? vm.urlParams.c = new URL(window.location.href).searchParams.get('c') : vm.urlParams = {}; 
+               vm.$store.dispatch('get_site_data').then(()=>{
+               });
+            }
             
 				vm.handle_page_load();  
 		  },
@@ -203,6 +220,7 @@
 			
 			handle_page_load() {
 				var vm = this;
+            
             vm.$store.dispatch('check_user').then(()=>{});
             
 				vm.$store.dispatch('update_page_status', {pageReady: 'ready'}).then(() => {
@@ -215,6 +233,7 @@
 			
 			set_page_type(name) {
 				var vm = this;
+            
 				switch(name) {
 					case 'adminpage':
                case 'newspage':
@@ -419,7 +438,7 @@
 			text-shadow: -1px -1px 0px rgba(0,0,0,0.15);		
 		}
 		.page_title {
-         display: flex;
+         
          justify-content: center;
 			font-size: 2.25rem;
          line-height: 1.5em;
@@ -430,7 +449,7 @@
 	
       
 		.section_title {
-			display: flex;
+			
          justify-content: flex-start;
 			width: 100%;
 			font-size: 2rem;
@@ -447,9 +466,9 @@
          text-align: right;
       }
 		.admin_title {
-			display: flex;
+			
 			width: 100%;
-			display: flex;
+			
 			width: 100%;
          font-size: 2rem;
          line-height: 1em;
@@ -472,7 +491,7 @@
 			text-transform: uppercase;
 		}
 		.form_section_title {
-			display: flex;
+			
 			width: 100%;
 			text-transform: uppercase;		
 			margin-top: .5rem;
@@ -520,7 +539,7 @@
    
    
 		.data_view {
-			display: flex;
+			
 			flex-direction: column;	
 			align-items: center;
 			position: fixed;		
@@ -544,7 +563,7 @@
 		.data_view:nth-of-type(n+7) {	left: 67rem; }
 		
 		.data_view .title {
-			display: flex;		
+					
 			padding: .5rem 1rem;
 			color: #222;
 			width: 100%;
@@ -567,7 +586,7 @@
 			width: 100vw; 
 		}
 		.data_view pre {
-			display: flex;
+			
 			margin: 1rem 0;
 			color: #222;
 			pointer-events: none;
@@ -576,7 +595,7 @@
 		}
       
       .list_button {
-         display: flex;
+         
             justify-content: center;
             text-align: center;
          font-size: 1.5rem;
@@ -596,12 +615,12 @@
 		
 		/*	------------	MINI REPORT	------------	*/
 		.mini_report {
-			display: flex;
+			
 			justify-content: space-between;
 			flex-wrap: wrap;
 		}
 		.mini_report .report_widget {
-			display: flex;
+			
 			align-items: flex-start;
 			flex-wrap: wrap;
 			background: var(--altBackground);
@@ -610,7 +629,7 @@
 			border-radius: .2rem;
 		}
 		.mini_report .widget_title {
-			display: flex;
+			
 			justify-content: center;
 			width: 100%;
 			font-weight: 300;
@@ -619,22 +638,22 @@
 			color: var(--contrastColor);		
 		}
 		.mini_report .info_wrapper {
-			display: flex;
+			
 			flex-wrap: wrap;
 			justify-content: space-around;
 		}
 		.mini_report .elements {
-			display: flex;
+			
 			flex-wrap: wrap;
 		}
 		.mini_report .info_element {
-			display: flex;
+			
 			width: 100%;
 			justify-content: space-between;
 			flex-wrap: wrap;
 		}
 		.mini_report .info_item {
-			display: flex;
+			
 			align-items: center;
 			justify-ontent: space-between;
 		}
@@ -642,7 +661,7 @@
 		.mini_report .name,
 		.mini_report .date,
 		.mini_report .value {
-			display: flex;
+			
 			text-align: right;
 			padding: 0 .25rem;
 			justify-content: flex-end;
@@ -663,7 +682,7 @@
 				left: 100%;
 			height: 100%;
 			width: 1rem; 
-			display: flex;
+			
 			align-items: center;
 			font: inherit;
 		}
@@ -727,7 +746,7 @@
 		/*	------	REPORT BOX	------	*/
 		
 		.report_box {
-			display: flex;
+			
 			align-items: center;
 			flex-wrap: wrap;
 			width: 100%;
@@ -739,13 +758,13 @@
 			background: #7eaebb;
 		}
 		.report_box .item {
-			display: flex;
+			
 			justify-contnet: space-between;
 			width: 100%;
 			margin: .25rem 0;
 		}
 		.report_box .item .text {
-			display: flex;
+			
 			flex-wrap: wrap;
 			align-items: center;
 			height: 2rem;
@@ -757,7 +776,7 @@
 		}
 		.report_box .item .value{
 			position: relative;
-			display: flex;
+			
 			font-size: 2rem;
 			font-weight: bold;
 			width: 4rem;
@@ -786,7 +805,7 @@
 				z-index: 25;
 			width: 3rem;
 			margin: .5rem .5rem 0 0;
-			display: flex;
+			
 			flex-direction: column;
 		}
 		.control_bar .control_button + .control_button{ 
@@ -794,7 +813,7 @@
 		}
 		
 		.control_button {
-			display: flex;
+			
 			width: 3rem;
 			height: 3rem;
 			line-height: 1.5rem;
@@ -821,7 +840,7 @@
          box-shadow: inset 1px 1px 4px rgba(0,0,0,0.65);
 		}
 		.control_button .text {
-         display: flex;
+         
          padding-left: .5rem;
          line-height: 1.25em;
          font-family: Dosis, sans-serif;
@@ -838,7 +857,7 @@
 				right: -100%;
 			height: 100vh;	
 			max-width: 42rem;
-			display: flex;
+			
 			flex-direction: column;
 			justify-content: flex-start;
 			align-items: center;
@@ -852,7 +871,7 @@
 		}
 		
 		.slideout .title {
-			display: flex;
+			
 			width: 100%;
 			font-weight: bold;
 			font-size: 1.35rem;
@@ -866,12 +885,12 @@
 				z-index: 10;
 			margin: 1rem;
 			width: 3rem;
-			display: flex;
+			
 			flex-direction: column;
 			
 		}
 		.slideout_controls .control {
-			display: flex;
+			
 			
 		}
 		.slideout_controls .control + .control {
@@ -879,13 +898,13 @@
 			
 		}
 		.slideout .section_content {
-			display: flex;
+			
 			margin: 1rem auto;
 			min-width: 20rem;
 		}
 		/*	------	DATE BULLET	------	*/
 		.date_bullet {
-			display: flex;
+			
 			flex-wrap: wrap;
 			align-items: center;
 			width: 3rem;
@@ -901,7 +920,7 @@
 			color: #fff;
 		}
 		.date_bullet .month {
-			display: flex;
+			
 			font-size: .7rem;
 			line-height: 1rem;
 			width: 100%;
@@ -911,7 +930,7 @@
 			text-transform: uppercase;
 		}
 		.date_bullet .day {
-			display: flex;
+			
 			width: 100%;
 			height: 50%;
 			align-items: flex-start;
@@ -924,16 +943,16 @@
 		
 		/*	------	INFO ELEMENT	------	*/
 		.info_elements {
-			display: flex;
+			
 			flex-wrap: wrap;		
 		}
 		.info_element {
-			display: flex;
+			
 			align-items: center;
 			justify-content: space-between;
 		}
 		.info_element img {
-			display: flex;
+			
 			width: 6rem;
 			height: 6rem;
 			margin-right: 1rem;
@@ -946,12 +965,12 @@
 		
 		/*	------	SEARCH / SORT BAR	------	*/
 		.search_bar {
-			display: flex; 
+			 
 			flex-wrap: wrap;		
 			padding: .5rem;
 		}
 		.search_bar .search{
-			display: flex;
+			
 			width: 100%;
 			align-items: center;
 			padding: 0 .25rem;
@@ -962,14 +981,14 @@
 			border-radius: var(--borderRadius);
 		}
 		.search_bar .buttons {
-			display: flex;
+			
 			width: 100%;
 			align-items: center;
 			justify-content: space-around;
 			flex-wrap: wrap;
 		}
 		.search_bar .sort_button {
-			display: flex;	
+				
 			border: solid 1px var(--borderColor);
 			border-radius: .25rem;
 			background: #eee;
@@ -985,17 +1004,17 @@
 
 		/*	------	NEWS ITEMS	------	*/
 		.news_items {
-			display: flex;
+			
 			flex-direction: column;		
 		}
 		.news_items .news_item{
-			display: flex;
+			
 			width:  100%;
 			padding: 0 .5rem;
 			flex-wrap: wrap;
 		}
 		.news_items .news_button {
-			display: flex;
+			
 			justify-content: space-between;
 			background: rgba(0,0,0,.1);
 			cursor: pointer;
@@ -1009,7 +1028,7 @@
 			color: var(--glowColor);
 		}
 		.news_items .news_button .title{
-			display: flex;
+			
 			flex-wrap: wrap;
 			justify-content: flex-start;
 			text-align: left;
@@ -1026,7 +1045,7 @@
 		
 		/*	------	HEADER NAVIGATION		-----	*/
 		.page_header .nav_link {
-			display: flex;
+			
 			justify-content: center;
 			align-items: center;
 			flex-wrap: wrap;
@@ -1134,7 +1153,7 @@
 		
 		.toggle_button {
 			position: relative;
-			display: flex;
+			
 					flex-wrap: wrap;
 			width: 100%;
 			font-size: .9rem;
@@ -1160,7 +1179,7 @@
 			color: var(--titleColor);
 		}
 		.toggle_button .text_wrapper {
-			display: flex;
+			
 			width: 100%;
 			flex-wrap: wrap;
 			color: inherit;
@@ -1168,7 +1187,7 @@
 			height: 1.85rem;
 		}
 		.toggle_button .text_wrapper .text {
-			display: flex;
+			
 			width: 100%;
 			height: 1.8rem;
 			align-items: center;
@@ -1177,7 +1196,7 @@
 			justify-content: center;
 		}
 		.toggle_button .text_wrapper .detail {
-			display: flex;
+			
 			width: 100%;
 			font-size: .8rem;
 			line-height: 1em;
@@ -1211,7 +1230,7 @@
 		
 		.button {
 			position: relative;
-			display: flex;
+			
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
@@ -1342,7 +1361,7 @@
 		}
 		
 		.close_button {
-			display: flex;
+			
 			justify-content: center;
 			align-items: center;
 			font-size: 3rem;
@@ -1371,7 +1390,7 @@
 			width: 100%;
 			background: rgba(131,119,82,.35);
          color: #fff;
-			display: flex;
+			
 			justify-content: center;
 			align-items: center;
 			transition: opacity .3s, z-index .3s;
@@ -1394,12 +1413,12 @@
 				top: 0;
 				right: 0;
 				z-index: 100;
-			display: flex;
+			
 			margin: .1rem .1rem 0 0;
 			justify-content: space-around;
 		}
 		.main_content form .form_buttons .form_button {
-			display: flex;
+			
 			justify-content: center;
 			align-items: center;
 			margin: 0 .25rem;
@@ -1480,7 +1499,7 @@
 			width: 49.5%;		
 		}	
 		.form_row {
-			display: flex;
+			
 			justify-content: space-between;
 			width: 100%;
 			position: relative;
@@ -1488,14 +1507,14 @@
 			padding: .25rem 0;
 		}
       .form_row .footnote {
-         display: flex;
+         
          width: 100%;
          font-weight: 100;
          color: var(--highlightColor);
       }
 		.form_element {
          position: relative;
-			display: flex;
+			
             flex-wrap: wrap;
             flex: 1; 
 			margin: 0 .2
@@ -1506,7 +1525,7 @@
 			margin-top: .75rem;
 		}	
 		.input_wrapper {
-			display: flex;
+			
 			position: relative;
 			line-height: inherit;
 			flex-wrap: wrap;
@@ -1537,13 +1556,13 @@
 		}	
 		.form_row .input_wrappers {
 			position: relative;
-			display: flex;
+			
 			width: 100%;
 			flex-wrap: wrap;
 		}
 		.form_row .input_wrapper {
 			position: relative;
-			display: flex;
+			
 			padding: 0 1rem;
 			flex: 1; 
 			flex-wrap: wrap;
@@ -1563,7 +1582,7 @@
 
 		label {
 			position: relative;
-			display: flex;
+			
 			flex-wrap: wrap;
 			align-items: center;
 			width: 8rem;
@@ -1604,7 +1623,7 @@
 			position: absolute;
 				top: 0;
 				left: 100%;
-			display: flex;
+			
 			height: 100%;
 			width: 1.5rem;
 			justify-content: center;
@@ -1627,7 +1646,7 @@
 			font-style: italic;
 		}
 		form .input_wrapper .response_icons {
-			display: flex;
+			
 			width: 2rem;
 			align-items: center;
 			justify-content: center;
@@ -1684,7 +1703,7 @@
 		input[type="text"],
 		.select,
 		.textarea {
-			display: flex;
+			
 			border-bottom: solid 1px #777;
 			margin-left: .5rem;
 			line-height: 1em;
@@ -1709,7 +1728,7 @@
 		}
 		.checkbox_wrapper {
          position: relative;
-         display: flex;
+         
             align-items: center;
             justify-content: center;
             flex-wrap: nowrap;
@@ -1731,7 +1750,7 @@
 			margin-left: 1rem;
 		}
 		.checkbox_wrapper .checkbox {
-			display: flex;
+			
 			position: absolute;
             top: 0;
             left: 0;         
@@ -1747,7 +1766,7 @@
 		}
 		.form_element .pass, 
 		.form_element .fail {
-			display: flex;
+			
 			align-items: center;
 			position: absolute;
 				top: 0;
@@ -1765,7 +1784,7 @@
 		}
 		.controls {
 			margin-top: 1rem;
-			display: flex;
+			
 			justify-content: flex-end;
 			padding: 0 2rem;
 		}
@@ -1899,6 +1918,7 @@
 		/*  -----------------------------------------------------------------------------------------------------
 										BASIC PAGE LAYOUT
 			-----------------------------------------------------------------------------------------------------    */ 
+      div, span, input, img,article, aside, details, figcaption, figure, footer, header, hgroup, label, i, nav, section { display: flex;   }
 		body {
 			overflow: hidden;
 			background: var(--backgroundColor);
@@ -1910,14 +1930,14 @@
 		}
       .main_page {
          position: relative;
-         display: flex;
+         
          min-height: 100vh;
       }
 		.page_wrapper.admin {
 			background: #f3fcff;
 		}
 		.page_background {
-			display: flex;
+			
 			justify-content: center;
 			align-items: center;
 			position: fixed;
@@ -1931,7 +1951,7 @@
 			opacity: .1;
 		}
 		.page_background .video {
-			display: flex;
+			
 			min-width: 100vw;
 			min-height: 100vh;
 			visibility: hidden;
@@ -1972,7 +1992,7 @@
    }
    
 		.main_view {
-			display: flex;
+			
 			flex-wrap: wrap;
 			justify-content: space-around;
 			min-height: 50vh;
@@ -1983,7 +2003,7 @@
 			margin: 0 auto;
 		}
 		.main_content .sections {
-			display: flex;
+			
             flex-wrap: wrap;
             justify-content: center;
 			position: relative;
@@ -1991,7 +2011,7 @@
 		}
 		
 		.main_content .section {
-			display: flex;         
+			         
 			width: 100%;
          max-width:65rem;
 		}
@@ -2021,7 +2041,7 @@
       
       
 		#app .reset_password {
-         display: flex;
+         
          justify-content: center;
          align-items: center;
          position: fixed;
@@ -2033,7 +2053,7 @@
       }
 		#app .reset_password form {
          position:relative;
-         display: flex;
+         
          flex-wrap: wrap;
          width: 100%;
          max-width: 35rem;
@@ -2057,7 +2077,7 @@
          text-shadow: none;
       }
 		#app .reset_password .warning {
-         display: flex;
+         
          width: 100%;
          justify-content: center;
          text-align: center;
@@ -2081,7 +2101,7 @@
          bottom: .5rem;
          left: 0;
          width: 100%;
-         display: flex;
+         
          justify-content: center;
          color: var(--passColor);
          font-size: 1.5rem;
@@ -2099,7 +2119,7 @@
             top: 6.5rem;
             left: 0;
             z-index: 49;
-         display: flex;
+         
             justify-content: center;
             flex-wrap: wrap;
          overflow: hidden;
@@ -2112,20 +2132,20 @@
       }
       
       .events_placeholder .login_message {
-         display: flex;
+         
          justify-content: center;
          margin-top:3rem;
          width: 100%;
       }
       
       .events_placeholder .sections {
-         display: flex;
+         
             justify-content: space-between;
          width: 100%;
          
       }
       .events_placeholder .section_title {
-         display: flex;
+         
          width: 100%;
          justify-content: center;
       }
@@ -2134,11 +2154,11 @@
          font-size: 1.5rem;
          font-weight: 300;
          width: 100%;
-         display: flex;
+         
          justify-content: center;
       }
       .events_placeholder .section .subtitle {
-         display: flex;
+         
          width: 100%;
          justify-content: center;
          font-size:.9rem;
@@ -2147,11 +2167,11 @@
       }
          
       .events_placeholder .submission_intro {
-         display: flex;
+         
          padding: .5rem .5rem .5rem 2rem;
       }
       .events_placeholder .event_submission {
-         display: flex;
+         
             flex-direction: column;
          padding: 0 1rem 0 2rem;
          width: 65%; 
@@ -2159,7 +2179,7 @@
          
       .events_placeholder .event_display{
          position: relative;
-         display: flex;
+         
          width: 30%;
       }
       .events_placeholder .event_display .loading {
@@ -2176,6 +2196,14 @@
 		.admin_page  * {
 			color: var(--mainColor);
 		}
+      
+      
+      .login_page {
+         
+         justify-content: center;  
+      }
+      
+      
       
 		
 	
@@ -2198,7 +2226,7 @@
 		@media (max-width:800px) { /* tablet, large phone */ 
 			
 			.page_header .signin_button {
-				display: flex;
+				
 			}
 		}
 		

@@ -35,7 +35,7 @@
                   <div class="sign-in_buttons">
                      <button class="button" :class="{'active':showLoginDropdown}" 
                         type="button" 
-                        @click.prevent="{showLoginDropdown? showLoginDropdown = false : showLoginDropdown = true; }" 
+                        @click.prevent="showLoginDropdown? showLoginDropdown = false : showLoginDropdown = true; " 
                         title="Sign-in to an existing account or create a new user-account"
                      >Sign In</button>
                      <a class="link" @click.prevent="{showLoginDropdown = true; dropdownSection ='register' }" >Create account</a>
@@ -48,7 +48,7 @@
 								<button type="button" class="button"  :class="{'active':dropdownSection == 'login'}" @click.prevent="dropdownSection = 'login'">Sign in</button>
 								<button type="button" class="button"  :class="{'active':dropdownSection == 'help'}" @click.prevent="dropdownSection == 'help'? dropdownSection = 'login' : dropdownSection ='help'">Sign-in Help</button>
 								<button type="button" class="button"  :class="{'active':dropdownSection == 'register'}" @click.prevent="dropdownSection == 'register'? dropdownSection = 'login' : dropdownSection ='register' ">New Account</button>
-								<button type="button" class="close_button fal fa-times" @click="{showLoginDropdown = false; dropdownSection = 'login';}"></button>
+								<button type="button" class="close_button fal fa-times" @click="showLoginDropdown = false; dropdownSection = 'login'"></button>
 							</div>
 							
 							
@@ -284,9 +284,9 @@
 					vm.showLoginLoading = true;
 					
 					vm.$store.dispatch('submit_login', loginInfo).then((response) => {
-                  
                   vm.showLoginLoading = false;
-                  if(response.user.uuid) {                     
+                  if(response.user.uuid) { 
+                  console.log(response);                    
                      vm.$store.dispatch('get_users_events', response.user.uuid);
                      vm.showLoginDropdown = false;
                   } 

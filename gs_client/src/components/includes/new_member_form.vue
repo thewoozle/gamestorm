@@ -2,7 +2,7 @@
 	<template>
 		
 
-      <form @submit.prevent="submit_new_form" class="rows" >
+      <form @submit.prevent="submit_new_form" class="rows new_account_form" >
          <div class="form_wrapper" :account=account>
          
             <div class="form_row email_check_row">
@@ -77,25 +77,15 @@
             
             
             <div class="form_row">
-               <div class="form_element">
-                  <div class="input_wrapper">
-                     <select class="select" name="state" id="state" v-model="account.state" @click="submitErrors.state = 'null'" @set="account.state == null? account.state = '' : ''">
-                        <option value="" style="display: none" >State...</option>
-                        <option :value="state.state" v-for="state in statesList" >{{state.name}}</option>	
-                     </select>
-                     <label>State or Territory</label>
-                     <span class="form_error" v-if="submitErrors.state" v-text="submitErrors.state? 'State or Territory is required' : ''"></span>
-                  </div>   
-               </div>      
-               <div class="form_element">
-                  <div class="input_wrapper" title="leave blank if over 18 at time of next convention">
-                  <datetime type="date" v-model="account.birth_date"   ></datetime>
-                  
-                  </div>				
-                  <label for="country">Birthdate</label>
-                  <span class="input_message" v-bind:class="submitErrors.birthDate? 'show' : ''" v-text="submitErrors.birthDate"></span>
-               </div>
-            </div>	
+               <label>State or Territory</label>
+               
+               <div class="input_wrapper">
+                  <select class="select" name="state" id="state" v-model="account.state" @click="submitErrors.state = 'null'" @set="account.state == null? account.state = '' : ''">
+                     <option value="" style="display: none" >State...</option>
+                     <option :value="state.state" v-for="state in statesList" >{{state.name}}</option>	
+                  </select>
+               </div>   
+            </div>  
             
             
             <div class="form_row">
@@ -113,6 +103,13 @@
                      <input class="input text_box" type="text" name="phone" id="phone"   v-model="account.phone" />
                   </div>                                    
                </div>
+            </div>    
+            <div class="form_row">
+               <label >Age</label>
+               <div class="input_wrapper">
+                  <input class="input text_box" title="age required if member is under 18 at time of the next convention" type="text" v-model="account.age" required @keyup="submitErrors.age = null"/>
+               </div>
+               <span class="input_message" v-bind:class="submitErrors.birthDate? 'show' : ''" v-text="submitErrors.birthDate"></span>
             </div>
             
             <p>All information will be confidential and used only in relation to having website access and for convention membership. </p>
@@ -128,12 +125,10 @@
 	
 	<script>
 			import Vue from 'vue'
-			import { mapState, mapGetters } from 'vuex'
+			import { mapState} from 'vuex'
          
          import moment from 'moment'
-         import { Datetime } from 'vue-datetime'
-         import 'vue-datetime/dist/vue-datetime.css'
-         Vue.use(Datetime);
+         
 			
 			export default{
 				name: 'new_member_form',
@@ -174,14 +169,9 @@
                ...mapState({
                   statesList		: 'statesList',               
                }),
-               ...mapGetters({
-                  conventionInfo	: 'conventionInfo',
-                  pageContent		: 'pageContent',
-               }),
 				},
             
             components: {
-               datetime: Datetime,
             },
 				
 				created() {
@@ -223,5 +213,42 @@
 	</script>
 	
 	<style>
+   .new_account_form {
+      display: flex;
+         justify-content: center;
+      width: 100%;   
+      max-width: 50rem;
+      padding: 1rem 2rem;
+      border: solid 1px var(--borderColor);
+      border-radius: .25rem;
+   }
+   .new_account_form .form_wrapper {
+      display: flex;
+      flex-wrap: wrap; 
+      width: 100%;
+      max-width: 30rem;
+   }
+   .new_account_form .form_row {
+      width: 100%; 
+      justify-content: flex-end;
+   }
+   .new_account_form .input_wrapper {
+      width: 100%;
+   }
+   .new_account_form .form_row + .form_row {
+      margin-top: .5rem;
+   }
+   .new_account_form .form_element {
+      max-width: calc(50% - 1rem);
+   }
+   .new_account_form .form_row label {
+      width: 10rem;
+      flex-wrap: wrap;
+      font-size: .9rem;
+      align-items: center;
+      justify-content: flex-end;
+   }
+   
+   
 	
 	</style>
