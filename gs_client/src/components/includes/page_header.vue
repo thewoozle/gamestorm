@@ -101,23 +101,6 @@
                            
                               <new_member_form :account={} v-on:newAccount = "submit_new_user" />
                               
-                              <div class="form_row">
-                                 <label for="new_password" title="minimum 6 characters, no spaces or quotes">Password 
-                                    <button type="button" class="password_show fal" v-bind:class="showPassword ? 'fa-eye' : 'fa-eye-slash'" @click="showPassword ? showPassword = false : showPassword = true"></button>
-                                 </label>
-                                 <div class="input_wrappers">
-                                    <div class="input_wrapper">
-                                       <input id="new_password" v-bind:type="showPassword? 'text' : 'password'" class="input text_box new_password" name="new_password"  v-model="newPassword" required placeholder="Password" @keyup="validate_new_password(); submitErrors.email = null"/>
-                                       <i class="pass_icon" v-bind:class="validatePassword == true? 'fal fa-check-square' : 'fas fa-ban fail'" v-if="newPassword"></i>
-                                    </div>	
-                                    
-                                    <div class="input_wrapper">
-                                       <input id="compare_password" v-bind:type="showPassword? 'text' : 'password'" class="input text_box verify_password" name="compare_password" required v-model="confPassword" placeholder="Verify Password" @keyup="validate_new_password()"/>
-                                       <i class="pass_icon" v-bind:class="newPassword == confPassword? 'fal fa-check-square' : 'fas fa-ban fail'" v-if="newPassword"></i>
-                                    </div>
-                                    <span class="input_message" v-bind:class="submitErrors.password? 'show' : ''" v-text="submitErrors.password"></span> 
-                                 </div>	
-                              </div>
                            
                         </div>   
 							</div>
@@ -285,21 +268,19 @@
 					
 					vm.$store.dispatch('submit_login', loginInfo).then((response) => {
                   vm.showLoginLoading = false;
-                  if(response.user.uuid) { 
-                  console.log(response);                    
+                  if(response.user.uuid) {              
                      vm.$store.dispatch('get_users_events', response.user.uuid);
                      vm.showLoginDropdown = false;
-                  } 
-                  if (response.response.message) {
-                        // show response message for two seconds
-                        vm.loginMessage = response.response.message;	
-                           
                   } 
                   if (response.users) {
                      vm.loginUsers = response.users;
                   }	
                    
                }, (err) => {
+                  if (err.message) {
+                        // show response message for two seconds
+                        vm.loginMessage = err.message;	
+                  } 
                      vm.submitErrors = err;
                   vm.showLoginLoading = false;
                });
@@ -712,6 +693,7 @@
 	
 	
 	#page_header .user_controls .login_dropdown {
+      flex-wrap: wrap;
 		position: absolute;
 		top: 100%;
 		right: 0;
@@ -834,6 +816,10 @@
    
    #page_header .user_controls .login_dropdown.register .dropdown_section {
       min-width: 40rem;
+   }
+   
+	#page_header .user_controls .dropdown_section .register {
+      flex-wrap: wrap;
    }
    #page_header .user_controls .login_dropdown .section_title {
       padding: .5rem 0;

@@ -232,7 +232,6 @@
       
       // UPDATE USER INFO
       create_update_user_info({commit}, userInfo) {
-         console.log(userInfo);
          return new Promise((resolve, reject) => {
             var   vm = this,
                   _formData = new FormData();
@@ -241,7 +240,7 @@
             }      
             Axios.post(apiDomain+'_update_create_user', _formData, {headers : 
                   {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
-            }).then((response) => {
+            }).then((response) => {               
                   resolve(response.data);
                   commit('set_userInfo', userInfo);
                   
@@ -857,10 +856,11 @@
 		},
       
       // CHECK EMAIL
-      check_email({commit}, emailData) {         
-         if(emailData.email.indexOf('@') >-1) {
-            return new Promise((resolve,reject) => {
-               Axios.get(apiDomain+'_check_email', {params: {email : emailData.email}}).then((response) => {
+      check_email({commit}, emailData) { 
+         if(emailData.indexOf('@') >-1) {
+            return new Promise((resolve,reject) => { 
+               Axios.get(apiDomain+'_check_email', {params: {email : emailData.email}}).then((response) => {   
+console.log(response.data);      
                   commit('set_check_email', {orderNumber: emailData.orderNumber, users:response.data.users});
                   resolve(response);
                });

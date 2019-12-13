@@ -147,7 +147,6 @@
             let _urlParams = new URL(window.location.href);
             let resPassword = _urlParams.searchParams.has('c');
             let login = _urlParams.searchParams.has('login');
-            console.log(resPassword);
             if(login == true) {
                vm.showOverlay = 'login';
                vm.showSpinner = false;
@@ -155,8 +154,7 @@
                _urlParams? vm.urlParams.c = new URL(window.location.href).searchParams.get('c') : vm.urlParams = {}; 
                vm.$store.dispatch('get_site_data').then(()=>{
                });
-            }
-            
+            }            
 				vm.handle_page_load();  
 		  },
 		  
@@ -1918,7 +1916,7 @@
 		/*  -----------------------------------------------------------------------------------------------------
 										BASIC PAGE LAYOUT
 			-----------------------------------------------------------------------------------------------------    */ 
-      div, span, input, img,article, aside, details, figcaption, figure, footer, header, hgroup, label, i, nav, section { display: flex;   }
+      div, span, input, img,article, aside, details, fig, section, caption, figure, footer, header, hgroup, label, i, nav, section { display: flex;   }
 		body {
 			overflow: hidden;
 			background: var(--backgroundColor);
@@ -1927,10 +1925,12 @@
 			position: relative;
 			width: 100vw;
 			height: 100vh;
+         justify-content: center;
 		}
       .main_page {
          position: relative;
-         
+         width: 100%;
+         max-width: 90rem;
          min-height: 100vh;
       }
 		.page_wrapper.admin {

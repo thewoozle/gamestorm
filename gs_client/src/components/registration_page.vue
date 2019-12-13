@@ -1224,6 +1224,10 @@
 			margin-top: .5rem;
 			padding: .25rem 0;
 		}
+      
+		.reg_form .panel .transaction_element {
+         flex-wrap: wrap;
+      }
 		.reg_form .panel.membership_credit,
 		.reg_form .panel.staff_panel {
 			max-height: 0;

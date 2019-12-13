@@ -154,7 +154,8 @@
 	<style>	
    
 		.section.intro {
-			max-width: 50rem;
+         jsutify-content: space-between;
+			width: 100%;
 			margin: 5vh auto 0;
 			padding: 0 0 0 1rem;
 		}
@@ -175,10 +176,7 @@
       }
 		.main_view .section_title {
       }
-		.news_items {
-			position: absolute;
-				top: 0;
-				left: 0;
+		.section.intro .news_items {         
 			width: 12rem;
 		}
 

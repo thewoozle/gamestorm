@@ -209,6 +209,7 @@
 			
 		#main_menu .nav_content {
 			width: 100%;
+         flex-direction: column;
 			position: relative;
 			padding: .5rem;
 			height: 100vh;		
