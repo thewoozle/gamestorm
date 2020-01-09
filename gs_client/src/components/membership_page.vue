@@ -79,7 +79,7 @@
                      
                         <div class="shopping_cart" >
                            <span class="title">Shopping Cart</span>
-                           <div class="content"  v-if="shoppingCart.items">
+                           <div class="content"  v-if="shoppingCart.items.length > 0">
                            
                               <div class="cart_item" v-for="(cartItem,index) in shoppingCart.items">
                               
@@ -328,11 +328,10 @@
                </div>
                
                <div class="cart_checkout" :class="showCheckout? 'show' : ''">
-                     <button type="button" class="close_button fal fa-times" @click.prevent="showCheckout ? showCheckout = false : showCheckout = true"></button>
+                     <button type="button" class="close_button fal fa-times" @click.prevent="showCheckout ? clear_paypal() : showCheckout = true"></button>
                   <div class="checkout_wrapper">
-                     <purchase_form />
+                     <purchase_form v-on:checkoutReturn = "handle_checkout_return" :key="paypalKey"/>
                   </div>
-                  <button type="button" class="button return_memberships" @click.prevent="showCheckout ? showCheckout = false : showCheckout = true">Return to membershps</button>
                </div>
             </section>
             
@@ -393,6 +392,7 @@
 				return {
                showInfoForm   : false,
                showCheckout   : false,
+               paypalKey      : 0,
             }
 			},
 			
@@ -499,6 +499,25 @@
                console.log(e);
             },
             
+            // HANDLE CHECKOUT RETURN
+            
+            handle_checkout_return(checkoutReturn) {
+               var vm = this;
+               if(checkoutReturn == 'COMPLETED') {
+                  vm.$store.dispatch('update_system_messages', 'Membership purchase successful').then(()=>{});
+                  vm.clear_paypal();
+               }
+            },
+            
+            
+            
+            clear_paypal() {               
+               var vm = this;
+               vm.paypalKey +=1; 
+               vm.showCheckout = false;
+            },
+            
+            
             
             // reset cart account choice
             reset_account_choice(itemNumber) {
@@ -522,8 +541,7 @@
                         'age'       :''
                         };
                      
-                     vm.$store.dispatch('update_shopping_cart', _cartItem).then(()=>{
-                     });
+                     vm.$store.dispatch('update_shopping_cart', _cartItem).then(()=>{});
                   }     
                      
                });
@@ -640,7 +658,6 @@
                if(vm.shoppingCart.items) {
                      vm.$store.dispatch('submit_shopping_cart').then((response) => {
                         // show checkout panel with summary and payment info
-                        console.log(response);
                         vm.showCheckout = true;
                      });
                }   
@@ -1073,15 +1090,13 @@
       display: flex;
       width: 100%;
       height: 100%;
-      overflow:hidden;
-      overflow-Y: auto;
    }
    
    .section.membership_purchasing .cart_checkout .close_button {
       position: absolute;
          top: 0;
          right: 0;
-         z-index: 10;
+         z-index: 50;
       margin: .75rem;
       border-radius: .25rem;      
    }

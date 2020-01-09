@@ -126,7 +126,7 @@
 				var vm = this;            
             vm.$store.dispatch('get_news_articles').then(()=>{});
             vm.get_user_info();
-				vm.check_logged_in();
+            
          },
          
          methods: {
@@ -136,10 +136,7 @@
                if(vm.user) {
                   vm.$store.dispatch('get_user_info', {'uuid' : vm.user.uuid, 'selectedCon' : vm.currentCon.tag_name}).then(()=>{
                   });
-               } else {
-                  vm.$router.push('/');
-                  
-               }
+               } 
             }
          },
 			mounted: function() { 

@@ -8,38 +8,38 @@
 					<div class="slide_in reg_report" :class="showRegReport? 'show' : ''">
                   <button class="close_button fal fa-times" type="button" @click.prevent="showRegReport? showRegReport = false : showRegReport=true" ></button>
 					
-               <pre>REG REPORTS</pre>
+                  <span class="section_title">REG REPORTS</span>
+                  <div class="report_content">
+                  
+                     <div class="report_element">
+                        <span class="element_title">FILTER BY STATE</span>
+                        <div class="report_row" v-for="state in memberFilter('state')" >{{state.name}} - {{state.num}}</div>
+                     </div>
+                     
+                     
+               
+                     <div class="report_element">
+                        <span class="element_title">FILTER BY PRICE POINT</span>
+                        
+                        <p  class="report_row" v-for="(item, key) in regReport.price_points" >${{key}} - {{item}}</p>
+                        <p  class="report_row">Average Membership Purchase: {{average_membership_price(regReport.price_points)}}</p>
+                     </div>
+                     
                
                
-            <div class="">
-               <span>FILTER BY STATE</span>
-               <div v-for="state in memberFilter('state')" >{{state.name}} - {{state.num}}</div>
-            </div>
-            
-            <p>----------------------------------------------------------------------------------------------</p>
-            
-            
-            <div class="">
-               <span>FILTER BY PRICE POINT</span>
                
-               <p v-for="(item, key) in regReport.price_points" >${{key}} - {{item}}</p>
-               <p>Average Membership Purchase: {{average_membership_price(regReport.price_points)}}</p>
-            </div>
-            
-            
-            
-            
-            
-            
-               <p>----------------------------------------------------------------------------------------------</p>
-               <p>REG  REPORT</p>
-            
-						<span class="text">Number of Registered Members</span>
-						<span class="value" v-text="regReport.registeredMembers || '-'"></span><br />                  
-               {{regReport}}
-               <p style="color: white" v-for="(item, key) in regReports.regReport">{{key}} - {{item}}</p>
+                     <div class="report_element">
+                        <span class="element_title">REG  REPORT</span>
                
-               
+                        <span class="text">Number of Registered Members</span>
+                        <span class="value" v-text="regReport.registeredMembers || '-'"></span><br />    
+                        
+                        <div  class="report_row" v-for="(item, key) in regReports.regReport">
+                           <span class="item key" v-text="key"></span> <span class="item value" v-text="item"></span>
+                        </div>
+                     </div>
+                     
+                  </div>
                
                </div>
                
@@ -226,6 +226,7 @@
                z-index: 25;
             width: calc(100% - 1rem);
             height: calc(100% - 1rem);
+            flex-direction: column;
             overflow: hidden;
             overflow-y: auto;
             min-height: 20rem;
@@ -236,6 +237,11 @@
          }
          .section.reg_reports .slide_in.show {
             left: .5rem;
+         }
+         
+         .section.reg_reports .report_content {
+            flex-wrap: wrap;
+            padding: 1rem 5vw;
          }
          .section.reg_reports .report_wrapper {
             display: flex;
@@ -249,8 +255,26 @@
             
          }
          
-         .section.reg_reports {
-            
+         .section.reg_reports .element_title {
+            font-size: 1.2em;
+            font-weight: bold;
+            width: 100%;
+            margin: .5rem 1rem;
+         }
+         .section.reg_reports .report_element {
+            width: 100%;
+            flex-wrap: wrap;
+         }
+         .section.reg_reports .report_element + .report_element {
+            margin-top: 2rem;
+            border-top: solid 2px var(--glowColor);
+         }
+         .section.reg_reports .report_row {
+            width: 100%;
+            flex-wrap: nowrap;
+         }
+         .section.reg_reports .report_row .item {
+            width: 12rem;
          }
          
 	</style>

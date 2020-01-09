@@ -1,7 +1,13 @@
 
 	<template>
 		<div class="component" id="payment_panel">
-         <div class="payment_wrapper">
+      
+         <div class="checkout_wrapper " :class="checkout? 'show' : ''"  >
+            <div class="paypal_content" ref="paypal"></div>
+            <button class="button return_button" @click.prevent="checkout=false">Return to cart</button>
+         </div>
+         
+         <div class="payment_wrapper" :class="checkout? '' : 'show'" >   
             <div class="mini_cart">
                <header class="header row">
                   <span class="element item title">Items</span>
@@ -22,6 +28,13 @@
                   <span class="element item">Total</span>
                   <span class="element value" v-text="'$'+shoppingCart.amount+'.00'"></span>
                </footer>
+               
+               <div class="controls">
+                  <button class="button" v-if="shoppingCart.items.length > 0" @click.prevent="checkout = true">Checkout with PayPal</button>                   
+               </div>
+               
+               
+               
             </div>
             
             <div class="payment_details">
@@ -72,17 +85,16 @@
                
             </div>
             
-            <div class="controls">
-                < checkout with paypal >
-            </div>
+            
          </div>
-      
+         
 		</div>
 	</template>
 	
 	<script>
       import Vue from 'vue'
 		import { mapState, mapGetters} from 'vuex';
+      
 			
       export default{
          name: 'purchaseForm',
@@ -90,10 +102,21 @@
          data() {
             return{
                cartItemType   : null,
-               acknowledgeCoc : false,   
+               acknowledgeCoc : false, 
+               checkout       : false,
+               loaded         : false,
+               paidFor        : false,
+               product: {
+                  price: 1.01,
+                  description: "description describing the thing",
+                  
+               },
+               
             }
          },
          
+         components: {
+         },
          watch: {
             
          },
@@ -109,9 +132,150 @@
          
          },
          
-         created() {
+         created() {            
          },
+         
+         props: {
+            checkoutReturn: {
+               type: Object,
+            },
+         },
+            
+         
+         mounted() {
+            const script = document.createElement("script");
+            
+            script.src = "https://www.paypal.com/sdk/js?client-id=ATufJRcU7JeB6B0IDxKEIAPT2H15TWJU4XkgD1oNJP--tnn5IGlB4DFKhq7_8awDylXKYZUOIXKwuQOX";
+            script.addEventListener("load", this.setLoaded);
+            document.body.appendChild(script);
+         },
+         
+         
          methods: {
+            
+            
+            setLoaded() {
+               var vm = this;
+               vm.loaded = true;
+               
+               console.log('create itemized description of items');
+               
+               
+               
+               window.paypal.Buttons({
+                  createOrder: (data, actions) => {
+                     return actions.order.create({
+                        application_context : { 
+                           shipping_preference: 'NO_SHIPPING'
+                        },
+                        purchase_units: [{
+                           description: this.product.description,
+                           noshipping: 1,
+                           amount: {
+                              currency_code: 'USD',
+                              value: vm.shoppingCart.amount,
+                           }
+                        }], 
+                          
+                        
+                     });
+                  },
+                  onApprove: (data, actions) =>{
+                     return actions.order.capture().then((details) =>{
+                        
+                        //update memberships - transaction - email
+                          
+                          
+                        // close slideout
+                        
+                        vm.$emit('checkoutReturn', details.status );
+                        
+                        //show on-screen notification
+                        
+                        // clear cart 
+                        // vm.$refs.paypal = [];
+                        // console.log(vm.$refs.paypal);
+                        // vm.setLoaded();
+                        
+                        console.log(data, details);
+                        
+                        // data: {orderID: "3SL20545SH089880T", payerID: "C89FKD8WKQSW2", facilitatorAccessToken: "A21AAFOoOIGrTmkRZ3LjoCgmVKWcksaf1UnGkJtjofq2UxF-x8kcFyjZSFfunwqL0SbARYGlFl9hicGHqKmfwJamPBPPD0DTQ"}
+                        
+                        // details: {create_time: "2020-01-09T18:41:02Z", update_time: "2020-01-09T18:43:21Z", id: "3SL20545SH089880T", intent: "CAPTURE", status: "COMPLETED", payer: 
+                        /*
+                        {  email_address: "mmcgu1966@gmail.com"
+                           payer_id: "C89FKD8WKQSW2"
+                           address: {country_code: "US"}
+                           name: {given_name: "Michael", surname: "McGuire"}
+                           __proto__: Object
+                           purchase_units: [{…}]
+                           links: [{…}]
+                           }
+                        */
+                       /* 
+                        submit_member(e) {
+                        var vm = this;
+                        
+                        vm.formErrors = [];
+                        
+                        if(!vm.member.badge_name) {
+                           vm.member.badge_name = vm.member.first_name;
+                        }
+                        
+                        if(!vm.member.display_name) {
+                           vm.member.display_name = vm.member.first_name + ' ' + vm.member.last_name;
+                        }
+                                       
+                        if (vm.member.con_status > 0) {
+                           vm.member.membership_description = vm.memberTypes.find(type => type.id == vm.member.con_status).membership_description;
+                        } else {
+                           vm.membership_description = null;
+                        }
+                        
+                        vm.$store.dispatch('submit_member', {'selectedCon':vm.selectedCon, 'member':vm.member}).then((response)=> {
+                           
+                           if (response.errors) {
+                              var errors = {};
+                              vm.formMessage = response.message;
+                              setTimeout(function() {
+                                 vm.formMessage = null;
+                              },3000);
+                              Object.entries(response.errors).forEach((error) => {
+                                 let errorKey = error[0].replace('member.', '');
+                                 let errorText = error[1][0].replace('member.', '');
+                                errors[errorKey] = errorText;
+                              });
+                              
+                              vm.formErrors = errors;
+                              console.log(errors);
+                           } else {
+                              if (vm.formErrors.length <1) {
+                                 console.log(response.member);
+                                 console.log(response.message);
+                                 vm.regSettings.reg_mode > 0? vm.print_badge(response.member.member)  : '';
+                                 vm.member = {};
+                                 vm.searchQuery = '';
+                                 vm.memberSort = 'last_name';   
+                                 vm.formMessage = response.message;     
+                                 setTimeout(function() {
+                                    vm.formMessage = null;
+                                 },2000);
+                              }
+                              
+                              
+                              vm.get_filtered_members();
+                              vm.member.state = '';
+                           }
+                        });
+                     }
+            
+            */
+                        
+        
+                     });
+                  }
+               }).render(vm.$refs.paypal);
+            },
             
             
             // REMOVE CART ITEM
@@ -131,6 +295,7 @@
                vm.acknowledgeCoc? vm.acknowledgeCoc = false : vm.acknowledgeCoc = true;
                vm.$store.dispatch('update_order_coc', vm.acknowledgeCoc).then(()=>{});               
             },
+            
          }
       }
 	
@@ -138,8 +303,8 @@
 	
 	<style>
       #payment_panel {
-         display: flex;
-         allign-self: flex-start;
+         align-self: flex-start;
+         flex-direction: column;
          width: 100%;
          
       }
@@ -148,10 +313,19 @@
       }
       
       #payment_panel .payment_wrapper {
-         display: flex;
             align-items: flex-start;
             justify-content: space-between;
-            flex-wrap: wrap;
+            flex-wrap: wrap;  
+            background: var(--lightColor);
+         overflow: hidden;
+         padding: 1rem 2rem;
+         overflow-Y: auto;
+         height: 100%;
+         opacity: 0;
+         transition: opacity .3s;
+      }
+      #payment_panel .payment_wrapper.show {
+         opacity: 1;
       }
       #payment_panel .mini_cart {
          display: flex;
@@ -248,12 +422,35 @@
          margin: 0;
       }
       #payment_panel .payment_details .detail_element {
-      }
-      
+      }      
       
       #payment_panel .controls {
          display: flex;
          width: 100%;
+      }
+      
+      #payment_panel .checkout_wrapper {
+         position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+         justify-content: center;   
+         opacity: 0;
+         background: var(--lightColor);
+         height: 100%;
+         transition: z-index .3s, opacity .3s, 
+      }
+      #payment_panel .checkout_wrapper.show {
+         z-index: 10;
+         opacity: 1;
+      }
+      #payment_panel .checkout_wrapper .return_button {
+         height: 4rem;
+         margin: 1rem;
+         width: 6rem;
+      }
+      #payment_panel .checkout_wrapper .paypal_content  {
+         width: calc(100% - 12rem);
       }
 	
 	</style>

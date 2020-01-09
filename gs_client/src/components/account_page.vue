@@ -85,7 +85,7 @@
 							
                         <div class="content">
                            <p>Hello {{userInfo.first_name+' '+userInfo.last_name}}</p>
-                           <div v-if="userInfo.con_status ">
+                           <div class="member_info" v-if="userInfo.con_status">
                               <p>You HAVE a membership for {{currentCon.name}} {{currentCon.con_num}}</p>
                               <p v-if="userInfo.badge_name">Your badge name is: 
                                  <span class="badge_name" v-text="userInfo.badge_name"></span>  
@@ -174,7 +174,7 @@
                               <button class="button" @click.prevent="add_link_code">Submit</button>
                            </div>
                            
-                           <div>
+                           <div class="link_code_buttons">
                               
                               <p>Click to generate a link code to share with accounts that you would like to link to this account. </p>
                               <button class="button" @click.prevent="create_link_code()">Create Code</button>
@@ -273,6 +273,7 @@
          
          created() {
             var vm = this;
+            
             if(vm.user.uuid) {
                vm.$store.dispatch('get_user_info', {'uuid' : vm.user.uuid, 'selectedCon' : vm.currentCon.tag_name}).then(()=>{
                });
@@ -532,39 +533,56 @@
 	}
 	
 	.section.account_section .section_content.aside .aside_section {
+      flex-direction: column;
 		position: absolute;
 			top: 0;
 			left: 0;
 			z-index: -1;
 		width: 100%;
 		opacity: 0;
-		height: 100%;		
+		height: 100%;
 		padding: 0 2rem;
 		overflow: hidden;
 		overflow-Y: auto;
 		transition: opacity .4s, z-index .4s;
 	}
+	.section.account_section .section_content.aside .link_code_buttons {
+      width: 100%;
+      flex-wrap: wrap;
+      justify-content: space-around;      
+   }
+	.section.account_section .section_content.aside .link_code_buttons p{
+      width: 100%;
+   }
+   
 	.section.account_section  .section_content.aside .aside_section .content  {
 		color: var(--textColor);
 		font-size: 1.25rem;
+      flex-direction: column;
       font-weight: 300;
 		text-shadow: none;
 		text-align: left;
 	}
+	.section.account_section  .section_content.aside .member_info {
+      flex-wrap: wrap;
+   }
 	.section.account_section  .section_content.aside .aside_section .content p {
 		text-shadow: inherit;
+      width: 100%;
       font-size: 1rem;
 		color: inherit;
 	}
 	.section.account_section  .section_content.aside .aside_section.show {
 		position: relative;
+      flex-wrap: wrap;
 		opacity: 1;
 		z-index: 10;
 		color: black;
 		min-height: 15rem;
 	}.section.account_section  .section_content.aside .link_code {
-      margin-top: .65rem;
-      padding: 0 .5rem;
+         flex-wrap: wrap;
+         margin-top: .65rem;
+         padding: 0 .5rem;
    }
 	.section.account_section  .section_content.aside .link_code p {
       display: flex;
@@ -651,12 +669,15 @@
    
    
    .section.account_section .linked_accounts {
-      
+      flex-direction: column;
    }
 	.section.account_section .aside_section form {
 		padding: 1rem 0;
 		margin: 0 auto;
 	}	
+	.section.account_section .aside_section form .rows {
+      flex-wrap: wrap;
+   }
 	.section.account_section .aside_section form label {
 		width: 12rem;
 	}

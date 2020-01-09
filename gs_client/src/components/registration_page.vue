@@ -244,7 +244,7 @@
 						
 							<div class="form_row status_row">	
 								<div class="input_wrapper">
-									<select class="select" name="status" v-model="member.con_status"   v-on:keydown.once="formErrors['con_status'] = null" >
+									<select class="select" name="status" v-model="member.con_status"   v-on:keydown.once="formErrors['con_status'] = null" @change="update_status()" >
 										<option value="" style="display:none;" selected = "selected">Membership Status</option>
 										<option value="0" >Not Attending</option>
 										<option v-for="type in memberTypes"  v-bind:value="type.id"  v-text="type.membership_description"></option>
@@ -587,6 +587,23 @@
 					vm.$store.dispatch('get_reg_settings').then(()=>{});
 				},
             
+            
+            // UPDATE STATUS (for staff - member status)
+            update_status() {
+               var vm = this;
+               // 2 = staff, 15 = concom
+               switch (vm.member.con_status) {                  
+                  case 15:
+                  case 13:
+                  case 21:
+                     vm.member.transaction_method = 12;  // comped
+                     break;
+                  case 14 :
+                  case 20: 
+                     vm.member.transaction_method = 13;  // guest
+                     break;
+               }               
+            },
             
             
 				get_filtered_members() {

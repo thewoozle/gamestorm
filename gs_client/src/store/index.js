@@ -76,6 +76,7 @@
 		staffPositions : {},
       statesList     : statesList,
       storeItems     : {},
+      systemMessages : [],
       timeblocks     : [],
 		user           : {},
       userEvents     : null,
@@ -86,7 +87,10 @@
 	}
 	
 	const actions = {
-		
+		// UPDATE SYSTEM MESSAGE
+      update_system_messages({commit}, message) {
+         commit('set_system_mesage', message);
+      },
 		// GET SITE DATA
 		get_site_data ({commit}) {
          
@@ -762,7 +766,6 @@
                      item[1].account.city.length >=2? delete item[1].submitErrors.city : item[1].submitErrors.city = 'city required';
                      item[1].account.zip.length >=2? delete item[1].submitErrors.zip : item[1].submitErrors.zip = 'postal code required';
                      
-                     
                      if(!success) { 
                         cartSuccess = false;
                         
@@ -786,24 +789,9 @@
                }
                
             });
-            
-            
-            
-            
-            
-            
-            // Axios.post(apiDomain+'_submit_checkout', {cart: state.shoppingCart}, { 
-               // headers: {'Content-Type': 'application/x-www-form-urlencoded;charset-UTF-8'}
-            // }).then((response)=> {
-                  // console.log(response.data);
-            // }, (err) =>{
-                  // console.log(err.statusText);
-            // });
          },
-         
-         
-      
-      
+            
+            
 		
 		/* -----------------------------------------------------------
                      SCHEDULING DATA 
@@ -855,12 +843,12 @@
 			});
 		},
       
+      
       // CHECK EMAIL
       check_email({commit}, emailData) { 
-         if(emailData.indexOf('@') >-1) {
+         if(emailData.email.indexOf('@') >-1) {
             return new Promise((resolve,reject) => { 
-               Axios.get(apiDomain+'_check_email', {params: {email : emailData.email}}).then((response) => {   
-console.log(response.data);      
+               Axios.get(apiDomain+'_check_email', {params: {email : emailData.email}}).then((response) => { 
                   commit('set_check_email', {orderNumber: emailData.orderNumber, users:response.data.users});
                   resolve(response);
                });
@@ -1061,7 +1049,20 @@ console.log(response.data);
       },  
 	}
 	
+   
+   /* --------------------------------------------------------------------
+               MUTATIONS
+      -------------------------------------------------------------------- */
 	const mutations = {
+      
+      set_system_mesage: (state, message) =>{
+         console.log(message);
+         state.systemMessages.push(message);
+
+         setTimeout(function() {
+            Vue.set(state, 'systemMessages', []);
+         },3000);
+      },
       
       set_current_con: (state, info) => {
 			state.conventionInfo= info;
@@ -1452,6 +1453,7 @@ console.log(response.data);
                for(var i = 0; i<= 5; i++) {
                   randString += randChars.charAt(Math.floor(Math.random() * randChars.length));               
                }
+               console.log(state.currentCon.tag_name);
                cartItem.item_order_number = state.currentCon.tag_name+'-'+ randString;
                cartItem.submitErrors = {};
                

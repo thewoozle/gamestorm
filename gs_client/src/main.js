@@ -29,17 +29,17 @@
          /*	----------------------------------------------------------- 
                      CHECK LOGGED IN	
             -----------------------------------------------------------	*/
-         check_logged_in() {
-            var vm = this;
-            if (Vue.ls.get('user') && Vue.ls.get('user').length > 0) {
-            console.log(Vue.ls.get('user').length);
-               vm.$store.dispatch('update_user', Vue.ls.get('user') );						
-            } else {
-               if (vm.$route.name != 'mainpage') {
-                  vm.$router.replace({name: 'mainpage'});
-               }
-            }					
-				},	
+         // check_logged_in() {
+            // var vm = this;
+            // if (Vue.ls.get('user') && Vue.ls.get('user').length > 0) {
+            // console.log(Vue.ls.get('user').length);
+               //vm.$store.dispatch('update_user', Vue.ls.get('user') );						
+            // } else {
+               // if (vm.$route.name != 'mainpage') {
+                  // vm.$router.replace({name: 'mainpage'});
+               // }
+            // }					
+			//	},	
             
             
             scroll_to_top() {

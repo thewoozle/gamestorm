@@ -3,6 +3,7 @@
       WIP
          checkout cart
          - update item, pretify cart display
+         - style and hook-up paypal payment checkout
       
       TODO
 

@@ -68,7 +68,7 @@
 									<div class="form_row" v-else >
 										<label for="email">Email</label>
 										<div class="input_wrapper">
-											<input type="text" class="input text_box" v-model="email" @keydown="submitErrors.email = null"  name="email" />
+											<input type="text" class="input text_box" v-model="email"  @keydown="submitErrors.email = null"  name="email" />
 											<span class="input_message" v-if="submitErrors.email">Enter the email address that is associated with this account</span>
 										</div>
 									</div>
@@ -76,7 +76,7 @@
 									
 									<div class="form_row">
 										<label for="password">Password
-											<button type="button" class="password_show fal fa-eye" :class="{'active': showPassword == 'text'}" @click.prevent="showPassword == 'text'? showPassword = 'password' : showPassword = 'text'"></button>
+											<button type="button" class="password_show fal fa-eye" tabindex="-1" :class="{'active': showPassword == 'text'}" @click.prevent="showPassword == 'text'? showPassword = 'password' : showPassword = 'text'"></button>
 										</label>
 										<div class="input_wrapper">
 											<input :type="showPassword" class="input text_box" v-model="password" @keydown="submitErrors.password = null" name="password" />
@@ -218,10 +218,10 @@
 			 
 			computed: {
             ...mapState({
-					statesList		: 'statesList',               
+					statesList		: 'statesList', 
+					conventionInfo	: 'conventionInfo',              
             }),
 				...mapGetters({
-					conventionInfo	: 'conventionInfo',
 					user			   : 'user',
 					pageContent		: 'pageContent',
 				}),
@@ -234,7 +234,6 @@
 		  
 			created() {
             var vm = this;
-				vm.check_logged_in();
             vm.newUser = {};
 				vm.newUser.state = '';
 			},

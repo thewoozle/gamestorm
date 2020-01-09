@@ -4,6 +4,10 @@
      
          <span id="loading" :class="showSpinner? 'show' : ''"><span class="spinner" ></span></span>
          
+         <div class="system_messages" :class="systemMessages.length > 0? 'show' : ''">
+            <span class="message" v-for="message in systemMessages" v-text="message"></span>
+         </div>
+         
          <div class="reset_password" v-if="urlParams.c">
             <div class="" v-if="$store.dispatch('validate_reset', {reset_code: urlParams.c})">
                <span class="warning" v-if="!urlParams.c"> Warning, unknown user. Please request a new password reset link</span>
@@ -42,31 +46,6 @@
                
                <router-view class="main_view"/>
                
-               
-                     <!-- EVENTS PLACEHOLDER
-                     <div class="events_placeholder" v-if="pageName == 'mainpage'" >
-                        <span class="section_title">GameStorm 21 Events</span>
-                        <div class="sections" v-if="user.uuid">
-                           <section class="section event_submission" >
-                              <span class="title">Event Submission Form</span>
-                              <span class="subtitle" v-text="'( Submission Deadline: '+ month_day_year(currentCon.event_submissions_close)+' )'"></span>
-                              
-                              <event_submission_form  />
-                              
-                           </section>
-                           
-                           <section class="section event_display">
-                              <user_events_list v-if="userEvents" />
-                              <span class="loading" v-else >Loading...</span>
-                           </section>
-                        </div>
-                        
-                        <div class="login_message" v-else >
-                           <p>Please Sign-in to  submit events</p>
-                        </div>
-                        
-                     </div>   
-                      -->
                 
                <page_footer v-if="pageType == 'public' " />
             </main>
@@ -88,6 +67,7 @@
 		import main_menu from '@/components/includes/main_menu'	
 		import Router from 'vue-router'
       import changepassword from '@/components/includes/change_password'
+      
 		
 		import page_footer from '@/components/includes/page_footer'	
 		import {apiDomain} from './config'
@@ -131,6 +111,7 @@
            ...mapState({
                devNotes    : 'devNotes',
                currentCon  : 'currentCon',
+               systemMessages: 'systemMessages',
                userEvents  : 'userEvents',
            }),
            ...mapGetters({
@@ -147,14 +128,15 @@
             let _urlParams = new URL(window.location.href);
             let resPassword = _urlParams.searchParams.has('c');
             let login = _urlParams.searchParams.has('login');
+               vm.$store.dispatch('get_site_data').then(()=>{
+               });
+            if(!vm.$route.name ) { vm.$router.push({name: 'mainpage'});}
             if(login == true) {
                vm.showOverlay = 'login';
                vm.showSpinner = false;
             } else if(resPassword == true) {
                _urlParams? vm.urlParams.c = new URL(window.location.href).searchParams.get('c') : vm.urlParams = {}; 
-               vm.$store.dispatch('get_site_data').then(()=>{
-               });
-            }            
+            }         
 				vm.handle_page_load();  
 		  },
 		  
@@ -166,7 +148,7 @@
             user:function(newval, oldval) {
                var vm = this;
                if(!newval.uuid) {
-                  vm.$route.name == 'mainpage'? '' : vm.$router.push({name: 'mainpage'});
+                  if(vm.$route.name == 'mainpage') { vm.$router.push({name: 'mainpage'});}
                }
             },
             
@@ -176,15 +158,6 @@
 		  
 		  methods: {
 			  
-			// GET STORE DATA FOR VUEX  
-			get_store_data() {
-				var vm = this;
-				vm.$store.dispatch('get_site_data').then(() => {
-					vm.handle_page_load(); 
-					vm.set_page_type(this.$route.name);
-				});	          	
-			},  
-         
 			  
 			// HANDLE PAGE SCROLL
 			handle_page_scroll(e) {
@@ -697,6 +670,35 @@
 		}
 
 		
+      .system_messages {
+         position: fixed;
+            top: -10rem;
+            left: 0;
+            z-index: 90;
+         width: 100%;  
+         height: 10rem;
+         opacity: 0;
+         background: rgba(255,255,255,.9);
+         color: var(--mainColor);
+         padding: 1rem 2rem;
+         justify-content: center;
+         align-items: center;
+         flex-direction: column;
+         transition: top .4s, opacity .4s;
+      }
+      .system_messages.show {
+         top: 0;
+         opacity: 1;
+      }
+      .system_messages .message {
+         width: auto;
+         font-size: 1.5rem;
+         color: var(--warningColor);
+      }
+      .system_messages .message +.message {
+         margin-top: 1rem;
+         
+      }
 		
 		
 		/*	------------	SCROLL BAR (webkit)	------------	*/	
