@@ -130,6 +130,7 @@
             let login = _urlParams.searchParams.has('login');
                vm.$store.dispatch('get_site_data').then(()=>{
                });
+               console.log(login);
             if(!vm.$route.name ) { vm.$router.push({name: 'mainpage'});}
             if(login == true) {
                vm.showOverlay = 'login';
@@ -200,11 +201,12 @@
                vm.showSpinner = false;	
                // });  
 				});
+            vm.set_page_type(vm.pageName);
 			},
 			
 			set_page_type(name) {
+            console.log(name);
 				var vm = this;
-            
 				switch(name) {
 					case 'adminpage':
                case 'newspage':
@@ -213,6 +215,7 @@
 						
 						
 					case 'registrationpage':
+               case 'atconpurchase':
                case 'regreportspage':
 						vm.pageType = 'registration';
 						break;
@@ -223,6 +226,7 @@
 					default: 
 						vm.pageType = 'public';
 				}
+            console.log('use store to hold page type and name');
 				//console.log('name:'+name+' / ' + vm.pageType);
 			},
 			
@@ -672,23 +676,27 @@
 		
       .system_messages {
          position: fixed;
-            top: -10rem;
+            top: 0;
             left: 0;
-            z-index: 90;
+            z-index: -1;
          width: 100%;  
-         height: 10rem;
+         max-height: 0;
+         overflow: hidden;
          opacity: 0;
          background: rgba(255,255,255,.9);
          color: var(--mainColor);
-         padding: 1rem 2rem;
          justify-content: center;
+         padding: 0 2rem;
          align-items: center;
          flex-direction: column;
-         transition: top .4s, opacity .4s;
+         transition: top .4s, opacity .4s, z-index .4s, max-height .4s, padding .4s;
       }
       .system_messages.show {
          top: 0;
          opacity: 1;
+         z-index: 90;
+         padding: 1rem 2rem;
+         max-height: 10rem;
       }
       .system_messages .message {
          width: auto;
@@ -1007,40 +1015,84 @@
 			
 			flex-direction: column;		
 		}
-		.news_items .news_item{
-			
+		.news_items .news_item {			
 			width:  100%;
+         position: relative;
 			padding: 0 .5rem;
-			flex-wrap: wrap;
+         justify-content: space-between;
 		}
-		.news_items .news_button {
-			
+		.news_items .news_item + .news_item {	
+         margin-top: 1rem;
+         padding-top: 1rem;
+         border-top: solid 1px var(--borderColor);
+      }
+		.news_items .news_date {
+         width: 3rem;
 			justify-content: space-between;
 			background: rgba(0,0,0,.1);
 			cursor: pointer;
-			width: 100%;
 			align-items: center;
 			height: 3rem;
 			color: var(--highlightColor);
 			font-weight: 100;		
 		}
-		.news_items .news_button:hover {
+		.news_items .news_date:hover {
 			color: var(--glowColor);
 		}
-		.news_items .news_button .title{
-			
+		.news_items .news_item .title {
+			padding: 0 1rem;
 			flex-wrap: wrap;
 			justify-content: flex-start;
 			text-align: left;
 			line-height: 1em;
+         font-size: 1.35rem;
+         color: var(--highlightColor);
 			width: calc(100% - 3rem);
 			font-weight: 300;
-			margin-left: auto;
 		}
+      
+		.news_items .article_button {
+         position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 10;
+         display: flex;
+         margin: .65rem;
+         justify-content: center;
+         align-items: center;
+         font-size: 2.5rem;
+         width: 1em;
+         height: 1em;
+         cursor: pointer;
+         border-radius: .25em;
+         background: rgba(0,118,163,.4);
+         color: var(--titleColor);
+      }
+		.news_items .article_button:hover {
+         background: rgba(0,0,0,0.1);
+      }
 		
 		.news_items .news_article {
-			
+         flex-wrap: wrap;
+         padding: .5rem 1rem;
+         width: 100%;
 		}
+		.news_items .news_article .content {
+         margin-top: 0;
+         max-height: 0;
+         flex-wrap: wrap;
+         overflow: hidden;
+         transition: max-height .4s, margin .4s, opacity .4s
+      }
+		.news_items .news_article.show .content {
+         margin-top: .5rem;
+         max-height: 10rem;
+         overflow-Y: auto;
+         opacity: 1;
+      }
+		.news_items .news_article .content p {
+         margin: .5rem 0;
+      }
 		
 		
 		/*	------	HEADER NAVIGATION		-----	*/
@@ -1911,10 +1963,41 @@
 		form .expanding_row.show {
 			line-height: 1rem;
 			max-height: 5rem;
+		}		
+		
+		.page_header {
+			display: flex;
+         justify-content: center;
+			position: fixed;
+				top: 0;
+				left: 0;
+				z-index: 50;
+			width: calc(100% - 1rem);
+			height: 6rem;
+			margin: 0 auto;
+			font-size: 0.45rem;
+         transition: height .2s;
 		}
+			
+		.page_header .header_inner {
+			position: relative;
+			display: flex;
+         align-items: center;
+			justify-content: space-between;
+			font-size: 1em;
+			height: 100%; 
+			width: 100%;	
+         max-width: 1300px;
+			transition: height .5s, background .5s;
+		}	
 		
-		
-		
+		.page_header .signin_button {
+			position: absolute;
+			top: 0;
+			right: 0;
+			z-index: 90;
+			display: none;
+		}
 		/*  -----------------------------------------------------------------------------------------------------
 										BASIC PAGE LAYOUT
 			-----------------------------------------------------------------------------------------------------    */ 
@@ -1969,7 +2052,7 @@
 			height: calc(100vh - 6rem);
 			width: 100%;
 			margin: 6rem 0  0 0; 
-			padding: 1rem 0 10rem;         
+			padding: 1rem 0 0;         
 			white-space: normal;
 			overflow: hidden;
 			overflow-y: auto;

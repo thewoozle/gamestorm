@@ -2,6 +2,9 @@
       
       WIP
          checkout cart
+         
+         - purchase_form create con_status from item.id
+         
          - update item, pretify cart display
          - style and hook-up paypal payment checkout
       

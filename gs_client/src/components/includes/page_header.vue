@@ -60,7 +60,7 @@
 										<div class="input_wrapper">
                                  <select class="select" name="uuid" v-model="uuid">
                                     <option value="" style="display: none">select user....</option>
-                                    <option v-for="user in loginUsers" :value="user.uuid" v-text="user.first_name+' '+user.last_name"></option>
+                                    <option v-for="user in loginUsers" :value="user.uuid"  v-text="user.first_name+' '+user.last_name"></option>
                                  </select>
 										</div>
                            </div>                       
@@ -68,7 +68,7 @@
 									<div class="form_row" v-else >
 										<label for="email">Email</label>
 										<div class="input_wrapper">
-											<input type="text" class="input text_box" v-model="email"  @keydown="submitErrors.email = null"  name="email" />
+											<input type="text" class="input text_box" v-model="email"  @keydown="submitErrors.email = null" @keyup="check_email($event)"  name="email" />
 											<span class="input_message" v-if="submitErrors.email">Enter the email address that is associated with this account</span>
 										</div>
 									</div>
@@ -179,7 +179,7 @@
 					dropdownSection	: 'login',
 					showPassword		: 'password',
 					email 				: '',
-					password		   	: '',
+					password		   	: null,
                uuid              : '',
 					formData		   	: {},
 					submitErrors		: {},
@@ -232,10 +232,11 @@
 				  
 			},
 		  
-			created() {
+			beforeCreate() {
             var vm = this;
             vm.newUser = {};
 				vm.newUser.state = '';
+            vm.password = null;
 			},
 			
 			
@@ -264,6 +265,7 @@
                   
 					vm.submitErrors = {};
 					vm.showLoginLoading = true;
+               
 					
 					vm.$store.dispatch('submit_login', loginInfo).then((response) => {
                   vm.showLoginLoading = false;
@@ -274,6 +276,7 @@
                   if (response.users) {
                      vm.loginUsers = response.users;
                   }	
+                  vm.password = null;
                    
                }, (err) => {
                   if (err.message) {
@@ -282,14 +285,17 @@
                   } 
                      vm.submitErrors = err;
                   vm.showLoginLoading = false;
+                  vm.password = null;
                });
+               
 					vm.$route.name == 'mainpage'? '' : vm.$router.push({name: 'mainpage'});
-               //vm.email = null;
-               vm.password = null;
+               
+               
                setTimeout(function() {
                   vm.loginMessage = null;
                   vm.submitErrors= {};
                   vm.showPassword = 'password';
+                  vm.showLoginLoading = false;
                },3000);  
 				},
 				
@@ -301,10 +307,27 @@
 					var vm = this;
 					vm.$store.dispatch('update_user' ).then(()=>{
                   vm.$route.name == 'mainpage'? '' : vm.$router.push({name: 'mainpage'});
-                  vm.showPassword = 'password';
+                  vm.showPassword= 'password';
                   vm.dropdownSection = 'login';
+                  vm.password    = null;
+                  vm.email       = '';
+                  vm.loginUsers  = {};
                });
 				},
+            
+            
+            /* ----------------------------------------------------------- 
+                        CHECK EMAIL (for multiple)
+               ----------------------------------------------------------- */
+               check_email(e) {
+                  var vm = this;
+                  
+                  vm.$store.dispatch('check_email', e.target.value).then((response)=>{
+                     vm.password = null;
+                     vm.loginUsers = response.data.users;
+                  });  
+               },
+            
             
 				/*	----------------------------------------------------------- 
 								REQUEST PASSWORD RESET	
@@ -324,8 +347,6 @@
                         vm.submitErrors = {};
                      } 
                   },4000);
-                  
-                  
                   
                }, (err) => {
                   vm.passwordResetMessage = err.email;
@@ -416,39 +437,7 @@
 			
 		/*------------	PAGE HEADER		------------	*/
 		
-		.page_header {
-			display: flex;
-         justify-content: center;
-			position: fixed;
-				top: 0;
-				left: 0;
-				z-index: 50;
-			width: calc(100% - 1rem);
-			height: 6rem;
-			margin: 0 auto;
-			font-size: 0.45rem;
-         transition: height .2s;
-		}
-			
-		.page_header .header_inner {
-			position: relative;
-			display: flex;
-         align-items: center;
-			justify-content: space-between;
-			font-size: 1em;
-			height: 100%; 
-			width: 100%;	
-         max-width: 1300px;
-			transition: height .5s, background .5s;
-		}	
 		
-		.page_header .signin_button {
-			position: absolute;
-			top: 0;
-			right: 0;
-			z-index: 90;
-			display: none;
-		}
 		
 	
 	#page_header .header_inner {

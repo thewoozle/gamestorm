@@ -15,6 +15,7 @@
    
 	import admin_page from '@/components/admin_page'
 	import registration_page from '@/components/registration_page'
+	import at_con_purchase_page from '@/components/at_con_purchase_page'
 	import reg_reports_page from '@/components/reg_reports_page'
 	import scheduling_page from '@/components/scheduling_page'
    import news_hub_page from '@/components/news_hub_page'
@@ -95,6 +96,10 @@
          path     : '/registration_reports',
          name     : 'regreportspage',
          component: reg_reports_page 
+      }, {
+         path     : '/at_con_purchase_form',
+         name     : 'atconpurchase',
+         component: at_con_purchase_page 
       }
       
 		

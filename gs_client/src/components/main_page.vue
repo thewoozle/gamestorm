@@ -24,26 +24,29 @@
 			
 
 			<div class="sections">
+         
 				<section class="section intro">
 				
 					<div class="news_items">
-						<div class="news_item" v-if="articles" v-for="article in articles">
+						<div class="news_item" v-bind:class="article.open? 'open' : ''" v-if="articles" v-for="article in articles">
 						
-							<button type="button" class="news_button" @click="article.open? article.open = false : article.open = true">
-								<span class="title" v-text="article.article_title"></span> 
+							<span class="news_date" >
 								<span class="date_bullet active" v-html="article_date(article.start_date)"></span> 
-							</button>
+							</span>
 							
-							<article class="news_article" v-if="article.open" v-html="article.article_body"></article>
+							<article class="news_article" :class="article.show_post? 'show' : ''"  >
+								<span class="title" v-text="article.post_title"></span> 
+                        <div class="content" v-html="article.body"></div>
+                        </article>
+                     <button class="article_button fal" v-bind:class="article.show_post? 'fa-arrow-alt-square-up':'fa-arrow-alt-square-down'" @click="$store.dispatch('show_article', article.post_id).then(()=>{$forceUpdate()});"></button>
+						</div>
 							<footer class="news_footer">
 								
 							</footer>
-						</div>
 					</div>
                
                
-					<div class="content_wrapper">	
-						<article class="content intro" v-if="pageContent.con_intro" v-html="pageContent.con_intro.content"></article>
+					<div class="site_intro" v-if="pageContent.con_intro" v-html="pageContent.con_intro.content">
 					</div>
 					
 				
@@ -52,7 +55,7 @@
 				
 				<section class="section current_con_intro">
             <span class="section_title"><span class="text">GameStorm 22</span></span>
-				<p>GS 22 will be at teh Jantzen Beach Red Lion again this year</p>
+				<p>GS 22 will be at the Jantzen Beach Red Lion again this year</p>
             <pre>show artwork, guests as available, number of registered members (not staff)</pre>
             
             
@@ -95,7 +98,6 @@
 			
 			data() {
 				return {
-					
 				}
 			},
 			
@@ -123,8 +125,10 @@
 			},
 			
 			created: function() { 
-				var vm = this;            
-            vm.$store.dispatch('get_news_articles').then(()=>{});
+				var vm = this;
+            
+            vm.$store.dispatch('get_news_articles').then(()=> {});
+            
             vm.get_user_info();
             
          },
@@ -134,8 +138,7 @@
             get_user_info() {
                var vm = this;
                if(vm.user) {
-                  vm.$store.dispatch('get_user_info', {'uuid' : vm.user.uuid, 'selectedCon' : vm.currentCon.tag_name}).then(()=>{
-                  });
+                  vm.$store.dispatch('get_user_info', {'uuid' : vm.user.uuid, 'selectedCon' : vm.currentCon.tag_name}).then(()=>{});
                } 
             }
          },
@@ -156,7 +159,14 @@
 			margin: 5vh auto 0;
 			padding: 0 0 0 1rem;
 		}
-		.section.intro .intro p {
+      
+		.section.intro .news_items {
+         flex-direction: column;
+      }
+		.section.intro .site_intro {
+         flex-direction: column;
+      }
+		.section.intro .site_intro p {
 			font-size: 1.75rem;
 			line-height: 1.35em;
 			letter-spacing: .025em;
@@ -173,9 +183,7 @@
       }
 		.main_view .section_title {
       }
-		.section.intro .news_items {         
-			width: 12rem;
-		}
+      
 
 
 	

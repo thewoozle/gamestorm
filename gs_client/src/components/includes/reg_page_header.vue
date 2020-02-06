@@ -5,6 +5,7 @@
 				<nav class="reg_menu">
 					<router-link class="nav_link" :to="'/'" >Exit</router-link>
 					<router-link class="nav_link" :to="'/registration_hub'" >Registration Hub</router-link>
+					<router-link class="nav_link" :to="'/at_con_purchase_form'" >At-Con purchase form</router-link>
 					<router-link class="nav_link" :to="'/registration_reports'" >Reg. Reports</router-link>
 				</nav> 
 				

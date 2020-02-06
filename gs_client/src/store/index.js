@@ -20,8 +20,7 @@
    const newCart = {
       'amount' : 0,
       'transaction' : '',
-      'items': [
-     
+      'items': [     
       ]
    } 
    
@@ -124,6 +123,11 @@
 				  console.log('error: '+err.statusText);
 			  });
 		},
+      
+      
+      show_article({commit}, postId) {
+         commit('set_show_article', postId);
+      },
       
       
       // GET NEWS ARTICLES 
@@ -511,8 +515,7 @@
             });         
       },
       
-      update_linked_account({commit}, item) {         
-         //commit('set_linked_account', info.account);
+      update_linked_account({commit}, item) {  
          commit('set_shopping_cart_update', item);
       },
       
@@ -729,7 +732,7 @@
          
          update_shopping_cart({commit}, item) {
             var vm = this;
-            if(!item.uuid) {item.uuid = '';} 
+            //if(!item.uuid) {item.uuid = '';} 
             commit('set_shopping_cart_update', item);
          },
          
@@ -739,7 +742,12 @@
             console.log(acknowledgement);
          },
          
+         // RESET SHOPPING CART 
+         reset_shopping_cart({commit}) {
+            commit('set_reset_shopping_cart');
+         },
          
+         // SUBMIT SHOPPING CART
          submit_shopping_cart({commit}) {
             var   vm = this,
                   cartSuccess = true;
@@ -758,13 +766,13 @@
                         delete item[1].submitErrors.account;
                      }
                      
-                     item[1].account.first_name.length >=2? delete item[1].submitErrors.first_name : item[1].submitErrors.first_name = 'first name required';
-                     item[1].account.last_name.length >=2? delete item[1].submitErrors.last_name : item[1].submitErrors.last_name = 'last name required';
-                     item[1].account.email.indexOf("@") >0 && item[1].account.email.indexOf(".") >0 ? delete item[1].submitErrors.email : item[1].submitErrors.email = 'email address required';
-                     item[1].account.address.length >=2? delete item[1].submitErrors.address : item[1].submitErrors.address = 'address required';
-                     item[1].account.state.length >=2? delete item[1].submitErrors.state : item[1].submitErrors.state = 'state required';
-                     item[1].account.city.length >=2? delete item[1].submitErrors.city : item[1].submitErrors.city = 'city required';
-                     item[1].account.zip.length >=2? delete item[1].submitErrors.zip : item[1].submitErrors.zip = 'postal code required';
+                     item[1].account.first_name && item[1].account.first_name.length >=2? delete item[1].submitErrors.first_name : item[1].submitErrors.first_name = 'first name required';
+                     item[1].account.last_name && item[1].account.last_name.length >=2? delete item[1].submitErrors.last_name : item[1].submitErrors.last_name = 'last name required';
+                     item[1].account.email && item[1].account.email.indexOf("@") >0 && item[1].account.email.indexOf(".") >0 ? delete item[1].submitErrors.email : item[1].submitErrors.email = 'email address required';
+                     item[1].account.address && item[1].account.address.length >=2? delete item[1].submitErrors.address : item[1].submitErrors.address = 'address required';
+                     item[1].account.state? delete item[1].submitErrors.state : item[1].submitErrors.state = 'state required';
+                     item[1].account.city && item[1].account.city.length >=2? delete item[1].submitErrors.city : item[1].submitErrors.city = 'city required';
+                     item[1].account.zip && item[1].account.zip.length >=2? delete item[1].submitErrors.zip : item[1].submitErrors.zip = 'postal code required';
                      
                      if(!success) { 
                         cartSuccess = false;
@@ -845,10 +853,10 @@
       
       
       // CHECK EMAIL
-      check_email({commit}, emailData) { 
-         if(emailData.email.indexOf('@') >-1) {
+      check_email({commit}, emailData) {
+         if(emailData.indexOf('@') >-1) {
             return new Promise((resolve,reject) => { 
-               Axios.get(apiDomain+'_check_email', {params: {email : emailData.email}}).then((response) => { 
+               Axios.get(apiDomain+'_check_email', {params: {email : emailData}}).then((response) => { 
                   commit('set_check_email', {orderNumber: emailData.orderNumber, users:response.data.users});
                   resolve(response);
                });
@@ -1104,6 +1112,16 @@
          });
          state.allArticles = articles;
       },
+      
+      set_show_article: (state, postId) =>{        
+         var vm = this;
+         Object.entries(state.articles).forEach((article)=>{
+            if(article[1].post_id == postId) {
+               article[1].show_post? article[1].show_post = false : article[1].show_post = true;                
+            }
+         });
+      },
+      
       
       //SET ADMIN PERMISSIONS       
       set_admin_permissions: (state, permissions) => {
@@ -1402,6 +1420,12 @@
       },
       
       
+      /* -------------------------------------------------------
+               SET RESET SHOPPING CART
+         -------------------------------------------------------  */
+         set_reset_shopping_cart: (state) => {
+            Vue.set(state, 'shoppingCart', newCart);
+         },
       
       /* -------------------------------------------------------
                SET SHOPPING CART UPDATE
@@ -1414,7 +1438,7 @@
          if(item.purchase == false) {
             // REMOVE
             if(state.shoppingCart.items) {
-               Object.entries(state.shoppingCart.items).forEach((cartItem)=>{               
+               Object.entries(state.shoppingCart.items).forEach((cartItem)=>{
                   if(cartItem[1].item_order_number== item.item_order_number) {
                      removeIndex = cartItem[0]
                   }
@@ -1422,7 +1446,7 @@
                
                delete state.shoppingCart.items[removeIndex]
                state.shoppingCart.items = state.shoppingCart.items.filter(v => v);
-               state.shoppingCart.items.length <=0? delete state.shoppingCart.items : '';
+               //state.shoppingCart.items.length <= 0? delete state.shoppingCart.items : '';
             
             }
             
@@ -1453,7 +1477,7 @@
                for(var i = 0; i<= 5; i++) {
                   randString += randChars.charAt(Math.floor(Math.random() * randChars.length));               
                }
-               console.log(state.currentCon.tag_name);
+               
                cartItem.item_order_number = state.currentCon.tag_name+'-'+ randString;
                cartItem.submitErrors = {};
                
@@ -1461,13 +1485,9 @@
             }  
          }
          
-         
-         
-         
-         
          // RECALC CART AMOUNT
          if(state.shoppingCart.items) {            
-            Object.entries(state.shoppingCart.items).forEach((cartItem) =>{
+            Object.entries(state.shoppingCart.items).forEach((cartItem) => {               
                cartAmount = parseInt(cartAmount) + cartItem[1].item.price;            
             });
             
@@ -1477,9 +1497,11 @@
          state.shoppingCart.amount = cartAmount;
          
          // clean-up empty items
-         state.shoppingCart.items = state.shoppingCart.items.filter(v => v);
-         state.shoppingCart.items.length <=0? delete state.shoppingCart.items : '';
-         
+         if(state.shoppingCart.items.length <= 0) {
+            state.shoppingCart.items = [];
+         } else {
+            state.shoppingCart.items.filter(v => v);
+         }
       },
 	}
 	

@@ -9,25 +9,29 @@
 					<div class="content_wrapper">	
 						<span class="section_title">GameStorm Events</span>
       
-						<article class="content intro" v-if="pageContent.events_intro" v-html="pageContent.events_intro.content"></article> 
+						<div class="content intro" v-if="pageContent.events_intro" v-html="pageContent.events_intro.content"></div> 
 						<p>Event submissions will be Open from {{day_date(currentCon.event_submissions_open)}} through {{day_date(currentCon.event_submissions_close)}}.</p>
 						<p>Event Signups will be Open from {{day_date(currentCon.signups_open)}} through {{day_date(currentCon.signups_close)}}.</p>
 					</div>
 					
 					<div class="news_items">
-							<span class="subsection_title">Events News</span>
-						<div class="news_item" v-if="articles" v-for="article in articles">
-							<button type="button" class="news_button" @click="article.open? article.open = false : article.open = true">
-								<span class="title" v-text="article.article_title"></span> 
+						<div class="news_item" v-bind:class="article.open? 'open' : ''" v-if="articles" v-for="article in articles">
+						
+							<span class="news_date" >
 								<span class="date_bullet active" v-html="article_date(article.start_date)"></span> 
-							</button>
+							</span>
 							
-							<article class="news_article" v-if="article.open" v-html="article.article_body"></article>
+							<article class="news_article" :class="article.show_post? 'show' : ''"  >
+								<span class="title" v-text="article.post_title"></span> 
+                        <div class="content" v-html="article.body"></div>
+                        </article>
+                     <button class="article_button fal" v-bind:class="article.show_post? 'fa-arrow-alt-square-up':'fa-arrow-alt-square-down'" @click="$store.dispatch('show_article', article.post_id).then(()=>{$forceUpdate()});"></button>
+						</div>
 							<footer class="news_footer">
 								
 							</footer>
-						</div>
 					</div>
+               
 				
 				</section> 
             
@@ -127,6 +131,7 @@
 			
 			created() {
             var vm = this;
+            vm.$store.dispatch('get_news_articles').then(()=> {});
             vm.$store.dispatch('get_con_events').then(()=>{});            
          },
 			mounted: function() {
@@ -216,13 +221,16 @@
 	
 	<style>
 	
-		.news_items {
-			position: absolute;
-				top: 0;
-				left: 0;
-			width: 12rem;
-		}
-      
+      .events_intro {
+         flex-direction: column;
+      }
+      .events_intro .content_wrapper {
+         flex-wrap: wrap;
+         padding: 2rem 0;
+      }
+      .events_intro .section_title {
+         width: 100%;
+      }
       .events_display .event_list {
          display: flex;
          flex-direction: column;

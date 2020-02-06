@@ -84,9 +84,6 @@
                      vm.partners[1]? vm.slide_2 = vm.partners[1]: '';
                      vm.partners.length > 2? vm.slide_3 = vm.partners[(vm.partners.length)-1] : vm.slide_3 = vm.partners[1];
                   }
-               
-               
-               
                }
             },
             

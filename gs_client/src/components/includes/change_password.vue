@@ -90,11 +90,7 @@
                         setTimeout(function() {
                            vm.loginMessage = null;
                            vm.urlParams = {};
-                           vm.showPassword = false;
-                           
-                           vm.$store.dispatch('update_user' ).then(()=>{
-                              vm.$route.name == 'mainpage'? '' : vm.$router.push({name: 'mainpage'});
-                           });
+                           vm.showPassword = false;                           
                         },2000);
                            
                   }, (err) => {

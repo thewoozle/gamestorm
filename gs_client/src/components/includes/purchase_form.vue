@@ -10,17 +10,17 @@
          <div class="payment_wrapper" :class="checkout? '' : 'show'" >   
             <div class="mini_cart">
                <header class="header row">
-                  <span class="element item title">Items</span>
+                  <span class="element item title">Item</span>
+                  <span class="element value title">Member</span>
+                  <span class="element value title">Age</span>
                   <span class="element value title">Amount</span>
                </header>
                <div class="cart_body">
                   <div class="row" v-for="cartItem in shoppingCart.items" >
-                     <span class="element item" v-text="cartItem.item.description"></span>
+                     <span class="element item" v-text="cartItem.item.long_description"></span>
+                     <span class="element name" v-text="cartItem.account.first_name+' '+cartItem.account.last_name"></span>
+                     <span class="element age" v-if="cartItem.account.age > 0 && cartItem.account.age <=17" v-text="cartItem.account.age"></span>
                      <span class="element value" v-text="'$'+cartItem.item.price+'.00'"></span>
-                     <span class="element member" >
-                        <span class="name" v-text="cartItem.account.first_name+' '+cartItem.account.last_name"></span>
-                        <span class="age" v-if="cartItem.account.age > 0 && cartItem.account.age <=17" v-text="cartItem.account.age"></span>
-                     </span>
                      <button class="cart_control far fa-user-times" @click.prevent="remove_cart_item(cartItem)"></button>
                   </div>
                </div>
@@ -38,40 +38,31 @@
             </div>
             
             <div class="payment_details">
-               <div class="detail_element billing_details">
-                  <span class="title">Billing Information</span>
+               <div class="detail_element membership_details">
+                  <span class="title">Membership Information</span>
                   
-                  if logged-in, show info else option to log-in, use a member's ifo, or enter info
-               {{user}}
-               </div>
-               <div class="detail_element create_account">
-                  if user not logged-in, ask to log-in or create account using payment info or new info
+                  <p>By purchasing {{shoppingCart.items.length}} membership{{shoppingCart.items.length > 1? 's':''}} for {{currentCon.name+' '+ currentCon.con_num}} I acknowledge 
+                     that I have read and agree to abide by the <a class="link" target="gswaiverpolicy" href="https://gamestorm.org/attend/policies/#cocpolicy">GameStorm Code of Conduct</a> 
+                     {{shoppingCart.items.length > 1? ' and accept responsability for ensuring that those receiving these memberships understand the expectation to likewise abide by the Code fo Conduct':''}}.
+                  </p>
+                  
+                  <p>A user account will automatically be created for any membershps purchased that do not already have an account associated with it. To activate an account, use the SIGHIN HELP option to set a new password. </p>
+                  
                </div>
                
-               <div class="detail_element Code_of_conduct">
-                  <span class="title">Code of Conduct</span>
-                  <div class="content" >
-                     <span class="checkbox_wrapper">
-                        <span class="check_box fal" :class="acknowledgeCoc? 'fa-check-square' : 'fa-square'" @click.prevent="update_order_coc()"></span> 
-                     </span>
-                     <p>By purchasing this membership I acknowledge that I have read and agree to abide by the 
-                        <a target="gswaiverpolicy" href="https://gamestorm.org/attend/policies/#cocpolicy">GameStorm Code of Conduct</a>
-                     </p>
-                  </div>
-               </div>
                
                <div class="detail_element children">
                   <span class="title">Minors</span>
                   <div class="content" >                  
                      <p>A completed waiver signed by a parent or legal guardian is required for all children age 17 and under. The waiver form must include contact information 
                         for the parent or guardian, which will only be used in relation to care of the child. <br />
-                        Please see the complete policy for Minors in the GameStorm Code of Conduct. 
+                        Please see the complete policy for Minors in the <a class="link" target="gswaiverpolicy" href="https://gamestorm.org/attend/policies/#cocpolicy">GameStorm Code of Conduct</a>. 
                      </p>   
-                        <a target="gswaiverpolicy" href="https://gamestorm.org/attend/policies/#cocpolicy">GameStorm Code of Conduct</a>
+                        
                      </p>
                      <span class="links">
-                        <a class="internal-link" href="https://gamestorm.org/attend/policies/waiver-child-15-and-over/" title="Child Waiver: 15 and over">Child Waiver: 15 and over</a>
-                        <a class="internal-link" href="https://gamestorm.org/attend/policies/waiver-child-under-15/" title="Child Waiver: Under 15">Child Waiver: Under 15</a>
+                        <a class="link" href="https://gamestorm.org/attend/policies/waiver-child-15-and-over/" title="Child Waiver: 15 and over">Child Waiver: 15 and over</a>
+                        <a class="link" href="https://gamestorm.org/attend/policies/waiver-child-under-15/" title="Child Waiver: Under 15">Child Waiver: Under 15</a>
                      </span>
                   </div>
                </div>
@@ -161,8 +152,18 @@
                console.log('create itemized description of items');
                
                
+               /* - le'process
+                  1) 
+                  2) create paypal order
+                  3) update member records and transactions 
+                  4) send email conformation 
+                  5) handle on-screen status 
+                  6) close shopping cart and paypal 
+               */
+                  
                
                window.paypal.Buttons({
+                  
                   createOrder: (data, actions) => {
                      return actions.order.create({
                         application_context : { 
@@ -176,102 +177,28 @@
                               value: vm.shoppingCart.amount,
                            }
                         }], 
-                          
-                        
                      });
                   },
                   onApprove: (data, actions) =>{
                      return actions.order.capture().then((details) =>{
-                        
-                        //update memberships - transaction - email
-                          
-                          
-                        // close slideout
-                        
-                        vm.$emit('checkoutReturn', details.status );
-                        
-                        //show on-screen notification
-                        
-                        // clear cart 
-                        // vm.$refs.paypal = [];
-                        // console.log(vm.$refs.paypal);
-                        // vm.setLoaded();
-                        
-                        console.log(data, details);
-                        
-                        // data: {orderID: "3SL20545SH089880T", payerID: "C89FKD8WKQSW2", facilitatorAccessToken: "A21AAFOoOIGrTmkRZ3LjoCgmVKWcksaf1UnGkJtjofq2UxF-x8kcFyjZSFfunwqL0SbARYGlFl9hicGHqKmfwJamPBPPD0DTQ"}
-                        
-                        // details: {create_time: "2020-01-09T18:41:02Z", update_time: "2020-01-09T18:43:21Z", id: "3SL20545SH089880T", intent: "CAPTURE", status: "COMPLETED", payer: 
-                        /*
-                        {  email_address: "mmcgu1966@gmail.com"
-                           payer_id: "C89FKD8WKQSW2"
-                           address: {country_code: "US"}
-                           name: {given_name: "Michael", surname: "McGuire"}
-                           __proto__: Object
-                           purchase_units: [{…}]
-                           links: [{…}]
-                           }
-                        */
-                       /* 
-                        submit_member(e) {
-                        var vm = this;
-                        
-                        vm.formErrors = [];
-                        
-                        if(!vm.member.badge_name) {
-                           vm.member.badge_name = vm.member.first_name;
-                        }
-                        
-                        if(!vm.member.display_name) {
-                           vm.member.display_name = vm.member.first_name + ' ' + vm.member.last_name;
-                        }
-                                       
-                        if (vm.member.con_status > 0) {
-                           vm.member.membership_description = vm.memberTypes.find(type => type.id == vm.member.con_status).membership_description;
-                        } else {
-                           vm.membership_description = null;
-                        }
-                        
-                        vm.$store.dispatch('submit_member', {'selectedCon':vm.selectedCon, 'member':vm.member}).then((response)=> {
+                        // update/create member information
+                        Object.entries(vm.shoppingCart.items).forEach((cartItem) => { 
+                           // transaction info
+                           cartItem[1].account.transaction_method = 1;
+                           cartItem[1].account.transaction_amount = cartItem[1].item.price;
+                           cartItem[1].account.transaction_record = details.id;
                            
-                           if (response.errors) {
-                              var errors = {};
-                              vm.formMessage = response.message;
-                              setTimeout(function() {
-                                 vm.formMessage = null;
-                              },3000);
-                              Object.entries(response.errors).forEach((error) => {
-                                 let errorKey = error[0].replace('member.', '');
-                                 let errorText = error[1][0].replace('member.', '');
-                                errors[errorKey] = errorText;
+                           // con status info 
+                           // create con_status from item.id
+                           cartItem[1].account.con_status = cartItem[1].item.id;
+                           
+                           vm.$store.dispatch('submit_member', {'selectedCon': vm.currentCon.tag_name, 'member': cartItem[1].account}).then((response)=> {
+                              cartItem[1].purchase = false;
+                              vm.$store.dispatch('update_shopping_cart',cartItem[1]).then(()=>{
                               });
-                              
-                              vm.formErrors = errors;
-                              console.log(errors);
-                           } else {
-                              if (vm.formErrors.length <1) {
-                                 console.log(response.member);
-                                 console.log(response.message);
-                                 vm.regSettings.reg_mode > 0? vm.print_badge(response.member.member)  : '';
-                                 vm.member = {};
-                                 vm.searchQuery = '';
-                                 vm.memberSort = 'last_name';   
-                                 vm.formMessage = response.message;     
-                                 setTimeout(function() {
-                                    vm.formMessage = null;
-                                 },2000);
-                              }
-                              
-                              
-                              vm.get_filtered_members();
-                              vm.member.state = '';
-                           }
+                           }); 
                         });
-                     }
-            
-            */
-                        
-        
+                        vm.$emit('checkoutReturn', details.status );
                      });
                   }
                }).render(vm.$refs.paypal);
@@ -330,8 +257,6 @@
       #payment_panel .mini_cart {
          display: flex;
          flex-wrap: wrap;
-         border: solid 1px #999;
-         border-radius: .25rem;
          width: calc(50% - 1rem);
       }
       #payment_panel .mini_cart .cart_body {
@@ -390,6 +315,10 @@
          width: calc(50% - 1rem);         
          min-height: 10rem;
       }
+      
+      #payment_panel .payment_details .detail_element .link {       
+         color: var(--linkColor);
+      }
       #payment_panel .payment_details .detail_element {
          display: flex;
          flex-direction: column;
@@ -406,15 +335,16 @@
          justify-content: flex-end;
       }
       
-      #payment_panel .payment_details .Code_of_conduct .content {
-         display: flex;
-         align-items: center;
+      #payment_panel .payment_details .detail_element .content {
+         flex-wrap: wrap;
       }
-      #payment_panel .payment_details .Code_of_conduct .checkbox_wrapper {
-         width: 6.5rem;         
+      #payment_panel .payment_details .detail_element .links  {
+         margin: 1rem;
+         flex-direction: column;
       }
-      #payment_panel .payment_details .Code_of_conduct  .check_box {
-         color: var(--borderColor2);
+      #payment_panel .payment_details .detail_element .links .link {
+         margin: .5rem 0;
+         width: auto;
       }
       
       

@@ -158,9 +158,8 @@
                                        <!--<span class="purchase_membership fal" v-if="!account.membership_description" :class="account.purchase? 'fa-check-square' : 'fa-square' " @click.prevent="set_membership_purchase(account)" ></span>-->
                                        <select class="select" v-if="!account.membership_description" @change.prevent="set_membership_purchase($event, account.uuid)" >
                                              <option value="" style="display: none" >membership type...</option>
-                                             <option value="" v-for="item in storeItems" v-if="show_store_item(item, 'none')" v-text="item.description + ' '+ '$'+item.price+'.00'" v-bind:value="item.id"></option>                                             
-                                             <option value="" v-for="item in storeItems" v-if="show_store_item(item, 'discount')" v-text="item.description + ' '+ '$'+item.price+'.00'" v-bind:value="item.id"></option>
-                                             <option value="" v-for="item in storeItems" v-if="show_store_item(item, 'day')" v-text="item.description + ' '+ '$'+item.price+'.00'" v-bind:value="item.id"></option>
+                                             <option value="" v-for="type in memberTypes" v-if="type.store_item == 1" v-text="type.short_description + ' '+ '$'+type.price+'.00'" v-bind:value="type.id"></option>
+                                             
                                        </select>
                                     </span>
                                  </div>
@@ -190,6 +189,7 @@
                      
                   	<div class="aside_section intro" :class="accountSection == 'my_convention' ? 'show': ''">	
 							<span class="section_title">My Convention</span>
+                     
                      <pre>
                         - show membership type with description 
                         - show users events with icons for type, presenter, seat-of with buttons to cancel (unless presenting)
@@ -261,7 +261,8 @@
                currentCon     : 'currentCon',
                linkCode       : 'linkCode',
                linkedAccounts : 'linkedAccounts',
-               storeItems  : 'storeItems',
+               storeItems     : 'storeItems',
+               memberTypes    : 'memberTypes',
             }),
          
             ...mapGetters({
@@ -283,7 +284,8 @@
                });
             
                if(Object.keys(vm.linkedAccounts).length == 0) { 
-                  vm.$store.dispatch('get_linked_accounts', vm.user.uuid).then(()=>{
+                  vm.$store.dispatch('get_reg_data').then(()=>{});
+                  vm.$store.dispatch('get_linked_accounts', vm.user.uuid).then(()=>{                     
                     vm.$forceUpdate();
                   });
                
@@ -338,8 +340,7 @@
             
             set_membership_purchase(event, uuid) {
                var   vm = this,
-                     item = {};
-               console.log(event.target.value+' - ' + uuid);      
+                     item = {};  
                
                Object.entries(vm.storeItems).forEach((storeItem) => {
                   if(storeItem[1].id == event.target.value) {
@@ -347,18 +348,12 @@
                      item.price = item.item.price;
                   }
                });
-               Object.entries(vm.linkedAccounts).forEach((account) => {
-                  //account[1].purchase? vm.membershipPurchases = true : vm.membershipPurchases = false;
-                  if(account[1].uuid == uuid) { item.account = account[1] } 
-               });
                
-               
-               vm.$store.dispatch('update_linked_account', item, uuid).then(() => {
+               item.item = vm.memberTypes.find(type => type.id === parseInt(event.target.value) );
+               item.account = vm.linkedAccounts.find(member => member.uuid === uuid);
+                              
+               vm.$store.dispatch('update_linked_account', item).then(() => {
                   vm.$forceUpdate();
-                  // vm.membershipPurchases = false;
-                  // Object.entries(vm.linkedAccounts).forEach((account) => {
-                     // account[1].purchase? vm.membershipPurchases = true : vm.membershipPurchases = false;
-                  // });
                });
                vm.membershipPurchases = true;
             },
