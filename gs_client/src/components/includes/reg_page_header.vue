@@ -11,7 +11,7 @@
 				
 				<h2 class="section_title">Registration Panel</h2>
 				
-				<div class="report_box reg_mini_report" >
+				<div class="report_box reg_mini_report"v-if="regReport.registeredMembers" >
 					<span class="item">
 						<span class="text">Number of Registered Members</span>
 						<span class="value" v-text="regReport.registeredMembers || '-'"></span>

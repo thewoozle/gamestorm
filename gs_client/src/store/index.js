@@ -50,6 +50,7 @@
       experienceLevels: experienceLevels,
 		galleryData    : {},
       guestGmList    : [],
+      lastTransaction: 0,
       linkCode       : null,
       linkedAccounts : {},
 		liveEvents     : {},
@@ -77,6 +78,7 @@
       storeItems     : {},
       systemMessages : [],
       timeblocks     : [],
+      transactions   : [],
 		user           : {},
       userEvents     : null,
       userInfo       : {},
@@ -129,6 +131,13 @@
          commit('set_show_article', postId);
       },
       
+      get_transactions({commit}) {
+         var vm = this;
+         Axios.get(apiDomain+'_get_transactions'
+         ).then((response)=>{
+            commit('set_transactions', response.data.transactions);
+         });
+      },
       
       // GET NEWS ARTICLES 
       get_news_articles({commit}) {
@@ -1502,6 +1511,14 @@
          } else {
             state.shoppingCart.items.filter(v => v);
          }
+      },
+      
+      
+      
+      // SET TRANSACTIONS
+      set_transactions: (state, transactions) => {
+         Vue.set(state, 'transactions', transactions.transactions);
+         Vue.set(state, 'lastTransaction', transactions.lastTransactionNumber[0]);
       },
 	}
 	

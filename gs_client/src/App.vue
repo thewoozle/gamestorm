@@ -2006,6 +2006,9 @@
 			overflow: hidden;
 			background: var(--backgroundColor);
 		}	
+      button {
+         cursor: pointer;
+      }
 		.page_wrapper {
 			position: relative;
 			width: 100vw;

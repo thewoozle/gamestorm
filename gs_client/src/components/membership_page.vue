@@ -390,8 +390,8 @@
 			
 			
             components: {
-               datetime    : Datetime,
-               purchase_form: purchaseForm
+               datetime       : Datetime,
+               purchase_form  : purchaseForm
             },
 				
 			
