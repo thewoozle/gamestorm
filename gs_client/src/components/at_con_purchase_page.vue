@@ -47,7 +47,7 @@
                         <button class="header_button remove fal fa-times-square" title="remove member" ></button>
                      </div>   
                      
-                     <at_con_member_form :account="member" class="member" :class="member.open? 'open' : ''" />
+                     <at_con_member_form :account="member" class="member" :class="member.open? 'open' : ''"  v-on:accountUpdate = "update_members" />
                      
                   </div>
                   
@@ -137,6 +137,11 @@
                var vm = this;
                vm.membershipPurchase[index].open?  vm.membershipPurchase[index].open = false :  vm.membershipPurchase[index].open = true;
             },
+            
+            update_members(account) {
+               var vm = this;
+               vm.$forceUpdate();
+            },
          }
 		}
 	
@@ -189,8 +194,8 @@
          margin: 2rem 0;
       }
       #at_con_page .glance {
-         width: 40%;
-         min-width: 30rem;
+         width: 30%;
+         min-width: 25rem;
          flex-direction: column;
       }
       #at_con_page .glance .section_content {
@@ -211,7 +216,7 @@
       }
       
       #at_con_page .purchase_form{
-         width: 50%;
+         width: 65%;
          min-width: 30rem;
          flex-direction: column;
          position: relative;
@@ -230,6 +235,8 @@
       #at_con_page .purchase_form .member_wrapper .header .member_title{
          opacity: 0;
          transition: opacity .1s;
+         padding: 0 2vw;
+         justify-content: center;
          width: calc(100% - 8rem);
       }
       #at_con_page .purchase_form .member_wrapper .header .member_title.show {
@@ -252,7 +259,7 @@
       }
       #at_con_page .purchase_form .member_wrapper .member.open {
          opacity: 1;
-         max-height: 30rem;
+         max-height: 50rem;
          overflow-Y: auto;
       }
       

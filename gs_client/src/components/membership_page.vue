@@ -415,9 +415,9 @@
 			
 			created() {
 				var vm = this;
-            vm.$store.dispatch('get_store_items').then(()=>{
-               vm.$forceUpdate();
-            });
+            // vm.$store.dispatch('get_store_items').then(()=>{
+               // vm.$forceUpdate();
+            // });
             
             vm.$store.dispatch('get_reg_data').then(()=>{});
             

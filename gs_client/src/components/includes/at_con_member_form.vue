@@ -1,6 +1,7 @@
 
 	<template>
 		
+      
 
       <form @submit.prevent="submit_new_form" class="rows at_con_member_form" >
          <div class="form_wrapper" :account=account>
@@ -105,41 +106,50 @@
             </div>   
             
             <div class="form_row">
-               <label >Age</label>
+               <label class="label" >Age<span class="subtext">( if under 18 at {{currentCon.short_name}} )</span></label>
                <div class="input_wrapper">
                   <input class="input text_box" title="age required if member is under 18 at time of the next convention" type="text" v-model="account.age"  @keyup="submitErrors.age = null"/>
                </div>
                <span class="input_message" v-bind:class="submitErrors.birthDate? 'show' : ''" v-text="submitErrors.birthDate"></span>
             </div>
             
+            <div class="form_row parent_info" :class="account.age? 'show' : ''">
+            
+               <label class="label" >Parental Information</label>
+               <div class="input_wrapper">
+                  <input class="input text_box" placeholder="Parent or Guardian" />
+                  <input class="input text_box" placeholder="contact number" />
+               </div>
+               
+               <p>Memberships for children are subject to the Children Policy and will require a liability waiver.  </br>
+                  Per OSFCI child policy, all children ten and under must be accompanied by an adult at all times. 
+                  </p>
+            </div>
+            
             <p>All information will be confidential and used only in relation to having website access and for convention membership. </p>
             
-            
-            <div class="form_row">
-               <label for="new_password" title="minimum 6 characters, no spaces or quotes">Password 
-                  <button type="button" class="password_show fal" v-bind:class="showPassword ? 'fa-eye' : 'fa-eye-slash'" @click="showPassword ? showPassword = false : showPassword = true"></button>
-               </label>
-               <div class="input_wrappers">
-                  <div class="input_wrapper">
-                     <input id="new_password" v-bind:type="showPassword? 'text' : 'password'" class="input text_box new_password"  v-model="newPassword" required placeholder="Password" @keyup="validate_new_password(); submitErrors.email = null"/>
-                     <i class="pass_icon" v-bind:class="validatePassword == true? 'fal fa-check-square' : 'fas fa-ban fail'" v-if="newPassword"></i>
-                  </div>	
-                  
-                  <div class="input_wrapper">
-                     <input id="compare_password" v-bind:type="showPassword? 'text' : 'password'" class="input text_box verify_password" required v-model="confPassword" placeholder="Verify Password" @keyup="validate_new_password()"/>
-                     <i class="pass_icon" v-bind:class="newPassword == confPassword? 'fal fa-check-square' : 'fas fa-ban fail'" v-if="newPassword"></i>
-                  </div>
-                  <span class="input_message" v-bind:class="submitErrors.password? 'show' : ''" v-text="submitErrors.password"></span> 
-               </div>	
-            </div>
+            <p>All memberships are subject to the Code of Conduct.  </p>
             
             <div class="form_row controls">
                <button type="submit" class="button">Submit</button>
             </div>
          </div>
             
+         <div class="member_types">
+            <span class="title">Membership Types</span>
+            <div class="member_type" :class="account.membership == type.type? 'picked' : '' " v-for="(type, index) in memberTypes" v-if="type.store_item">
+               <div class="type_description">
+                  <span class="type" v-text="type.short_description"></span>
+                  <span class="price" v-text="'$'+type.price+'.00'"></span>
+               </div>  
+               <div class="check_wrapper">
+                  <span class="type_check fal" :class="account.membership == type.type? 'fa-check-square' : 'fa-square' " @click.prevent="set_account_membership(index)"></span>
+               </div>
+            </div>
+         
+         </div>
+      
       </form>
-
 	</template>
 	
 	<script>
@@ -186,7 +196,9 @@
             
 				computed: {
                ...mapState({
-                  statesList		: 'statesList',               
+                  statesList		: 'statesList',    
+                  currentCon     : 'currentCon',
+                  memberTypes    : 'memberTypes',
                }),
 				},
             
@@ -194,6 +206,8 @@
             },
 				
 				created() {
+               var vm = this;
+               vm.$store.dispatch('get_reg_data').then(()=>{});
 				},
             
 				methods: {
@@ -214,7 +228,16 @@
                      });
                   },
                   
-                  
+                  /* -----------------------------------------------------------
+                              SET ACCOUNT MEMBERSHIP
+                     ----------------------------------------------------------- */
+                  set_account_membership(index) {
+                     var vm = this;
+                     vm.account.membership = vm.memberTypes[index].type;
+                     vm.account.price = vm.memberTypes[index].price;
+                     vm.$emit('accountUpdate', vm.account );
+                     vm.$forceUpdate();   
+                  },
                   
                   /* -----------------------------------------------------------
                               SUBMIT FORM 
@@ -230,25 +253,18 @@
                   },
                   
                   
-               /* ---------------------------------------------------------------
-                        VALIDATE NEW PASSWORD
-                  ---------------------------------------------------------------   */
-               validate_new_password() {
-                  var vm = this;
-                  vm.newPassword = vm.newPassword.replace(/ |"|'|`/g, '');
-                  vm.confPassword = vm.confPassword.replace(/ |"|'|`/g, '');
-                  vm.newPassword.length >= 6? vm.validatePassword = true : vm.validatePassword = false;
-               },
-               
-                  
                   
 				}
 			}
 	
 	</script>
 	
+   
+   
+   
+   
 	<style>
-   .new_account_form {
+   .at_con_member_form {
       display: flex;
          justify-content: center;
       width: 100%;   
@@ -257,32 +273,108 @@
       border: solid 1px var(--borderColor);
       border-radius: .25rem;
    }
-   .new_account_form .form_wrapper {
+   .at_con_member_form .form_wrapper {
       display: flex;
       flex-wrap: wrap; 
-      width: 100%;
+      width: calc(100% - 18rem);
+      min-width: 20rem;
+      overflow: hidden;
       max-width: 30rem;
    }
-   .new_account_form .form_row {
+   .at_con_member_form .form_row {
       width: 100%; 
       justify-content: flex-end;
    }
-   .new_account_form .input_wrapper {
+   .at_con_member_form .input_wrapper {
       width: 100%;
    }
-   .new_account_form .form_row + .form_row {
+   .at_con_member_form .form_row + .form_row {
       margin-top: .5rem;
    }
-   .new_account_form .form_element {
+   .at_con_member_form .form_element {
       max-width: calc(50% - 1rem);
    }
-   .new_account_form .form_row label {
-      width: 10rem;
+   .at_con_member_form .form_row label {
+      width: 8rem;
       flex-wrap: wrap;
       font-size: .9rem;
       align-items: center;
       justify-content: flex-end;
    }
+   #at_con_page .at_con_member_form .email_check .icon {
+      color: var(--warningColor);
+      top: 0;
+   }
+   #at_con_page .at_con_member_form .email_check .message {
+      background: #4f0202;
+      color: var(--highlightColor);
+   }
+   
+   .at_con_member_form .parent_info {
+      overflow: hidden;
+      flex-wrap: wrap;
+      padding: 0 2rem;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height .4s, opacity .4s;
+   }
+   .at_con_member_form .parent_info.show {
+      max-height: 10rem;
+      opacity: 1;
+   }
+   .at_con_member_form .parent_info .label {
+      width: 100%;
+      justify-content: flex-start;
+   }
+   .at_con_member_form .parent_info  .text_box{
+      border: solid 1px var(--borderColor);
+      margin: .25rem 0;
+   }
+   .at_con_member_form .parent_info {
+   }
+   
+   
+   .at_con_member_form .member_types {
+      width: 18rem;
+      padding: 0 1rem; 
+      flex-direction: column;
+   }
+   .at_con_member_form .member_types .member_type {
+      margin-top: .5rem;      
+      opacity: .95;
+   }
+   .at_con_member_form .member_types .member_type.picked {
+      opacity: 1;
+   }
+   .at_con_member_form .member_types .title {
+      justify-content: center;
+   }
+   .at_con_member_form .member_types .type {
+      width: 100%;
+      font-size: 1.1rem;
+   }
+   .at_con_member_form .member_types .type_description {
+      width: calc(100% - 2rem);
+      flex-wrap: wrap;
+   }
+   .at_con_member_form .member_types .price {
+      padding: 0 1rem;
+      width: 100%;
+      justify-content: flex-end;
+      font-size: 1.15rem;
+   }
+   .at_con_member_form .member_types .check_wrapper {
+      width: 3rem;
+      justify-content: center;
+      align-items: center;
+      border-left: solid 1px var(--borderColor);
+      
+   }
+   .at_con_member_form .member_types .type_check {
+      cursor: pointer;
+      font-size: 2rem;
+   }
+   
    
    
 	

@@ -827,50 +827,6 @@
       top: auto;
       bottom: 0;
    }
-	#page_header .user_controls .dropdown_section .email_check {
-      position:relative;
-      display: flex;
-      position: absolute;
-      top: 0;
-      right: 0;
-      height: 100%;
-      width: 2rem;
-   }
-	#page_header .user_controls .dropdown_section .email_check .icon {
-      position: absolute;
-         top: calc(50% - 2rem);
-         right: 1rem;
-         z-index: 10;
-      display: flex;
-         justify-content: center;
-         align-items: center;
-      width: 2rem;
-      height: 2rem;
-      font-size: 1.25rem;
-      text-shadow: 0 1px 1px rgba(0,0,0,0.15);
-      background: rgba(0,0,0,0.15);
-      color: var(--passColor);
-   }
-	#page_header .user_controls .dropdown_section .email_check .icon.fa-user-plus,
-	#page_header .user_controls .dropdown_section .email_check .icon.fa-exclamation {
-      color: var(--warningColor);
-      cursor: pointer;
-   }
-	#page_header .user_controls .dropdown_section .email_check .message {
-      position: absolute;
-         top: 0;
-         right: -30rem;
-      width: 30rem;
-      font-size: .85rem;
-      background: #4f0202;
-      color: var(--highlightColor);
-      padding: .15rem .5rem;
-      display: flex;      
-      transition: right .5s;
-   }
-	#page_header .user_controls .dropdown_section .email_check_row .email_check .icon:hover ~ .message {
-      right: 3rem;
-   }
 	#page_header .user_controls .dropdown_section form .controls {
 		display: flex;
 		justify-content: flex-end;

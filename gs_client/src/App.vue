@@ -1452,6 +1452,52 @@
 			z-index: 100;
 		}
 		
+      
+	.email_check {
+      position:relative;
+      display: flex;
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: 2rem;
+   }
+	.email_check .icon {
+      position: absolute;
+         top: calc(50% - 2rem);
+         right: 1rem;
+         z-index: 10;
+      display: flex;
+         justify-content: center;
+         align-items: center;
+      width: 2rem;
+      height: 2rem;
+      font-size: 1.25rem;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.15);
+      background: rgba(0,0,0,0.15);
+      color: var(--passColor);
+   }
+	.email_check .icon.fa-user-plus,
+	.email_check .icon.fa-exclamation {
+      color: var(--warningColor);
+      cursor: pointer;
+   }
+	.email_check .message {
+      position: absolute;
+         top: 0;
+         right: -30rem;
+      width: 30rem;
+      font-size: .85rem;
+      background: #4f0202;
+      color: var(--highlightColor);
+      padding: .15rem .5rem;
+      display: flex;      
+      transition: right .5s;
+   }
+	.email_check .icon:hover ~ .message {
+      right: 3rem;
+   }
+   
 		
 		
 		
@@ -1652,6 +1698,13 @@
          text-align: left;
          justify-content: flex-start;
          flex-wrap: nowrap;
+      }
+      .label .subtext {
+         width: 100%;
+         font-size: .65em;
+         margin-top: .25em;
+         font-style: italic;
+         justify-content: inherit;
       }
 		label .password_show {
 			position: absolute;
