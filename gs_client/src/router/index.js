@@ -12,6 +12,7 @@
    import gallery_page from '@/components/gallery_page'
    import membership_page from '@/components/membership_page'
    import login_page from '@/components/login_page'
+   import info_page from '@/components/info_page'
    
 	import admin_page from '@/components/admin_page'
 	import registration_page from '@/components/registration_page'
@@ -61,6 +62,10 @@
          path     : '/login',
          name     : 'loginpage',
          component: login_page
+      },{
+         path     : '/info',
+         name     : 'infopage',
+         component: info_page
       },
       
       // FORGOT PASSWORD 

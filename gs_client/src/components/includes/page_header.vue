@@ -54,7 +54,7 @@
 							
 							<div class="dropdown_section login_section" :class="{'show': dropdownSection == 'login'}">
 								<form method="post" @submit.prevent="submit_login">
-                           <div class="form_row" v-if="loginUsers.length > 0 " >
+                           <div class="form_row" v-if="loginUsers.length > 1 " >
                               <input type="hidden" name="email" v-model="email" />
 										<label for="email">Select shared user account</label>
 										<div class="input_wrapper">

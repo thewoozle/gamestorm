@@ -126,9 +126,6 @@
 			
 			created: function() { 
 				var vm = this;
-            
-            vm.$store.dispatch('get_news_articles').then(()=> {});
-            
             vm.get_user_info();
             
          },
@@ -154,17 +151,19 @@
 	<style>	
    
 		.section.intro {
-         jsutify-content: space-between;
+         justify-content: space-between;
 			width: 100%;
 			margin: 5vh auto 0;
-			padding: 0 0 0 1rem;
+			padding: 0 8vw;
 		}
       
 		.section.intro .news_items {
          flex-direction: column;
+         padding: 0 3vw;
       }
 		.section.intro .site_intro {
          flex-direction: column;
+         margin-top: 1rem;
       }
 		.section.intro .site_intro p {
 			font-size: 1.75rem;

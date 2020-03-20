@@ -9,8 +9,7 @@
 						<div class="nav_link_wrapper" >					
 							
 							<router-link :to="'/'" class="nav_link nav_link_tile convention_link" @click="scroll_to_top()" >
-								<span class="image_wrapper">
-									<img class="image" src="/static/images/GameStormGarage_i.jpg"/>
+								<span class="image_wrapper" style="background: url(/static/images/GameStormGarage_i.jpg)">
 								</span>
 								<span class="text_wrapper"><span class="text">GameStorm</span></span>
 							</router-link>
@@ -28,53 +27,43 @@
 								<router-link :to="'/connect'" class="nav_link disabled"  @click="scroll_to_top()" >Connect</router-link>
 								
 							</div>					
-						</div>				
-					</div>			
+						</div>
+					</div>	
+               
 					
 					<div class="nav_section">
 						<div class="nav_link_wrapper" >
 							<router-link class="nav_link nav_link_tile convention_link" @click="scroll_to_top()" :to="'/convention'">
-								<span class="image_wrapper">
-									<img class="image" src="/static/images/gs_19_dealers_room-i.jpg"/>
+								<span class="image_wrapper" stye="background: url(/static/images/gs_19_dealers_room-i.jpg)">
 								</span>
 								<span class="text_wrapper"><span class="text">Convention</span></span>
 							</router-link>
 							<div class="nav_sublinks">
-								<router-link class="nav_link" :to="'/gallery'" @click="scroll_to_top()">Gallery</router-link>								
-								<router-link class="nav_link disabled" :to="'/venue'" @click="scroll_to_top()">Venue</router-link>
-								<router-link class="nav_link " :to="'/membership'"  @click="scroll_to_top()">Convention Membership</router-link>
-								<router-link class="nav_link disabled" :to="'/dealers'" @click="scroll_to_top()">Dealers</router-link>
-								<router-link class="nav_link disabled" :to="'/orpg'" @click="scroll_to_top()" title="Adventures League, Pathfinder Society, Cult of Chaos, Shadowrun Organized Play" >Organized RolePlaying</router-link>
-								<router-link class="nav_link disabled" :to="'/gamelab'"  @click="scroll_to_top()">GameLab</router-link>
-								<router-link class="nav_link disabled" :to="'/paw'" @click="scroll_to_top()" >Play &amp; Win</router-link>
-							</div>					
-						</div>				
-					</div>	
-               
-               
-					<div class="nav_section">
-						<div class="nav_link_wrapper" >
-							<router-link class="nav_link nav_link_tile" @click="scroll_to_top()" :to="'/events'">
-								<span class="image_wrapper">
-									<img class="image" src="/static/images/GameStormGarage_i.jpg"/>
-								</span>
-								<span class="text_wrapper"><span class="text">Events</span></span>
-							</router-link>
-							<div class="nav_sublinks">
+                     
 								<router-link  :to="'/events'" class="nav_link" @click="scroll_to_top()">Event List</router-link>
 								<router-link  :to="'/events'" class="nav_link" @click="scroll_to_top()">Submit an Event</router-link>
 								<router-link  :to="'/events'" class="nav_link" @click="scroll_to_top()">My Events</router-link>
+                     
+								<router-link class="nav_link" :to="'/gallery'" @click="scroll_to_top()">Gallery</router-link>
+                        
+								<router-link class="nav_link disabled" :to="'/venue'" @click="scroll_to_top()">Venue</router-link>
+                        
+								<router-link class="nav_link " :to="'/membership'"  @click="scroll_to_top()">Convention Membership</router-link>
+                        
+                        
+								<router-link class="nav_link " :to="'/orpg'" @click="scroll_to_top()" title="Adventures League, Pathfinder Society, Cult of Chaos, Shadowrun Organized Play" >Organized RolePlaying</router-link>
+								<router-link class="nav_link " :to="'/gamelab'"  @click="scroll_to_top()">GameLab</router-link>
+								<router-link class="nav_link " :to="'/paw'" @click="scroll_to_top()" >Play &amp; Win</router-link>
 							</div>					
 						</div>				
 					</div>	
-
                
-				<!--
+               
 					<div class="nav_section">
 						<div class="nav_link_wrapper" >
-							<router-link :to="'/info" class="nav_link nav_link_tile">
-								<span class="image_wrapper">
-									<img class="image" src="/static/images/GameStormGarage_i.jpg"/>
+							<router-link :to="'/info'" class="nav_link nav_link_tile">
+								<span class="image_wrapper" style="background: url(/static/images/GameStormGarage_i.jpg)">
+									<img class="image" src=""/>
 								</span>
 								<span class="text_wrapper"><span class="text">Info</span></span>
 							</router-link>
@@ -83,27 +72,13 @@
 								<router-link class="nav_link" :to="'/'" @click="scroll_to_top()">News center</router-link>
 								<router-link class="nav_link" :to="'/policies'" @click="scroll_to_top()" >Policies</router-link>
 								<router-link class="nav_link" :to="'/'"  @click="scroll_to_top()">Benifits of Volunteering</router-link>
-							</div>					
-						</div>				
-					</div>
-					
-					
-					<div class="nav_section">
-						<div class="nav_link_wrapper" >
-							<router-link :to="'/connect'"class="nav_link nav_link_tile" @click="scroll_to_top()">
-								<span class="image_wrapper">
-									<img class="image" src="/static/images/GameStormGarage_i.jpg"/>
-								</span>
-								<span class="text_wrapper"><span class="text">Connect</span></span>
+								<router-link class="nav_link" :to="'/connect'"  @click="scroll_to_top()">Connect</router-link>
 								<router-link class="nav_link" :to="'/'">Forum</router-link>
 								<router-link class="nav_link" :to="'/'">Event Calendar</router-link>
-							</router-link>
-							<div class="nav_sublinks">
-								
 							</div>					
 						</div>				
 					</div>
-				-->
+					
 				</div>
 		
 		
@@ -235,7 +210,7 @@
 		#main_menu .nav_link_wrapper .nav_link_tile {
 			display: flex;		
 			justify-content: flex-start;
-			height: 5rem;
+			height: 3rem;
 			color: var(--textColor3);
 			transition: background .2s;
 		}
@@ -244,6 +219,7 @@
 			display: flex;
 			width: 10rem;
 			height: 100%;
+         background-size: cover;
 			background: #333;
 			padding: 0 1px 1px 0;
 			border-radius: 0 0 .2rem 0;

@@ -52,7 +52,7 @@
                   if different hour, show HOUR sidebar
                   </pre>
                   
-                  <div class="timeblocks" v-html="timeblocks()"></div>
+                  <div class="events" v-html="filtered_events()"></div>
                
                
                </div>
@@ -109,6 +109,7 @@
 					showEventForm	   : null,
 					newGm			      : null,
                eventsDisplayOption: 'list',
+               eventsFilter      : 'event_day_num',
 				}
 			},
 			
@@ -132,15 +133,180 @@
 			created() {
             var vm = this;
             vm.$store.dispatch('get_news_articles').then(()=> {});
-            vm.$store.dispatch('get_con_events').then(()=>{});            
+            vm.$store.dispatch('get_events', {'selected_con' : vm.currentCon.tag_name}).then(()=>{ });            
          },
+         
 			mounted: function() {
 				
 			},
 			
 			
 			methods: {
-				timeblocks() {
+				filtered_events() {
+               
+               // FOR GAMECONAPP_EVENT
+               var   vm       = this,
+                     day      = null,
+                     hour     = null,
+                     events   = vm.conEvents,
+                     eventList= '';   
+               
+               
+                  Object.entries(events).forEach(([key, event]) => {
+                     
+                     if (event.start_time) {
+                        
+                        event.event_day_num = vm.event_dayofweek(event.start_time);
+                        event.event_day = vm.event_day(event.start_time);                        
+                        event.event_start_time = vm.tag_time(event.start_time);
+                     } else {
+                        event.event_day = '';
+                        event.start_time = '';
+                     }
+                     
+                  });
+               
+               if(vm.conEvents) {
+                  
+                  //sort events by vm.eventsfilter
+						switch(vm.eventsfilter) {
+							case 'event_day_num' :
+                     //console.log(vm.memberSort);
+								members =  vm.conEvents.sort((a, b) => {
+									b[vm.eventsFilter] === null? -1: console.log(b[vm.eventsFilter]);
+									return parseInt(a[vm.eventsFilter]) - parseInt(b[vm.eventsFilter]);
+								});							
+								break;
+                        
+                     default: 
+                        events = vm.conEvents;
+
+                  }
+                  
+                  
+                  Object.entries(events).forEach(([key, event]) => {
+                     
+                     var  eventPresenters= '',
+                           eventCapacity  = null,
+                           trackColor     = '',
+                           eventDetails   = '',
+                           textColor      = '',
+                           conEvent       = '';
+                           
+                     switch (event.track) {
+                        case 'BOARD' : 
+                           trackColor = '#5cff6c';
+                           textColor   = '#222'; 
+                           break;
+                        case 'RPG' : 
+                           trackColor = '#fb94c3';
+                           break;
+                        case 'LARP' : 
+                           trackColor = '#fbbc04';
+                           break;
+                        case 'LAB' : 
+                           trackColor = '#58a3ff';
+                           break;
+                        case 'CONSL' : 
+                           trackColor = '#f0e8db';
+                           break;
+                        case 'MINIS' : 
+                           trackColor = '#828282';
+                           break;
+                        case 'PANEL' : 
+                           trackColor = '#d6aaee';
+                           break;
+                        case 'SPECL' : 
+                           trackColor = '#dedede';
+                           break;
+                        case 'CCG' : 
+                           trackColor = '#98c6ff';
+                           break;
+                        case 'IH' : 
+                           trackColor  = '#795435';
+                           break;
+                        case 'PAW' : 
+                           trackColor = '#e07b03';
+                           break;
+                        case 'SHADW' : 
+                           trackColor = '#ff5761';
+                           break;
+                        case 'CHAOS' : 
+                           trackColor = '#ff5761';
+                           break;
+                        case 'PATH' : 
+                           trackColor = '#ff5761';
+                           break;
+                        case 'PATH' : 
+                           trackColor = '#ff5761';
+                           break;
+                        case 'AL' : 
+                           trackColor = '#ff5761';
+                           break;
+                        case 'KIDS' : 
+                           trackColor = '#f2fb78';
+                           break;
+                        case 'CREATION' : 
+                           trackColor = '#0d96c1';
+                           break;
+                           
+                        default: 
+                           trackColor = '#c0c0c0';
+                     }      
+                     
+                     if(event.role == 'GM') {      
+                        eventPresenters += '<span class="presenter">'+event.first_name+' '+ event.last_name+'</span>';
+                     }
+                     
+                     eventCapacity = '<span class="event_capacity">'+event.player_max+'</span>';
+                     
+                     
+                     eventDetails = '<div class="event_dropdown">';
+                     eventDetails += '  <i class=" caret fas fa-caret-up"></i>';
+                     eventDetails +='  <div class="info capacity_info">';
+                     eventDetails +='     <span class="detail">this event has x seats available, be the first to sign-up</span>';
+                     eventDetails +='     <span class="detail">this event has x seats with x open seats available. </span>';
+                     eventDetails +='     <span class="detail">this event is full. </span>';
+                     eventDetails +='     <span class="full_message">Adding this event to your schedule will make you #x on the waitlist</span>';
+                     eventDetails += ' </div>';
+                     eventDetails += ' <div class="info long_description">'+event.long_description+'</div>';
+                     eventDetails += ' <div class="info event_location">'+event.name+'</div>';
+                     eventDetails += '</div>';
+                         
+                     conEvent += '<div class="event '+ event.track+'" style="background-color: '+ trackColor+'; color :'+textColor+';">'; 
+                     conEvent += '  <span class="event_name" >'+ event.event_name+'</span>';
+                     conEvent +=    eventCapacity;
+                     conEvent += '  <span class="presenters">';
+                     conEvent +=       eventPresenters;
+                     conEvent += '  </span>';
+                     conEvent +=    eventDetails;
+                     conEvent += '  <span class="">'+ event.event_day+' - '+event.event_start_time+'</span>'; 
+                     conEvent += '</div>';
+                     
+                     
+                     
+                     eventList += conEvent;
+                        
+                  });
+               
+               
+               }
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               /* FOR EVENTS
                var   vm    = this,
                      day   = null,
                      hour  = null,
@@ -166,14 +332,14 @@
                      
                      eventDetails = '<div class="event_dropdown">';
                      eventDetails += '  <i class=" caret fas fa-caret-up"></i>';
-                     eventDetails +='  <div class="capacity_info">';
+                     eventDetails +='  <div class="info capacity_info">';
                      eventDetails +='     <span class="detial">this event has x seats available, be the first to sign-up</span>';
                      eventDetails +='     <span class="detial">this event has x seats with x open seats available. </span>';
                      eventDetails +='     <span class="detial">this event is full. </span>';
                      eventDetails +='     <span class="full_message">Adding this event to your schedule will make you #x on the waitlist</span>';
                      eventDetails += ' </div>';
-                     eventDetails += ' <div class="long_description">'+event.event_description+'</div>';
-                     eventDetails += ' <div class="event_location">'+event.location+'</div>';
+                     eventDetails += ' <div class="info long_description">'+event.event_description+'</div>';
+                     eventDetails += ' <div class="info event_location">'+event.location+'</div>';
                      eventDetails += '</div>';
                      
                            
@@ -203,12 +369,13 @@
                         timeblocks += '   <span class="time">'+eventTime+'</span>';
                         timeblocks += '   <div class="events">';
                      }
-                        timeblocks += conEvent;
+                     
+                     timeblocks += conEvent;
                   });
                
                }           
-               
-               return timeblocks;
+               */
+               return eventList;
                
             },
             
@@ -256,6 +423,9 @@
          font-weight: 100;
          color: #333;
       }
+      .events_display .events {
+         flex-wrap: wrap;
+      }
       .events_display .timeblock {
          display: flex;
             flex-wrap: nowrap;
@@ -281,13 +451,13 @@
         
       }
       
-      .events_display .events .event {
+      .events_display .event_list .event {
          position: relative;
          display: flex;
             flex-direction: column;
          background: #bbb;
          padding: .25rem .35rem;
-         min-height: 3rem;
+         height: 4rem;
          border-radius: .25rem;
          margin: .1rem .25rem; 
          cursor: pointer;
@@ -295,18 +465,20 @@
          box-shadow: 1px 1px 1px rgba(255,255,255,.15);
          transition: opacity .3s;
       }
-      .events_display .events .event:hover {
+      .events_display .event_list .event:hover {
          opacity: .9;
          z-index: 25;
       }
-      .events_display .events .event .event_name {
+      .events_display .event_list .event .event_name {
          display: flex;
          min-width: 6rem;
          letter-spacing: .025em;
+         font-size: .9rem;
+         color: inherit;
          padding-right: 3.5rem;
          text-shadow: -1px -1px 0px rgba(0,0,0,0.25);
       }
-      .events_display .events .event .presenters {
+      .events_display .event_list .event .presenters {
          display: flex;
          padding: 0 .25rem;
          margin: .25em 0 0 0;
@@ -315,7 +487,7 @@
          font-size: .7rem;
          text-shadow: 1px 1px 1px rgba(255,255,255,.35);
       }
-      .events_display .events .event .event_capacity {
+      .events_display .event_list .event .event_capacity {
          position: absolute;
             top: 0;
             right: 0;
@@ -327,7 +499,7 @@
             background: rgba(0,0,0,0.35);
          
       }
-      .events_display .events .event .event_dropdown {
+      .events_display .event_list .event .event_dropdown {
          display: flex;
             flex-wrap: wrap;
          position: absolute;
@@ -346,14 +518,15 @@
          padding: .5rem; 
          transition: opacity .3s, position .3s, max-height .3s;
       }
-      .events_display .events .event:hover .event_dropdown {
+      .events_display .event_list .event:hover .event_dropdown {
          z-index: 10;
          max-height: 30rem;
          overflow: visible;
          opacity: 1;
+         color: var(--mainColor);
          border: solid 3px #444;
       }
-      .events_display .events .event .event_dropdown .caret {
+      .events_display .event_list .event .event_dropdown .caret {
          position: absolute;
             top: -1.4rem;
             left: 5rem;
@@ -361,10 +534,14 @@
          font-size: 2rem;   
          color: #444;
       }
-      .events_display .events .event .event_dropdown .capacity_info {
+      .events_display .event_list .event .event_dropdown .info {
          display: flex;
             flex-wrap: wrap;
+         color: var(--mainColor);
          width: 100%;
+      }
+      .events_display .event_list .event .event_dropdown .detail {
+         color: inherit;
       }
 	
 	

@@ -89,6 +89,65 @@
             
             
             
+         /* -----------------------------------------------------------------------
+         JSONCSV - by Jewell
+            ----------------------------------------------------------------------- */   
+         JSON2CSV(objArray, settings) {
+            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+            var   csv = '',
+                  siteSettings = {},
+                  line = '',
+                  vm = this;
+                                    
+             if (settings.labels) {
+                 var head = array[0];
+                 if (settings.quotes) {
+                     for (var index in array[0]) {
+                         var value = index + "";
+                         line += '"' + value.replace(/"/g, '""') + '",';
+                     }
+                 } else {
+                     for (var index in array[0]) {
+                         line += index + ',';
+                     }
+                 }
+
+                 line = line.slice(0, -1);
+                 csv += line + '\r\n';
+             }
+
+            for (var i = 0; i < array.length; i++) {
+                 var line = '';
+
+                 if (settings.quotes) {
+                     for (var index in array[i]) {
+                         var value = array[i][index] + "";
+                         line += '"' + value.replace(/"/g, '""') + '",';
+                     }
+                 } else {
+                     for (var index in array[i]) {
+                         line += array[i][index] + ',';
+                     }
+                 }
+
+                 line = line.slice(0, -1);
+                 csv += line + '\r\n';
+            }
+             
+            var downloadLink = document.createElement("a");
+            var blob = new Blob(["\ufeff", csv]);
+            var url = URL.createObjectURL(blob);
+            downloadLink.href = url;
+            downloadLink.download = "data.csv";
+
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+
+
+             //return csv;
+         },
+            
             
          /* -----------------------------------------------------------------------
                DATE FUNCTIONS
@@ -103,7 +162,16 @@
          event_day(date) {
             // Thu
             let formattedDate = '';
+            //console.log(moment(date).format('dd'));
             date? formattedDate = moment(date).format('dd') : '';
+            return formattedDate;
+         },
+         
+         event_dayofweek(date) {
+            // Thu
+            let formattedDate = '';
+            //console.log(moment(date).format('dd'));
+            date? formattedDate = moment(date).day() : '';
             return formattedDate;
          },
          

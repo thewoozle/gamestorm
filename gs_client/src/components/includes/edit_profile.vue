@@ -23,8 +23,12 @@
 									</div>
 									
 									<div class="form_row">
-										<label for="">Bus_name</label>
-										<input class="input text_box" type="text" name="bus_name" id="business name"v-model="info.bus_name" />
+										<label for="">badge name</label>
+										<input class="input text_box" type="text" name="badge_name" id="badge_name"v-model="info.badge_name" />
+									</div>
+									<div class="form_row">
+										<label for="">badge name 2</label>
+										<input class="input text_box" type="text" name="badge_name2" id="badge_name2"v-model="info.badge_name2" />
 									</div>
 									
 									<div class="form_row">

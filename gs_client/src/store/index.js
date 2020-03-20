@@ -32,6 +32,7 @@
       adminPermissions: {},
       ageGroups      : {},  
       allEvents      : {},
+      allUsers       : {},
 		articles       : {},
       allArticles    : {},
 		badgeTemplate	: null,
@@ -58,6 +59,7 @@
 		members	      : [],
 		memberTypes    : {},
       memberPercent  : 0,
+      messages       : {},
 		news           : {},
 		pageContent    : {},
 		pageStatus     : {},
@@ -101,29 +103,29 @@
                });
          }
          
-				Axios.get(apiDomain+ '_get_site_data').then((response) => {
-               if(response.data.convention.price_breaks) {
-                  response.data.convention.price_breaks = JSON.parse(response.data.convention.price_breaks);
-               }else {
-                  response.data.convention.price_breaks = [];
-               }
-               
-               if(window.sessionStorage) {
-                  sessionStorage.currentCon = JSON.stringify(response.data.convention);
-               }
-               
-					response.data.convention? commit('set_current_con', response.data.convention) : '';
-               
-               
-					commit('set_site_data', {
-						pageContent	: response.data.pageContent,
-                  venues      : response.data.venues,                 
-					});
-               commit('set_news_articles', response.data.articles);
-               commit('set_conventions', response.data.conventions);
-			  }, (err) => {
-				  console.log('error: '+err.statusText);
-			  });
+         Axios.get(apiDomain+ '_get_site_data').then((response) => {
+            if(response.data.convention.price_breaks) {
+               response.data.convention.price_breaks = JSON.parse(response.data.convention.price_breaks);
+            } else {
+               response.data.convention.price_breaks = [];
+            }
+            
+            if(window.sessionStorage) {
+               sessionStorage.currentCon = JSON.stringify(response.data.convention);
+            }
+            
+            response.data.convention? commit('set_current_con', response.data.convention) : '';
+            
+            
+            commit('set_site_data', {
+               pageContent	: response.data.pageContent,
+               venues      : response.data.venues,                 
+            });
+            commit('set_news_articles', response.data.articles);
+            commit('set_conventions', response.data.conventions);
+        }, (err) => {
+           console.log('error: '+err.statusText);
+        });
 		},
       
       
@@ -149,6 +151,7 @@
             console.log(err.data);
          });
       },
+      
       get_all_articles({commit}) {
          var vm = this;
          
@@ -159,6 +162,23 @@
          });
       },
       
+      
+      // GET MESSAGES (for email blasts)
+      get_messages({commit},messageData) {
+         Axios.post(apiDomain+'_get_messages', messageData,{
+            headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+         }).then((response)=>{
+            commit('set_messages', response.data.messages);
+         });
+      },
+      
+      // GET ALL USERS 
+      get_all_users({commit}) {
+            Axios.get(apiDomain+'_get_all_users').then((response) => {
+               commit('set_all_users', response.data.users);
+            });
+            
+      },
       
       
       
@@ -724,6 +744,25 @@
 		},
       
       
+      // CREATE MEMBERSHIP CSV FOR PRINTING
+      create_membership_csv({commit}, user) {
+         var vm = this;
+         
+         return new Promise((resolve,reject) =>{
+            Axios.post(apiDomain+'_membership_csv', {'permission' : user.permissions.registration}, {
+               headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
+            }).then((response)=>{
+               resolve (response.data.csv);
+               
+            });
+            
+         });
+            
+         
+         
+      },
+      
+      
 		/*-----------------------------------------------------------
                   SEND GUEST GM INVITES
       ----------------------------------------------------------- */
@@ -961,30 +1000,39 @@
       
       
       // GET EVENTS
-		get_con_events({commit}, selectedCon) {
-         var vm = this,
-            _formData = new FormData();
-			_formData.append('con', selectedCon);
+		get_events({commit}, eventsData) {
+         var vm = this;
          
-         // check localStorage and set_con_events
-         if(localStorage) {
-            if(localStorage.conEvent) {               
-               commit('set_con_events', {
-                  conEvents : JSON.parse(localStorage.conEvents),
-               });
-            }
-         }             
          
-         Axios.post(apiDomain+'_get_con_events', _formData).then((response) => {
-         //Axios.post('https://new.gamestorm.org/public/api/_get_con_events', _formData).then((response) => {
-            if(localStorage) {
-               localStorage.setItem('conEvents', JSON.stringify(response.data.events));
-            }   
+         // get scheduledb events         
+         Axios.post(apiDomain+'_get_gameconapp_event', {eventsData}, {headers : 
+            {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}}).then((response) => {
+            
+            // convert gameconapp_event model to events model
+            
+            
             
             commit('set_con_events', response.data.events);
          },(err) => {
             console.log(err.statusText);
          });
+         
+         
+         
+         // normal site events
+         /*
+         Axios.post(apiDomain+'_get_con_events', {eventsData}, {headers : 
+            {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}}).then((response) => {
+            
+            // if(localStorage) {
+               // localStorage.setItem('conEvents', JSON.stringify(response.data.events));
+            // }   
+            console.log(response.data);
+            // commit('set_con_events', response.data.events);
+         },(err) => {
+            console.log(err.statusText);
+         });
+         */
 		},
       
       
@@ -1112,7 +1160,7 @@
       
       // SET NEWS ARTICLES 
       set_news_articles: (state, articles) => {
-         state.articles = articles;
+         Vue.set(state, 'articles', articles);
       },
       set_all_articles: (state, articles) => {
          // creates the 'show' atribute for accordions
@@ -1131,6 +1179,19 @@
          });
       },
       
+      
+      // SET ALL USERS
+      set_all_users: (state, users) => {
+         var vm = this;
+         Vue.set(state, 'allUsers', users);
+      },
+      
+      
+      // SET MESSAGES 
+      set_messages: (state, messages) => {
+         var vm = this;
+         Vue.set(state, 'messages', messages);   
+      },
       
       //SET ADMIN PERMISSIONS       
       set_admin_permissions: (state, permissions) => {
@@ -1181,7 +1242,7 @@
       
 		//SET CON EVENTS
 		set_con_events: (state, conEvents) =>{
-         //console.log(conEvents);         
+         //console.log(conEvents);
 			Vue.set(state, 'conEvents', conEvents);
 		},
             

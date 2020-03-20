@@ -44,10 +44,10 @@
                </div>
                
                <div class="report_wrapper">
-               <div class="buttons">
-                  <button type="button" class="button" @click="showReport = 'regReport'" :title="conventionInfo.short_name+' Reg. Report'">Registration Report</button>
-                  <button type="button" class="button" @click="showReport = 'volunteers'" :title="conventionInfo.short_name+' members that checked VOLUNTEER INTEREST'">Volunteers</button>
-               </div>
+                  <div class="buttons">
+                     <button type="button" class="button" @click="showReport = 'regReport'" :title="conventionInfo.short_name+' Reg. Report'">Registration Report</button>
+                     <button type="button" class="button" @click="showReport = 'volunteers'" :title="conventionInfo.short_name+' members that checked VOLUNTEER INTEREST'">Volunteers</button>
+                  </div>
                
                   <div class="control_bar">					
                      <button class="control_button fal fa-cog" type="button" @click.prevent="showRegReportSettings? showRegReportSettings = false : showRegReportSettings = true" title="Show Reg. settings"  ></button>
@@ -56,33 +56,42 @@
                   
                   
                   <div class="reg_lists">
-            <pre>
-                     [ REG LISTS ]     
-               [ select convention or current con ]
-               lists menu:
-                  [list by name (filter location, attendance, age, price, reg date, ), badge, staff, guest GM (elegable/accepted), contact, volunteer, GM interest, industry guest, transaction, ]
-            </pre>
+                     <pre>
+                              [ REG LISTS ]     
+                        [ select convention or current con ]
+                        lists menu:
+                           [list by name (filter location, attendance, age, price, reg date, ), badge, staff, guest GM (elegable/accepted), contact, volunteer, GM interest, industry guest, transaction, ]
+                     </pre>
             
                
-               <p>----------------------------------------------------------------------------------------------</p>
-               <p>GUEST GMs REPORT</p>
-               <p style= "color: white">{{(regReports.guestGm.length)+1}}</p>
-               <p style="color: white" v-for="person in regReports.guestGm">{{person.first_name+' '+person.last_name}} - {{person.email}}</p>
-                            
+                  <p>----------------------------------------------------------------------------------------------</p>
+                  <p>GUEST GMs REPORT</p>
+                  <p style= "color: white">{{(regReports.guestGm.length)+1}}</p>
+                  <p style="color: white" v-for="person in regReports.guestGm">{{person.first_name+' '+person.last_name}} - {{person.email}}</p>
+                  
+                               
+                  
+                  <p>----------------------------------------------------------------------------------------------</p>
+                  <p>STAFF  REPORT</p>
+                  <p style= "color: white">{{(regReports.staffList.length)+1}}</p>
+                  <p style="color: white" v-for="person in regReports.staffList">{{person.department_name+' - ' +person.first_name+' '+person.last_name}} - {{person.email}}</p>
+                  
+                  <p>----------------------------------------------------------------------------------------------</p>
+                  <p>GM INTEREST REPORT</p>
+                  <p style="color: white" v-for="person in regReports.gmInterest">{{person.email}}</p>
+                  
+                  <p>----------------------------------------------------------------------------------------------</p>
+                  <p>VOLUNTEERS INTEREST REPORT</p>
+                  <p style="color: white" v-for="person in regReports.volunteers">{{person.email}}</p>
+                  
+                  <p>----------------------------------------------------------------------------------------------</p>
+                  <p>DEALERS REPORT</p>
+                  <p style="color: white; flex-wrap: nowrap;" v-for="person in regReports.dealers"><span style="display: flex" v-text="person.first_name+' '+person.last_name"></span><span style="display: flex" v-if="person.notes"  v-text="', '+person.notes"></span></p>
                
-               <p>----------------------------------------------------------------------------------------------</p>
-               <p>STAFF  REPORT</p>
-               <p style= "color: white">{{(regReports.staffList.length)+1}}</p>
-               <p style="color: white" v-for="person in regReports.staffList">{{person.department_name+' - ' +person.first_name+' '+person.last_name}} - {{person.email}}</p>
                
-               <p>----------------------------------------------------------------------------------------------</p>
-               <p>GM INTEREST REPORT</p>
-               <p style="color: white" v-for="person in regReports.gmInterest">{{person.email}}</p>
-               
-               <p>----------------------------------------------------------------------------------------------</p>
-               <p>VOLUNTEERS INTEREST REPORT</p>
-               <p style="color: white" v-for="person in regReports.volunteers">{{person.email}}</p>
-               
+                  <p>----------------------------------------------------------------------------------------------</p>
+                  <p>INDUSTRY GUESTS REPORT</p>
+                  <p style="color: white; flex-wrap: nowrap;" v-for="person in regReports.industryGuests"><span style="display: flex" v-text="person.first_name+' '+person.last_name"></span><span style="display: flex" v-if="person.notes"  v-text="', '+person.notes"></span></p>
                
                
                   </div>
@@ -251,10 +260,24 @@
             overflow-y: auto;
             border-radius: var(--borderRadius);
             background: #2a2b2d;
-            box-shadow: var(--blackBoxShadow);
-            
+            box-shadow: var(--blackBoxShadow);            
+         }
+         .section.reg_reports .report_wrapper .buttons {
+            flex-direction: column;
+         }
+         .section.reg_reports .report_wrapper .buttons .button {
+            height: 4rem;
+            display: flex;
+            align-items: center;
+         }
+         .section.reg_reports .report_wrapper .buttons .button + .button {
+            border-top: solid 1px var(--mainColor);
          }
          
+         .section.reg_reports .reg_lists {
+            display: flex;
+            flex-direction: column;
+         }
          .section.reg_reports .element_title {
             font-size: 1.2em;
             font-weight: bold;

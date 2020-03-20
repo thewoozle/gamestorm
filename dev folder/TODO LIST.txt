@@ -1,6 +1,8 @@
   
       
       WIP
+      
+         generate membrship CSV for badge printing
          checkout cart
          
          - purchase_form create con_status from item.id
@@ -16,22 +18,6 @@
       LOGIN
          don't show password on login
          
-      PURCHASE MEMBERSHIPS
-         [
-            not logged-in: 
-               - user clicks on link, prompt to create account or log in. 
-            logged-in: 
-               - show list of already purchased memberships and mini-cart
-               - STEP ONE: dropdown of options (4)
-               - STEP TWO: select from linked account or enter new info 
-                  - check email address for duplicate and ask if 'this person'
-               - update mini-cart   
-               - click 'purchase' go to purchase screen
-               
-               - show 'credit' for any members in cart 
-               - options to edit / add / remove
-               - STEP THREE: paypal purchase               
-         ]
          
       
       REGISTRATION:

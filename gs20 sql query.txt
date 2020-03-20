@@ -52,11 +52,12 @@
    
 
    - Guest GM eligability  - GAMECONAPP
-   SELECT `event_name`, `duration_in_minutes`, `event_id`, `first_name`, `last_name`, `email`,`uuid` FROM `gameconapp_event` e  
-   inner Join `gameconapp_connection` c on c.event_id = e.id 
-   inner join `gameconapp_gcuser` u on  u.wp_user_id = c.user_id
+   SELECT `event_name`, `duration_in_minutes`, `event_id`, `role`,`first_name`, `last_name`, `email`,`uuid` FROM gameconapp_gcuser u
+   inner Join `gameconapp_connection` c on c.user_id = u.id  
+   inner Join `gameconapp_event` e  on e.id = c.event_id
    where e.convention_id = '5' and c.role = 'GM' 
-   order by `last_name`
+   order by `last_name` ASC, `first_name`
+   
    
    - total hours
    select u.first_name, u.last_name,round(sum(duration_in_minutes / 60 ),0) as `total hours`, u.uuid, u.email  from gameconapp_event e 

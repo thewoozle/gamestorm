@@ -28,16 +28,9 @@
 						</div>	
 						
 						<div class="control_wrapper ">
-							<button class="toggle_button" @click="badges_csv()">Create printer CSVs</button>
+							<button class="toggle_button" @click="get_membership_csv()">Create printer CSVs</button>
 						</div>
-			
-						<div class="control_wrapper ">
-							<a href="_membership_csv" target="_blank" class="toggle_button" >
-								<span class="text_wrapper">
-									<span class="text">Create Membership CSV</span> 
-								</span>	
-							</a>
-						</div>
+									
 								
 						<div class="control_wrapper ">
 							<button class="toggle_button" v-bind:class="regSettings.reg_mode== 1? 'active':''"  type="button" @click.prevent="update_reg_settings('reg_mode')" >
@@ -51,7 +44,7 @@
 						<div class="control_wrapper ">
 							<button type="button" class="toggle_button" :class="showGuestGms? 'active' : ''" @click.prevent="handle_slideouts('showGuestGms')">
 								<span class="text_wrapper">
-									<span class="text">Guest Gm email blast</span> 
+									<span class="text">Guest Gm list and email blast</span> 
 								</span>	
 							</button>
 						</div>
@@ -523,8 +516,6 @@
 					paymentMethods	: 'paymentMethods',
 					staffPositions	: 'staffPositions',	
                memberPercent  : 'memberPercent',
-            }),
-				...mapGetters({
 					user		   	: 'user',
 					members			: 'members',
 					regSettings		: 'regSettings',
@@ -592,18 +583,34 @@
             update_status() {
                var vm = this;
                // 2 = staff, 15 = concom
-               switch (vm.member.con_status) {                  
+               switch (vm.member.con_status) {      // comped            
                   case 15:
                   case 13:
+                  case 17:
                   case 21:
-                     vm.member.transaction_method = 12;  // comped
+                     vm.member.transaction_method = 12;  
                      break;
-                  case 14 :
+                     
+                  case 14:                          // guest
                   case 20: 
-                     vm.member.transaction_method = 13;  // guest
+                     vm.member.transaction_method = 13;  
                      break;
                }               
             },
+            
+         get_membership_csv() {
+            var   vm = this,
+                  settings = {},
+                  csv;
+            settings.labels = true;
+            settings.quotes = true;
+            vm.$store.dispatch('create_membership_csv', vm.user).then((response)=>{
+               var csv = vm.JSON2CSV(response, settings);
+               
+            });
+            
+               
+         },
             
             
 				get_filtered_members() {
@@ -624,7 +631,7 @@
 							case 'badge_number' :
                      //console.log(vm.memberSort);
 								members =  vm.members.sort((a, b) => {
-                           return parseInt(a[vm.memberSort]) - parseInt(b[vm.memberSort]);                           
+                           return parseInt(a[vm.memberSort]) - parseInt(b[vm.memberSort]);
 								});							
 								break;
 								
@@ -966,6 +973,9 @@
 			display: flex;
 			flex-direction: column;	
 			width: 15rem;
+         max-height: calc(100% - .5rem);
+         overflow: hidden;
+         overflow-Y: auto;
 			padding: 3rem 1rem 1rem 1rem;
 			margin: .5rem .5rem 0 0;
 			border: solid 1px var(--borderColor2);

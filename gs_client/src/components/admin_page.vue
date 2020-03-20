@@ -13,10 +13,11 @@
                
                <div class="panel_display">
                   <div class="buttons">
-                     <button type="button" v-if="user.permissions.admin >=3"class="button":class="siteSetting== 'conventions'? 'active' : ''" @click="siteSetting = 'conventions'">Conventions</button>
-                     <button type="button" v-if="user.permissions.admin >=3"class="button":class="siteSetting== 'venues'? 'active' : ''" @click="siteSetting = 'venues'">Venues</button>
-                     <button type="button" v-if="user.permissions.admin >=5"class="button":class="siteSetting== 'users'? 'active' : ''" @click="siteSetting = 'users'">Users</button>
-                     <button type="button" v-if="user.permissions.admin >=5" class="button":class="siteSetting== 'permissions'? 'active' : ''" @click="siteSetting = 'permissions'">Permissions</button>
+                     <button type="button" v-if="user.permissions.admin >=3" class="button" :class="siteSetting== 'conventions'? 'active' : ''" @click="siteSetting = 'conventions'">Conventions</button>
+                     <button type="button" v-if="user.permissions.admin >=3" class="button" :class="siteSetting== 'venues'? 'active' : ''" @click="siteSetting = 'venues'">Venues</button>
+                     <button type="button" v-if="user.permissions.admin >=5" class="button" :class="siteSetting== 'users'? 'active' : ''" @click="siteSetting = 'users'">Users</button>
+                     <button type="button" v-if="user.permissions.admin >=5" class="button" :class="siteSetting== 'permissions'? 'active' : ''" @click="siteSetting = 'permissions'">Permissions</button>
+                     <button type="button" v-if="user.permissions.admin >=3" class="button" :class="siteSetting== 'messages'? 'active' : ''" @click="siteSetting = 'messages'">Messages</button>
                   </div>
                   
                   <div class="panels">
@@ -228,6 +229,9 @@
                            Buttons: [ show all ] [ show inactive (wtih # inactive ] [ del. inactive ] [ requested password]</br>
                            each user options: [ deactivate ], [ make admin ], [ send password reset ], [ activate (if deactivated)]
                         </p>
+                        <div class="" style="flex-direction: column;">
+                           <p v-for="user in allUsers" style="width=100%;">{{user}}</p>
+                        </div>
                         
                      </div>
                      
@@ -294,6 +298,45 @@
                            
                         </div>   
                      </div>
+                     
+                     
+                     
+                     
+                  <!--  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                         MESSAGES
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            -->
+                     <div class="panel messages" v-if="siteSetting == 'messages'">
+                        <p>MESSAGES</p>
+                        <p>email blast center. select user-type and select message. create editable list and send. </p>
+                        <div class="buttons message_buttons">
+                           <button class="button" :class="userFilter == 'all'? 'selected' : ''" @click.prevent="set_filtered_users('all')" >All users</button>
+                           <button class="button" :class="userFilter == 'members'? 'selected' : ''"  @click.prevent="set_filtered_users('members')" >All Con membership</button>
+                           <button class="button" :class="userFilter == 'email'? 'selected' : ''"  @click.prevent="set_filtered_users('email')" >Yes Email</button>
+                           <button class="button" :class="userFilter == 'volunteer'? 'selected' : ''"  @click.prevent="set_filtered_users('volunteer')" >Volunteer Interest</button>
+                           <button class="button" :class="userFilter == 'GM'? 'selected' : ''"  @click.prevent="set_filtered_users('GM')" >GM Interest</button>
+                           <button class="button" :class="userFilter == 'guest_GM'? 'selected' : ''"  @click.prevent="set_filtered_users('guest_GM')" >Guest GM</button>
+                           <button class="button" :class="userFilter == 'staff'? 'selected' : ''" @click.prevent="set_filtered_users('staff')" >All Staff</button>
+                        </div>
+                        <div class="messages_wrapper">
+                           <div class="users" >
+                              <div class="user_wrapper" v-if="filteredUsers">
+                                 <p>users: {{filteredUsers.length}}</p>
+                                 <p class="user" v-for="user in filteredUsers" > {{user.first_name+' '+user.last_name }}</p>
+                              </div>  
+                           </div>
+                        
+                           <div class="messages">
+                              <div class="message_wrapper" v-for="message in messages">
+                                 <span class="title" v-text="message.title"></span>
+                                 <div class="message" v-html="message.message"></div>
+                              </div>   
+                           </div>
+                        </div>   
+                        
+                     </div>
+                     
+                     
+                     
                   </div>   
                   
                </div>
@@ -310,7 +353,7 @@
 	
 	<script>
 		import Vue from 'vue'
-		import { mapGetters } from 'vuex'
+		import { mapState } from 'vuex'
 		import Router from 'vue-router'
 		import { Datetime } from 'vue-datetime'
       import moment from 'moment'
@@ -330,8 +373,10 @@
                editVenue               : {},
                showConventionDetails   : null,
                showConventionSlideout  : false,
-               siteSetting             : "news",
-               formErrors              : {},     
+               siteSetting             : "conventions",
+               userFilter              : null,
+               formErrors              : {},
+               filteredUsers           : null,
                newAdminPermission      : '',
 				}
 			},
@@ -347,17 +392,18 @@
 			
 			
 			computed: {
-				...mapGetters({
+				...mapState({
 					user			      : 'user',
 					regReport	      : 'regReport',
                conventions       : 'conventions',
                venues            : 'venues',
                adminPermissions  : 'adminPermissions',
-               members           : 'members',
                allArticles       : 'allArticles',
+               messages          : 'messages',
+               allUsers          : 'allUsers',
 				}),
             
-				
+            
 			},
 			
 			created() {
@@ -365,8 +411,9 @@
 				vm.check_user();
 				vm.$store.dispatch('get_reg_report').then(()=>{});
 				vm.$store.dispatch('get_admin_permissions').then(()=>{});
-				vm.$store.dispatch('get_members').then(() => {});
 				vm.$store.dispatch('get_all_articles').then(() => {});
+            vm.$store.dispatch('get_messages').then((response) => {});
+            vm.$store.dispatch('get_all_users').then((response) => {});
             vm.clear_edit_convention();
 			},
 			
@@ -383,6 +430,65 @@
                vm.editConvention = {};
                vm.editConvention.venue = '';
             },
+            
+            
+            // SET FILTERED USERS 
+            set_filtered_users(filter) {
+               
+               var vm = this;
+               vm.filteredUsers = [];
+               
+               switch (filter) {
+                  case 'all': 
+                     vm.filteredUsers = vm.allUsers;
+                     break;
+                     
+                  case 'members': 
+                     vm.allUsers.forEach((user)=> {
+                        user.con_status > 0? vm.filteredUsers.push(user) : '';
+                     });
+                     break;
+                  
+                  case 'email': 
+                     vm.allUsers.forEach((user)=> {
+                        user.email_contact? vm.filteredUsers.push(user) : '';
+                     });
+                     break;
+                  
+                  case 'volunteer': 
+                     vm.allUsers.forEach((user)=> {
+                        user.volunteer_interest? vm.filteredUsers.push(user) : '';
+                     });
+                     break;
+                  
+                  case 'GM': 
+                     vm.allUsers.forEach((user)=> {
+                        user.gm_interest? vm.filteredUsers.push(user) : '';
+                     });
+                     break;
+                  
+                  case 'guest_GM': 
+                     vm.allUsers.forEach((user)=> {
+                        user.con_status == '14'? vm.filteredUsers.push(user) : '';
+                     });
+                     break;
+                     
+                  case 'staff':
+                     vm.allUsers.forEach((user)=> {
+                        user.con_status == '15' || user.con_status == '21' ? vm.filteredUsers.push(user) : '';
+                     });
+                     break;
+                  
+                  default: 
+                  
+               }
+               
+               vm.$forceUpdate();
+               
+               
+            },
+            
+            
             
 				// CHECK USER PAGE PERMISSION
 				check_user() {
@@ -535,6 +641,56 @@
          width: 100%;
          max-width: 100%;
          transition: max-height .3s, right .6s;
+      }
+      
+      .panel.messages .message_buttons {
+         flex-wrap: wrap;
+         flex-direction: row;
+         width: 100%;
+      }
+      .panel.messages .message_buttons .button {
+         width: 10rem;
+         margin: .75rem;         
+         align-items: center;
+      }
+      .panel.messages .message_buttons .button:hover,
+      .panel.messages .message_buttons .button.selected {
+         background: none;
+         color: var(--contrastColor);
+      }
+            
+      .panel.messages .messages_wrapper .users {
+         width: 12rem;
+         flex-direction: column;
+      }
+      .panel.messages .messages_wrapper .users .user_wrapper {
+         width: 100%;
+         flex-direction: column;
+      }
+      .panel.messages .messages_wrapper .users .user {
+         width: 100%;
+      }
+      
+      .panel.messages .messages_wrapper .messages {
+         width: calc(100% - 12rem);
+         padding: 0 1rem;
+         flex-direction: column;
+      }
+      .panel.messages .messages_wrapper .message_wrapper {
+         width: 100%;
+         flex-direction: column;
+      }
+      .panel.messages .messages_wrapper .message_wrapper +.message_wrapper {
+         margin-top: 2rem;
+      }
+      .panel.messages .messages_wrapper .title {
+         width: 100%;
+      }
+      .panel.messages .messages_wrapper {
+         
+      }
+      .panel.messages .messages_wrapper {
+         
       }
       
       .panel_display .panel .control_buttons {

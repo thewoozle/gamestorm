@@ -122,22 +122,26 @@
 			},
 		  },
 		  
+			beforeCreate() { 
+            var vm = this;
+            vm.$store.dispatch('get_site_data').then(()=>{});         
+         },
 			
 		  created() {
             var vm = this;
             let _urlParams = new URL(window.location.href);
             let resPassword = _urlParams.searchParams.has('c');
             let login = _urlParams.searchParams.has('login');
-               vm.$store.dispatch('get_site_data').then(()=>{
-               });
-               console.log(login);
+            
+            console.log(login);
+            
             if(!vm.$route.name ) { vm.$router.push({name: 'mainpage'});}
             if(login == true) {
                vm.showOverlay = 'login';
                vm.showSpinner = false;
             } else if(resPassword == true) {
                _urlParams? vm.urlParams.c = new URL(window.location.href).searchParams.get('c') : vm.urlParams = {}; 
-            }         
+            }        
 				vm.handle_page_load();  
 		  },
 		  
@@ -1023,7 +1027,7 @@
 		}
 		.news_items .news_item + .news_item {	
          margin-top: 1rem;
-         padding-top: 1rem;
+         padding-top: .6rem;
          border-top: solid 1px var(--borderColor);
       }
 		.news_items .news_date {
