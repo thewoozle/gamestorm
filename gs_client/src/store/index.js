@@ -165,7 +165,7 @@
       
       // GET MESSAGES (for email blasts)
       get_messages({commit},messageData) {
-         Axios.post(apiDomain+'_get_messages', messageData,{
+         Axios.post(apiDomain+'_get_messages', messageData, {
             headers : {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'}
          }).then((response)=>{
             commit('set_messages', response.data.messages);
@@ -178,6 +178,14 @@
                commit('set_all_users', response.data.users);
             });
             
+      },
+      
+      // SEND MESSAGES 
+      send_messages({commit}, userFilter) {         
+         Axios.post(apiDomain+'send_messages', {userFilter: userFilter }, {
+            headers : {'Content-Type' : 'application/x-www-form-urlencoded; cjarset=UTF-8'}
+         }).then((response) => {            
+         });   
       },
       
       

@@ -331,7 +331,9 @@
                                  <div class="message" v-html="message.message"></div>
                               </div>   
                            </div>
-                        </div>   
+                        </div> 
+                        
+                        <button class="button" @click.prevent="$store.dispatch('send_messages', userFilter)">Send Messages</button>
                         
                      </div>
                      
@@ -436,6 +438,7 @@
             set_filtered_users(filter) {
                
                var vm = this;
+               vm.userFilter = filter;
                vm.filteredUsers = [];
                
                switch (filter) {
@@ -666,6 +669,9 @@
       .panel.messages .messages_wrapper .users .user_wrapper {
          width: 100%;
          flex-direction: column;
+         max-height: 40rem;
+         overflow:hidden;
+         overflow-Y: auto;
       }
       .panel.messages .messages_wrapper .users .user {
          width: 100%;
