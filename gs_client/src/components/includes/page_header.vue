@@ -25,6 +25,7 @@
 								<router-link :to="'/my_convention'" class="button" >My Convention</router-link>		
 								<router-link v-if="user.permissions && user.permissions.admin > 0" :to="'/admin'" class="button" >Admin</router-link>								
 								<button type="button" class="button" @click.prevent="logout">Sign Out</button>
+                        {{user.uuid}}
 						</div>						
 					</div>
 					
@@ -219,9 +220,7 @@
 			computed: {
             ...mapState({
 					statesList		: 'statesList', 
-					conventionInfo	: 'conventionInfo',              
-            }),
-				...mapGetters({
+					conventionInfo	: 'conventionInfo', 
 					user			   : 'user',
 					pageContent		: 'pageContent',
 				}),
@@ -271,6 +270,12 @@
                   vm.showLoginLoading = false;
                   if(response.user.uuid) {              
                      vm.$store.dispatch('get_users_events', response.user.uuid);
+                     
+                  // start activity timer 
+                  vm.reset_activity_timer();
+                  
+            
+                  
                      vm.showLoginDropdown = false;
                   } 
                   if (response.users) {
@@ -298,6 +303,37 @@
                   vm.showLoginLoading = false;
                },3000);  
 				},
+            
+         /* -----------------------------------------------------------------------
+                           RESET ACTIVITY TIMER
+                           every 20 minutes, check for activity
+            ----------------------------------------------------------------------- */   
+         reset_activity_timer() {
+            var   vm = this,
+                  user = vm.user,
+                  timer = (1000*60),
+                  timeout = (1000*60*20); // 20 minutes
+            //var   timeout = (1000*30);    //30 seconds
+            
+            setTimeout(()=> {
+               if(user.activity_timer > timeout) {
+                  user = {};
+                  console.log('logout at: '+ (parseInt(user.activity_timer)/1000) +' seconds');
+                  vm.$store.dispatch('update_user_events', null);
+               } else {
+                  user.activity_timer = parseInt(user.activity_timer) + (timer);
+                  console.log((parseInt(user.activity_timer)/1000)+' secs');
+               }
+               
+               vm.$store.dispatch('update_user', user).then(()=>{
+                  vm.$forceUpdate();
+                  vm.reset_activity_timer();                  
+               });
+               
+            }, (timer));
+            
+         },   
+         
 				
 				
 				/*	----------------------------------------------------------- 

@@ -479,6 +479,7 @@
                console.log('show form');
                   // vm.showInfoForm = itemNumber;
                }; 
+               vm.$store.dispatch('reset_activity_timer');
             },
             
             
@@ -495,6 +496,7 @@
                   vm.clear_paypal()
                   vm.$forceUpdate();
                }
+               vm.$store.dispatch('reset_activity_timer');
             },
             
             
@@ -533,6 +535,7 @@
                   }     
                      
                });
+               vm.$store.dispatch('reset_activity_timer');
             },
             
             

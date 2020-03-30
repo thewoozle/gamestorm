@@ -375,6 +375,7 @@
                
                }           
                */
+               vm.$store.dispatch('reset_activity_timer');
                return eventList;
                
             },

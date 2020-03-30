@@ -485,7 +485,7 @@
                   default: 
                   
                }
-               
+               vm.$store.dispatch('reset_activity_timer');
                vm.$forceUpdate();
                
                

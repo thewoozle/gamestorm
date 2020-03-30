@@ -150,11 +150,17 @@
 				pageName(name) {
 					this.set_page_type(name);
 				},
+            
             user:function(newval, oldval) {
                var vm = this;
                if(!newval.uuid) {
                   if(vm.$route.name == 'mainpage') { vm.$router.push({name: 'mainpage'});}
                }
+            },
+            
+            $route(to, from) {
+               var vm = this;
+               vm.$store.dispatch('reset_activity_timer');
             },
             
 		  },
@@ -186,8 +192,8 @@
 						app.classList.remove('scroll_40', 'scroll_80', 'scroll_120', 'scroll_160');
 					}	
 				
+               vm.$store.dispatch('reset_activity_timer');
 				}
-				
 			},
          
          

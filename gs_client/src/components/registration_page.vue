@@ -710,6 +710,7 @@
                      vm.member = response.member;
                   }
                });
+               vm.$store.dispatch('reset_activity_timer');
             },
             
 				// CHECK USER PAGE PERMISSION
@@ -747,6 +748,7 @@
 					vm.member = {};
 					vm.searchQuery = '';
                vm.member.state = '';
+               vm.$store.dispatch('reset_activity_timer');
 				},
             
 				

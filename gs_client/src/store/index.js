@@ -267,12 +267,17 @@
 		update_user({commit}, user) {         
          if(user) {
             window.sessionStorage.user = JSON.stringify(user);
-            commit('set_user', {user});
+            commit('set_user', user);
          } else {
             window.sessionStorage.user = '';
             commit('set_user');
          }
 		},
+      reset_activity_timer({commit}) {
+         var user = state.user;
+         user.activity_timer = 0;
+         commit('set_user', user);         
+      },
       
       
       // UPDATE USER INFO
@@ -326,23 +331,8 @@
             }).then((response) => {
                var _response = response.data.response;
                if (_response.user && _response.success =='pass') {
-                  
+                  _response.user.activity_timer = 0 //Date.now();
                   commit('set_user', _response.user);
-                  
-                  if(window.sessionStorage) {  
-                     sessionStorage.user = JSON.stringify(_response.user); 
-                  
-                  // start one-hour-and-two-minutes timer then log-out
-                     setTimeout(function() {
-                        console.log('LOG OUT timer expired');
-                        
-                        sessionStorage.user = '';
-                        commit('set_user', {});
-                        commit('set_user_events', '');
-                     //},(10*1000));
-                     }, (60*60*1000) *2);
-                  }
-                        
                   resolve(_response);
                }  else {
                   reject(_response);
@@ -425,15 +415,25 @@
       },
       
       // GET USERS EVENTS 
-      get_users_events({commit}, uuid) {
-         Axios.post(apiDomain+'_get_users_events', {uuid: uuid}, {
-            headers : {'Content-Type' : 'application/x-www-form-urlencoded;  charset=UTF-8' }
-         }).then((response) => {            
-            commit('set_user_events', response.data.userEvents);
-         }, (err) => {
-            console.log(err);
-         });
+      get_users_events({commit}) {
+         var vm = this;
+         if(vm.user) {
+            Axios.post(apiDomain+'_get_users_events', {uuid: uuid}, {
+               headers : {'Content-Type' : 'application/x-www-form-urlencoded;  charset=UTF-8' }
+            }).then((response) => {  
+               if(response.data.userEvents) {
+                  commit('set_user_events', response.data.userEvents);
+               }
+            }, (err) => {
+               console.log(err);
+            });
+         }
       },
+      
+      update_user_events({commit, events}) {
+         commit('set_user_events', events);
+         
+      }, 
       
       // VALIDATE RESET 
       validate_reset({commit}, reset_code) {
