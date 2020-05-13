@@ -210,8 +210,8 @@
                      <div class="panel venues"  v-if="siteSetting == 'venues'">
                         <div class="" v-for="venue in venues" >
                            <span class="" v-text="venue.venue_name"></span>
-                           <button class="active_toggle fa-circle" v-bind:class="venue.active? 'fas' : 'fal' " v-bind:title="venue.active? 'deactivate' : 'activate'"></button>
-                           <button class="edit_button fal fa-edit" title="Edit venue" ></button>
+                           <button class="control_button fa-circle" v-bind:class="venue.active? 'fas' : 'fal' " v-bind:title="venue.active? 'deactivate' : 'activate'"></button>
+                           <button class="control_button fal fa-edit" title="Edit venue" ></button>
                         </div>
                         <button class="button">New Venue</button>
                      </div>
@@ -231,7 +231,7 @@
                         </p>
                         <div class="" style="flex-direction: column;">
                            <p v-for="user in allUsers" style="width=100%;">{{user}}</p>
-                        </div>
+                        </div>ghyj
                         
                      </div>
                      
@@ -292,7 +292,7 @@
                               <span class="title">New Admin Permission</span>
                               <select class="select" v-model="newAdminPermission" @change="set_new_permission()" >
                                  <option value="">select user...</option>
-                                 <option v-bind:value="member" v-for="member in members" v-if="member_not_already_admin(member.uuid)" v-text="member.first_name+' '+member.last_name"></option>
+                                 <option v-bind:value="member" v-for="member in allUsers" v-if="member_not_already_admin(member.uuid)" v-text="member.first_name+' '+member.last_name"></option>
                               </select>
                            </div>
                            
@@ -305,9 +305,8 @@
                   <!--  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                          MESSAGES
                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            -->
-                     <div class="panel messages" v-if="siteSetting == 'messages'">
-                        <p>MESSAGES</p>
-                        <p>email blast center. select user-type and select message. create editable list and send. </p>
+                     <div class="panel messages" v-if="siteSetting == 'messages'" :class="allUsers? 'show' : ''">
+                        <span class="title">MESSAGES</span>
                         <div class="buttons message_buttons">
                            <button class="button" :class="userFilter == 'all'? 'selected' : ''" @click.prevent="set_filtered_users('all')" >All users</button>
                            <button class="button" :class="userFilter == 'members'? 'selected' : ''"  @click.prevent="set_filtered_users('members')" >All Con membership</button>
@@ -318,10 +317,13 @@
                            <button class="button" :class="userFilter == 'staff'? 'selected' : ''" @click.prevent="set_filtered_users('staff')" >All Staff</button>
                         </div>
                         <div class="messages_wrapper">
-                           <div class="users" >
+                           <div class="users" >                               
+                              <span class="num_users" v-if="filteredUsers" > users: {{filteredUsers.length}}</span>
                               <div class="user_wrapper" v-if="filteredUsers">
-                                 <p>users: {{filteredUsers.length}}</p>
-                                 <p class="user" v-for="user in filteredUsers" > {{user.first_name+' '+user.last_name }}</p>
+                                 <div class="user" v-for="user in filteredUsers" > 
+                                    <span class="name" v-text="user.first_name+' '+user.last_name"></span>   
+                                    <span class="control_button remove fas fa-user-minus"></span>
+                                 </div>
                               </div>  
                            </div>
                         
@@ -334,7 +336,7 @@
                         </div> 
                         
                         <button class="button" @click.prevent="$store.dispatch('send_messages', userFilter)">Send Messages</button>
-                        
+                        <div class="cover" :class="allUsers? '' : 'show'"><span class="loading">loading...</span></div>
                      </div>
                      
                      
@@ -378,8 +380,9 @@
                siteSetting             : "conventions",
                userFilter              : null,
                formErrors              : {},
-               filteredUsers           : null,
+               filteredUsers           : [],
                newAdminPermission      : '',
+               boxData                 : {},
 				}
 			},
 			
@@ -442,9 +445,6 @@
                vm.filteredUsers = [];
                
                switch (filter) {
-                  case 'all': 
-                     vm.filteredUsers = vm.allUsers;
-                     break;
                      
                   case 'members': 
                      vm.allUsers.forEach((user)=> {
@@ -483,6 +483,8 @@
                      break;
                   
                   default: 
+                     vm.filteredUsers = vm.allUsers;
+                     break;
                   
                }
                vm.$store.dispatch('reset_activity_timer');
@@ -609,7 +611,7 @@
          display: flex;
             justify-content: space-between;            
          width: 100%;
-         margin-top: 2rem;
+         margin-top: 1rem;
          padding: 0 2vw;
          max-width: 70rem;       
          min-height: 25rem;         
@@ -619,7 +621,33 @@
             flex-direction: column;
          position: relative;
          padding: 2rem;
+         opacity: .5;
          width: 100%;
+         transform: opacity .3s;
+      }
+      .panel_display .panel.show {
+         opacity: 1;
+      }
+      .panel_display .panel .cover {
+         position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+         flex-direction: column;
+         align-items: center;
+         justify-content: center;
+         width: 100%;
+         height: 100%;
+         background: none;
+      }
+      .panel_display .panel .cover.show {
+         background: rgba(0,0,0,0.5);
+            z-index: 100;         
+      }
+      .panel_display .panel .cover .loading {
+         font-size: 2rem;
+         color: var(--lightColor);
+         text-shadow: -1px -1px 1px rgba(0,0,0,0.65);
       }
       .panel_display .panel_title {
          display: flex;
@@ -849,13 +877,13 @@
             flex-direction: row;
             flex-wrap: nowrap;
       }
-      .convention_list .control_button {
+      .panel .control_button {
          display: flex;
             justify-content: center;
             align-items: center;
          border-radius: .1rem;
-         width: 2rem;
-         height: 2rem;
+         width: 1.5rem;
+         height: 1.5rem;
          font-size: 1.5rem;
          border-color: rgba(0,0,0,0);
          border-radius: .2rem;

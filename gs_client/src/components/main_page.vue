@@ -22,55 +22,43 @@
 				</video>
 			</div>
 			
+         
 
 			<div class="sections">
          
-				<section class="section intro">
-				
-					<div class="news_items">
-						<div class="news_item" v-bind:class="article.open? 'open' : ''" v-if="articles" v-for="article in articles">
-						
-							<span class="news_date" >
-								<span class="date_bullet active" v-html="article_date(article.start_date)"></span> 
-							</span>
-							
-							<article class="news_article" :class="article.show_post? 'show' : ''"  >
-								<span class="title" v-text="article.post_title"></span> 
-                        <div class="content" v-html="article.body"></div>
-                        </article>
-                     <button class="article_button fal" v-bind:class="article.show_post? 'fa-arrow-alt-square-up':'fa-arrow-alt-square-down'" @click="$store.dispatch('show_article', article.post_id).then(()=>{$forceUpdate()});"></button>
-						</div>
-							<footer class="news_footer">
-								
-							</footer>
-					</div>
-               
-               
-					<div class="site_intro" v-if="pageContent.con_intro" v-html="pageContent.con_intro.content">
-					</div>
-					
-				
+				<section class="section  site_intro">
+					<div class="content" v-if="pageContent.title_blurb" v-html="pageContent.title_blurb.content"></div>
+               		
 				</section> 
-				
-				
-				<section class="section current_con_intro">
-            <span class="section_title"><span class="text">GameStorm 22</span></span>
-				<p>GS 22 will be at the Jantzen Beach Red Lion again this year</p>
-            <pre>show artwork, guests as available, number of registered members (not staff)</pre>
             
             
-            <pre>Membership registration for GS22 is now open</pre>
+            <section class="section con_info next_con">
+					<div class="content" v-if="pageContent.next_con_blurb" v-html="pageContent.next_con_blurb.content"></div>		
+            </section>
             
-            
+				<section class="section news">        
 
-               <pre>Event Registration / submit events</pre>               
-                           
-                           
-				</section>
+               <div class="news_list">
+                  <span class="article_button news_date" v-bind:class="article.open? 'open' : ''" v-if="articles" @click="$store.dispatch('show_article', article.post_id).then(()=>{$forceUpdate()});" v-for="article in articles">
+              			<span class="date_bullet active" v-html="article_date(article.start_date)">
+                     </span> <span class="title" v-text="article.post_title"></span>
+                  </span>
+               </div>
+               
+               <div class="news_items">
+                  <div class="news_item" :class="article.show_post? 'show' : ''" v-if="articles" v-for="article in articles">
+								<span class="title" v-text="article.post_title"></span> 
+                        <div class="content" v-html="'<div>'+article.body+'</div>'"></div>
+                     
+							<footer class="news_footer"></footer>
+                  </div>   
+					</div>
+               
+				</section> 
+            
 				
-				<section class="section previous_con_intro">
-            <span class="section_title"><span class="text">GameStorm 21 was another smash hit</span></span>
-				<pre> show some gallery images and a couple comments, number of guest GM memberships</pre>
+				<section class="section con_info prev_con">
+               <div class="content" v-if="pageContent.prev_con_blurb" v-html="pageContent.prev_con_blurb.content"></div>
 				</section>
 				
 				
@@ -150,42 +138,102 @@
 	
 	<style>	
    
-		.section.intro {
-         justify-content: space-between;
-			width: 100%;
-			margin: 5vh auto 0;
-			padding: 0 8vw;
-		}
-      
-		.section.intro .news_items {
-         flex-direction: column;
-         padding: 0 3vw;
-      }
-		.section.intro .site_intro {
-         flex-direction: column;
-         margin-top: 1rem;
-      }
-		.section.intro .site_intro p {
-			font-size: 1.75rem;
-			line-height: 1.35em;
-			letter-spacing: .025em;
-			font-weight: 300;
-			margin: .75rem 0;
-			text-align: center;
-			text-shadow: -1px -1px 1px rgba(0,0,0,0.35);
-		}
-      .main_view .section {
+      .main_view .section {}
+      .main_view .section  .content {
          flex-wrap: wrap;
       }
       .main_view .section + .section {
          margin-top: 2rem;
       }
+      
 		.main_view .section_title {
       }
       
+		.section.site_intro {
+			width: 100%;
+			margin: 5vh auto 0;
+		}
+		.section.site_intro .content {
+         font-size: 1.75rem;         
+      }
+      .section.con_info .content {
+         flex-wrap: wrap;
+      }
+      .section.con_info .section_title {
+         wixth: 100%;
+      }
+      .section.con_info {
+         
+      }
+      
+      .section.news {
+         justify-content: space-between;
+         padding: 0 1rem;
+      }
+      .section.news .news_list {
+         width: 20rem;
+         flex-direction: column;
+         justify-content: space-between;
+      }
+      .section.news {
+         
+      }
+      .section.news .news_items {
+         width: calc(100% - 20rem);
+         flex-direction: column;         
+      }
+      .section.news .news_items .news_item {
+         width: 100%;
+         max-height: 0;
+         overflow: hidden;
+         opacity: 0;
+         transition: opacity .4s, max-height .4s, overflow .4s;
+      }
+      .section.news .news_items .news_item + .news_item {
+         margin-top: 1rem;
+      }
+      .section.news .news_items .news_item.show {
+         max-height: 25rem;
+         overflow: auto;
+         opacity: 1;
+      }
+      
+      
 
+
+
+
+      /*  ---------------------------------------------------------------------------------
+								RESPONSIVE LAYOUT
+			---------------------------------------------------------------------------------  	*/
+		@media (max-width:800px) { /* tablet, large phone */ 
+			
+         .section.intro {
+            justify-content: space-between;
+            width: 100%;
+            margin: 5vh auto 1vw;
+         }
+         
+         .section.intro .news_items,
+         .section.intro .site_intro {
+            width: 100%
+         } 
+         .section.intro .site_intro {
+            margin-top: 2rem;
+         } 
+      
+		}
+		
+		@media (max-width:400px) { /* small phone */ 
+		
+		}
+	
+   
+   
+   
 
 	
+      
 		
 	
 	</style>

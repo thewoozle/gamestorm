@@ -4,22 +4,33 @@
          <span class="title admin_title">News Hub</span>
                
          <section class="section articles">                        
-                        <div class="articles_list">
-                           <div class="article" :class="article.active? 'active' : 'inactive'" v-for="article in allArticles">
-                              <div class="header" @click.prevent="article.show? article.show = false : article.show = true">
-                              {{article.show}}
-                                 <span class="active_icon" :class="article.active? 'active fas fa-circle':'inactive fal fa-power-off'"></span>
-                                 <span class="article_title" v-text="article.article_title"></span>
-                                 <div class="dates">
-                                    <span class="" v-text="article.start_date? 'start: '+date_time(article.start_date) : 'start: auto'"></span>
-                                    <span class="" v-text="article.end_date? 'end: '+ date_time(article.end_date): 'end: open'"></span>
-                                 </div>                                 
-                                 <span class="expand fal " :class="article.show? 'expand fa-arrow-square-up' : 'fa-arrow-square-down'"></span>
-                              </div>   
-                              <div class="article_body" :class="article.show? 'show' : ''" v-html="article.article_body"></div>
-                              <span class="" v-text="article.article_tags"></span>                           
-                           </div >
+            <div class="articles_list">
+               <div class="article" :class="article.active? 'active' : 'inactive'" v-for="article in allArticles">
+                  <div class="header" @click.prevent="article.show? article.show = false : article.show = true">
+                     <div class="content">
+                        <span class="active_icon" :class="article.active? 'active fas fa-circle':'inactive fal fa-power-off'"></span>
+                           <span class="article_title" v-text="article.article_title"></span>
+                           <div class="dates">
+                              <span class="" v-text="article.start_date? 'start: '+date_time(article.start_date) : 'start: auto'"></span>
+                              <span class="" v-text="article.end_date? 'end: '+ date_time(article.end_date): 'end: open'"></span>
+                           </div>
+                           <div class="controls">
+                              <button class="control_button fal" :class="article.active? 'fa-power-off' : 'fa-circle'" v-bind:title="article.active? 'force-deactivate this article' : 'force-activate this article'"></button>
+                              <button class="control_button fal fa-trash-alt"></button>
+                           <button class="control_button">clear</button>
+                           <button class="control_button">edit/save</button>
+                           </div>   
                         </div>
+                        <div class="controls">
+                           <span class="control_button fal " :class="article.show? 'active fa-arrow-square-up' : 'fa-arrow-square-down'"></span>
+                        </div>   
+                     </div>   
+                     <div class="article_body" :class="article.show? 'show' : ''" >
+                        <textarea class="text_box" v-text="article.body" ></textarea>
+                     </div>
+                     <span class="" v-text="article.article_tags"></span>
+               </div >
+            </div>
          </section>
 
 		</div>
@@ -92,8 +103,12 @@
          width: 100%;
          font-weight: bold;
       }
+      .news_hub .articles_list {
+         flex-direction: column;
+      }
       .news_hub .article {
          padding: .5rem;
+         flex-wrap: wrap;
       }
       .news_hub .article + .article{
          margin-top: .5rem;
@@ -109,9 +124,14 @@
       
       .news_hub .article .header {
          display: flex;
+         justify-content: space-between;
+         width: 100%;
          cursor: pointer;
          align-items: center;
          justify-content: space-between;
+      }
+      .news_hub .article .header .content {
+         
       }
       .news_hub .article .article_title {
          display: flex;
@@ -141,14 +161,24 @@
          flex-direction: column;
          font-size: .9rem;
       }
-      .news_hub .article .expand {
+      .news_hub .controls .control_button {
          display: flex;
+         color: var(--lightColor);
+         align-items: center;
+         justify-content: center;
          font-size: 1.5rem;
+         width: 1.5rem;
+         height: 1.5rem;
          margin: 0 .5rem;
+      }
+      .news_hub .controls .control_button.active,
+      .news_hub .controls .control_button:hover {
+         color: var(--button);
       }
       .news_hub .article .article_body {
          max-height: 0;         
          overflow: hidden;
+         width: 100%;
          transition: max-height .3s;
       }
       .news_hub .article .article_body.show {

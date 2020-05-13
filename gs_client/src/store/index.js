@@ -1180,9 +1180,11 @@
       
       set_show_article: (state, postId) =>{        
          var vm = this;
-         Object.entries(state.articles).forEach((article)=>{
+         Object.entries(state.articles).forEach((article) => {
             if(article[1].post_id == postId) {
-               article[1].show_post? article[1].show_post = false : article[1].show_post = true;                
+               article[1].show_post = true;
+            } else {
+               article[1].show_post = false;
             }
          });
       },

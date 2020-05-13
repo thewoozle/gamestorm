@@ -13,8 +13,8 @@
 	}
 	
 	:root {
-		font-size: 14px;
-		font-size: calc(.75vw + .75vh);
+		font-size: 15px;
+		font-size: calc(.8vw + .8vh);
 	}	
 	
 	@media (max-width:1024px)  { 
@@ -40,6 +40,7 @@
 		box-sizing:         border-box;  
 	}	
 	h1, h2, h3, p  {   text-align: left; orphans: 3;widows: 3;  }
+   p { font-size: inherit; }
 	h2, h3 { page-break-after: avoid;  }
 	a { outline: none; text-decoration: none; cursor: pointer; color: #0000FF; font-size: inherit;}
 	a:hover {text-decoration: none;	}
@@ -86,14 +87,13 @@
 		visibility: visible;
 		transition: opacity .4s;
 		margin: 0;
-		font-size: 13px;
 	}
 	body.preload {
 		visibility: hidden
 	}
     /* makes font-size consistent, set font size with percentages*/
     * { 
-		font-size: 1rem; 
+		font-size: 1.15rem; 
 		*font-size:small; 
 		*font:x-small; 
 		line-height: 1.22em;

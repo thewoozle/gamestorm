@@ -317,20 +317,20 @@
             
             setTimeout(()=> {
                if(user.activity_timer > timeout) {
+                  console.log('reset');
                   user = {};
-                  console.log('logout at: '+ (parseInt(user.activity_timer)/1000) +' seconds');
+                  //console.log('logout at: '+ (parseInt(user.activity_timer)/1000) +' seconds');
                   vm.$store.dispatch('update_user_events', null);
                } else {
                   user.activity_timer = parseInt(user.activity_timer) + (timer);
-                  console.log((parseInt(user.activity_timer)/1000)+' secs');
+                  //console.log((parseInt(user.activity_timer)/1000)+' secs');
                }
                
                vm.$store.dispatch('update_user', user).then(()=>{
-                  vm.$forceUpdate();
-                  vm.reset_activity_timer();                  
+                  vm.reset_activity_timer();
+                  vm.$forceUpdate();             
                });
-               
-            }, (timer));
+            }, (timeout));
             
          },   
          

@@ -921,8 +921,12 @@
 			min-width: 20rem;
 		}
 		/*	------	DATE BULLET	------	*/
-		.date_bullet {
-			
+      .news_date .title {
+         align-items: center;
+         padding: 0 .65rem;
+         flex-wrap: wrap;
+      }
+		.date_bullet {			
 			flex-wrap: wrap;
 			align-items: center;
 			width: 3rem;
@@ -1021,88 +1025,11 @@
 		}
 
 		/*	------	NEWS ITEMS	------	*/
-		.news_items {
-			
+		.news_items {			
 			flex-direction: column;		
 		}
-		.news_items .news_item {			
-			width:  100%;
-         position: relative;
-			padding: 0 .5rem;
-         justify-content: space-between;
-		}
-		.news_items .news_item + .news_item {	
-         margin-top: 1rem;
-         padding-top: .6rem;
-         border-top: solid 1px var(--borderColor);
-      }
-		.news_items .news_date {
-         width: 3rem;
-			justify-content: space-between;
-			background: rgba(0,0,0,.1);
-			cursor: pointer;
-			align-items: center;
-			height: 3rem;
-			color: var(--highlightColor);
-			font-weight: 100;		
-		}
-		.news_items .news_date:hover {
-			color: var(--glowColor);
-		}
-		.news_items .news_item .title {
-			padding: 0 1rem;
-			flex-wrap: wrap;
-			justify-content: flex-start;
-			text-align: left;
-			line-height: 1em;
-         font-size: 1.35rem;
-         color: var(--highlightColor);
-			width: calc(100% - 3rem);
-			font-weight: 300;
-		}
       
-		.news_items .article_button {
-         position: absolute;
-            top: 0;
-            right: 0;
-            z-index: 10;
-         display: flex;
-         margin: .65rem;
-         justify-content: center;
-         align-items: center;
-         font-size: 2.5rem;
-         width: 1em;
-         height: 1em;
-         cursor: pointer;
-         border-radius: .25em;
-         background: rgba(0,118,163,.4);
-         color: var(--titleColor);
-      }
-		.news_items .article_button:hover {
-         background: rgba(0,0,0,0.1);
-      }
-		
-		.news_items .news_article {
-         flex-wrap: wrap;
-         padding: .5rem 1rem;
-         width: 100%;
-		}
-		.news_items .news_article .content {
-         margin-top: 0;
-         max-height: 0;
-         flex-wrap: wrap;
-         overflow: hidden;
-         transition: max-height .4s, margin .4s, opacity .4s
-      }
-		.news_items .news_article.show .content {
-         margin-top: .5rem;
-         max-height: 10rem;
-         overflow-Y: auto;
-         opacity: 1;
-      }
-		.news_items .news_article .content p {
-         margin: .5rem 0;
-      }
+      
 		
 		
 		/*	------	HEADER NAVIGATION		-----	*/
