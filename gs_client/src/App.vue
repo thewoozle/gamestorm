@@ -433,13 +433,11 @@
 	}
 	
       
-		.section_title {
-			
+		.section_title {			
          justify-content: flex-start;
 			width: 100%;
 			font-size: 2rem;
 			line-height: 1.5em;
-			font-weight: 600;
 			text-transform: uppercase;
 			padding: 0 0 0 25px;
 			color: var(--titleColor);		
@@ -920,10 +918,37 @@
 			margin: 1rem auto;
 			min-width: 20rem;
 		}
-		/*	------	DATE BULLET	------	*/
+		/*	------	ARTICLE BUTTON AND DATE BULLET	------	*/
+      
+      .article_button {
+         cursor: pointer;
+         align-items: center;
+         background: #325840;
+         border-radius: .5rem;
+         padding: .5rem 0 .5rem .5rem;
+         box-shadow: 1px 1px 2px rgba(0,0,0,0.25);
+         transition: transform .4s, color .4s, margin .4s, width .4s;
+      }
+      .article_button.open,
+      .article_button:hover {
+         color: var(--passColor);
+      }
+      .article_button.open {
+         transform: scale(1.1);
+         margin-left: 5%;
+         width: 90%;
+         background: none;
+         box-shadow: none;
+      }
+      .article_button + .article_button { 
+         margin-top: 1rem;
+         padding-top: .25rem;
+      }
+      
       .news_date .title {
          align-items: center;
          padding: 0 .65rem;
+         max-width: calc(100% - 4rem);
          flex-wrap: wrap;
       }
 		.date_bullet {			
@@ -932,36 +957,49 @@
 			width: 3rem;
 			height: 3rem;
 			border-radius: 50%;
-			background: var(--button);
-			color: var(--titleColor);
+			background: rgba(122,220,138,.65);
+			color: inherit;
 			text-shadow: -1px -1px 1px rgba(0,0,0,.1);
-			border: solid 1px var(--backgroundColor);
+         box-shadow: 1px 1px 1px rgba(11,79,22,0.35);
 		}
-		.date_bullet.active {
-			background: var(--passColor);
-			color: #fff;
+      
+		.article_button.open .date_bullet {
+			background: none;
+			color: inherit;
+         box-shadow: none;
 		}
+      
+		.date_bullet .day,
 		.date_bullet .month {
-			
-			font-size: .7rem;
 			line-height: 1rem;
 			width: 100%;
 			height: 50%;
-			align-items: flex-end;
+			align-items: center;
 			justify-content: center;
+         transition: color .4s;         
+      }
+		.date_bullet .month {			
+			font-size: .7rem;
+         padding-top: .25rem;
 			text-transform: uppercase;
 		}
-		.date_bullet .day {
-			
-			width: 100%;
-			height: 50%;
-			align-items: flex-start;
-			line-height: 1rem;
-			padding-top: .1rem;
+		.date_bullet .day {	
+			padding-bottom: .5rem;
 			letter-spacing: .05em;
-			justify-content: center;
 			font-size: 1.25rem;
 		}
+      
+      .article_button .arrow {
+         font-size: 3rem;
+         opacity: 0;
+         margin-left: auto;
+         transition: opacity .4s;
+      }
+      .article_button.open .arrow {
+         opacity: 1;
+      }
+      
+      
 		
 		/*	------	INFO ELEMENT	------	*/
 		.info_elements {

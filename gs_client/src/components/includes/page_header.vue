@@ -25,7 +25,6 @@
 								<router-link :to="'/my_convention'" class="button" >My Convention</router-link>		
 								<router-link v-if="user.permissions && user.permissions.admin > 0" :to="'/admin'" class="button" >Admin</router-link>								
 								<button type="button" class="button" @click.prevent="logout">Sign Out</button>
-                        {{user.uuid}}
 						</div>						
 					</div>
 					

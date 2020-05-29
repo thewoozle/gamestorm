@@ -13,6 +13,7 @@
                
                <div class="panel_display">
                   <div class="buttons">
+                     <button type="button" v-if="user.permissions.admin >=5" class="button" :class="siteSetting== 'page_content'? 'active' : ''" @click="siteSetting = 'pageContent'">Page Content</button>
                      <button type="button" v-if="user.permissions.admin >=3" class="button" :class="siteSetting== 'conventions'? 'active' : ''" @click="siteSetting = 'conventions'">Conventions</button>
                      <button type="button" v-if="user.permissions.admin >=3" class="button" :class="siteSetting== 'venues'? 'active' : ''" @click="siteSetting = 'venues'">Venues</button>
                      <button type="button" v-if="user.permissions.admin >=5" class="button" :class="siteSetting== 'users'? 'active' : ''" @click="siteSetting = 'users'">Users</button>
@@ -22,10 +23,53 @@
                   
                   <div class="panels">
                   
+                  
+                  <!--  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                         PAGE CONTENT 
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            -->
+                     <div class="panel page_content" :class="siteSetting == 'pageContent'? 'show' : ''" v-if="siteSetting == 'pageContent'">   
+                           <span class="title">Entries</span>
+                           <div class="contents">
+                              <header class="titles">
+                                 <div class="content_info">
+                                    <span class="title content_title" >Content Name / Page</span>
+                                 </div>   
+                                 <span class="title content_description">Content Description</span>   
+                              </header>
+                              <div class="content_elements">
+                                 <div class="content_element" v-if="pageContent" v-for="content in pageContent">
+                                    <div class="content_info">
+                                       <span class="content_title"  >
+                                          <span class="text">Name: </span>
+                                          <span class="value" ></span>
+                                       </span>
+                                       <span class="page_name" v-text="'Page: '+content.page_name">
+                                          <span class="text">Page: </span>
+                                          <span class="value" v-text="content.page_name"></span>
+                                       </span>
+                                       <span class="content_active">
+                                          <span class="text">Active: </span> 
+                                          <button class="control_button value fal" :class="content.content_active? 'fa-circle' : 'fa-ban'" title="deactivate"  ></button>
+                                       </span>
+                                       <span class="content_edit">
+                                          <span class="text">Edit: </span>
+                                          <button class="control_button active fal fa-edit" title="deactivate"  ></button>
+                                       </span>
+                                    </div>
+                                    <div class="content_description">
+                                       <div class="content_content" v-html="content.content"></div>
+                                    </div>
+                                 </div>
+                              </div>   
+                           </div>
+                     </div>
+                     
+                     
+                  
                   <!--  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                          CONVENTIONS 
                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            -->
-                     <div class="panel conventions" v-if="siteSetting == 'conventions'">
+                     <div class="panel conventions" :class="siteSetting == 'conventions'? 'show' : ''"  v-if="siteSetting == 'conventions'">
                      
                         <div class="slideout" :class="showConventionSlideout? 'show' : ''">
                         
@@ -207,7 +251,7 @@
                   <!--  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                          VENUES 
                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            -->
-                     <div class="panel venues"  v-if="siteSetting == 'venues'">
+                     <div class="panel venues" :class="siteSetting == 'venues'? 'show' : ''"   v-if="siteSetting == 'venues'">
                         <div class="" v-for="venue in venues" >
                            <span class="" v-text="venue.venue_name"></span>
                            <button class="control_button fa-circle" v-bind:class="venue.active? 'fas' : 'fal' " v-bind:title="venue.active? 'deactivate' : 'activate'"></button>
@@ -222,7 +266,7 @@
                   <!--  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                          USERS 
                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            -->
-                     <div class="panel users" v-if="siteSetting == 'users'">
+                     <div class="panel users"  :class="siteSetting == 'users'? 'show' : ''" v-if="siteSetting == 'users'">
                         <p>USERS</p>
                         <p>searchable user list with password reset edit info fields, and permissions links</p>
                         <p>show all users with default filter of most recent 10. [ Search box ] <br />
@@ -239,7 +283,7 @@
                   <!--  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                          ADMIN PERMISSIONS 
                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            -->
-                     <div class="panel permissions" v-if="siteSetting == 'permissions'">
+                     <div class="panel permissions" :class="siteSetting == 'permissions'? 'show' : ''"  v-if="siteSetting == 'permissions'">
                         <p>USER PERMISSIONSfor admins, departments, and other access</p>
                         <p>show all admin users buttons: [ admin ] [ manager ] [ scheduler ] </br>
                            admin user options: [ change status ] [ set department ] [ demote ]
@@ -305,7 +349,7 @@
                   <!--  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                          MESSAGES
                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            -->
-                     <div class="panel messages" v-if="siteSetting == 'messages'" :class="allUsers? 'show' : ''">
+                     <div class="panel messages" v-if="siteSetting == 'messages'"  :class="siteSetting == 'messages'? 'show' : ''" >
                         <span class="title">MESSAGES</span>
                         <div class="buttons message_buttons">
                            <button class="button" :class="userFilter == 'all'? 'selected' : ''" @click.prevent="set_filtered_users('all')" >All users</button>
@@ -377,7 +421,7 @@
                editVenue               : {},
                showConventionDetails   : null,
                showConventionSlideout  : false,
-               siteSetting             : "conventions",
+               siteSetting             : "pageContent",
                userFilter              : null,
                formErrors              : {},
                filteredUsers           : [],
@@ -403,6 +447,7 @@
                conventions       : 'conventions',
                venues            : 'venues',
                adminPermissions  : 'adminPermissions',
+					pageContent 	   : 'pageContent',
                allArticles       : 'allArticles',
                messages          : 'messages',
                allUsers          : 'allUsers',
@@ -674,6 +719,82 @@
          transition: max-height .3s, right .6s;
       }
       
+      
+      /* ---   PAGE CONTENT ---  */
+      .panel.page_content  {
+         background: none;     
+         padding: 1rem;
+         overflow: visible;
+         flex-wrap: wrap;
+      }
+      .panel.page_content .contents  {
+         width: 100%;
+         flex-direction: column;
+         max-height: calc(100% - 3rem);
+      }
+      .panel.page_content .content_elements {
+         overflow: hidden;
+         overflow-Y: auto;
+         flex-direction: column;   
+         margin-top: 1rem;
+      }
+      .panel.page_content .content_element {
+         width: 100%;
+         flex-wrap: wrap;
+      }
+      .panel.page_content .titles {
+         flex-wrap: nowrap;
+         justify-content: space-between;
+         height: 2rem;
+         align-items: flex-start;
+      }
+      
+      .panel.page_content  .page_name,
+      .panel.page_content  .content_active,
+      .panel.page_content  .content_title {
+         width: 12rem;
+      }
+      .panel.page_content  .content_info .text {
+         width: 4rem;
+         justify-content: flex-end;
+         flex-wrap: nowrap;
+      }
+      .panel.page_content  .content_title .value {
+         padding-left: .35rem;
+      }
+      .panel.page_content  .titles .title {
+         font-weight: bold;
+         font-size: 1.25rem;
+      }
+      .panel.page_content  .titles .content_description {
+         margin: 0 auto;
+      }
+      .panel.page_content .titles .content_active {
+         height: 2rem;
+         align-items: center;
+      }
+      
+      .panel.page_content  .page_name {
+         width: 10rem;
+      }
+      .panel.page_content .content_content {}
+      .panel.page_content .content_info {
+         width: 30%;
+         flex-direction: column;
+      }
+      .panel.page_content .content_descriptions {
+         width: 70%;
+         flex-wrap: wrap;      
+      }
+      .panel.page_content .content_element .content_description {
+         height: 5rem;
+         transform: scale(.65);
+         overflow: hidden;
+      }
+      
+      
+      
+      /* ---   MESSAGES ---  */
       .panel.messages .message_buttons {
          flex-wrap: wrap;
          flex-direction: row;

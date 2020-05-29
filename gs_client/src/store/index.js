@@ -1168,6 +1168,7 @@
       
       // SET NEWS ARTICLES 
       set_news_articles: (state, articles) => {
+         articles[0].show_post = true;
          Vue.set(state, 'articles', articles);
       },
       set_all_articles: (state, articles) => {
